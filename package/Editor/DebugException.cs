@@ -77,7 +77,7 @@ namespace Demystify.DebugPatch
 			// https://regex101.com/r/rv7QXz/2
 			// @"(?<type>ref|out|async|string|bool|void|object|byte|int|long)",
 			@"at ((?<new>new)|(((?<return_tuple>\(.*\))|((?<async>async)?( ?(?<return_type>.*?))))) )?((?<namespace>.*) ?(\.|\+))?(?<class>.*?)\.(?<method_name>.+?)(?<params>\(.*?\))\+?(((?<func>\(.*?\) => {.*}))|((?<local_func>.*?)\((?<local_func_params>.*)\)))?",
-			// @"(?<exception>.*?\w*Exception:.+)",
+			@"(?<exception>.*?\w*Exception:.+)",
 			// @"(?<method_name>\w+?)(?<generic_type><.*?>)(\+)?|((?<empty_brackets>\(\))|(?<params>\(.*?\)))(\+)?(?<lambda>\(.*?\) => {.*?})?",
 			// @"(?<type>(<.+?>))",
 			// @"((?<constructor>new\s\w+?)[\.\s])",
@@ -85,17 +85,18 @@ namespace Demystify.DebugPatch
 
 		private static readonly Dictionary<string, string> theme = new Dictionary<string, string>()
 		{
-			{"new", "#ffcc99"},
-			{"return_tuple", "#66ffff"},
-			{"async", "#ff8888"},
-			{"return_type", "#66ffff"},
-			{"namespace", "#999999"},
-			{"class", "#669955"},
-			{"method_name", "#33ff88"},
-			{"params", "#66ffff"},
-			{"func", "#55ff33"},
-			{"local_func", "#ffff00"},
-			{"local_func_params", "#ffff00"},
+			{"new", "#F5D96A"},
+			{"async", "#63FFF2"},
+			{"return_tuple", "#63FFF2"},
+			{"return_type", "#63FFF2"},
+			{"namespace", "#B3B3B3"},
+			{"class", "#FFFFFF"},
+			{"method_name", "#63FFF2"},
+			{"params", "#63FFF2"},
+			{"func", "#B09BDD"},
+			{"local_func", "#B09BDD"},
+			{"local_func_params", "#B09BDD"},
+			{"exception", "#ff3333"},
 		};
 
 		private static readonly Lazy<string> Pattern = new Lazy<string>(() =>
@@ -105,57 +106,39 @@ namespace Demystify.DebugPatch
 			return allPatterns;
 		});
 
-		// private static List<string> cache = new List<string>();
 
 		private static void AddBasicSyntaxHighlighting(ref string line)
 		{
 			static string Eval(Match m)
 			{
 				var str = m.Value;
-				// var l = "";
-
-
-				if (m.Groups.Count > 1)
+				
+				if (m.Groups.Count <= 1) return str;
+				for (var index = m.Groups.Count - 1; index >= 1; index--)
 				{
-					// Debug.Log(m.Groups[0]);
-					// int inserted = 0;
-					for (var index = m.Groups.Count - 1; index >= 1; index--)
+					var @group = m.Groups[index];
+					if (string.IsNullOrWhiteSpace(@group.Value) || string.IsNullOrEmpty(@group.Name)) continue;
+					if (theme.TryGetValue(@group.Name, out var col))
 					{
-						var @group = m.Groups[index];
-						// Debug.Log(str + " -> " + @group.Value + " - " + @group.Name);
-						if (string.IsNullOrWhiteSpace(@group.Value) || string.IsNullOrEmpty(group.Name)) continue;
-						// skip numbers only
-						// if (str.Substring(group.Index, group.Length).Contains("<color=")) continue;
-						// if(!l.Contains(group.Value))
-						// 	l = group + l;
-						if (theme.TryGetValue(@group.Name, out var col))
-						{
-							// var start = group.Index - inserted;
-							// if (start < 0) continue;
-							// var portion = str.Substring(start, group.Length);
-							// Debug.Assert(portion == group.Value);
-							var prefix = "<color=" + col + ">";
-							var postfix = "</color>";
-							// str = str.Substring(0, start) + prefix + portion + postfix + str.Substring(start + portion.Length);
-							// inserted += prefix.Length + postfix.Length;
-							str = str.Replace(@group.Value, prefix + @group.Value + postfix);
-						}
-#if UNITY_DEMYSTIFY_DEV
-						else
-						{
-							if (int.TryParse(group.Name, out _)) continue;
-							if (!string.IsNullOrWhiteSpace(group.Name) && group.Name.Length > 1)
-								Debug.LogWarning("Missing color entry for " + @group.Name + ", matched for " + @group);
-						}
-#endif
+						var replaced = false;
+						str = Regex.Replace(@str, Regex.Escape(@group.Value),
+							m =>
+							{
+								if (replaced) return m.Value;
+								replaced = true;
+								return "<color=" + col + ">" + @group.Value + "</color>";
+							},
+							RegexOptions.Compiled);
 					}
+#if UNITY_DEMYSTIFY_DEV
+					else
+					{
+						if (int.TryParse(@group.Name, out _)) continue;
+						if (!string.IsNullOrWhiteSpace(@group.Name) && @group.Name.Length > 1)
+							Debug.LogWarning("Missing color entry for " + @group.Name + ", matched for " + @group);
+					}
+#endif
 				}
-
-				// if (!cache.Contains(l))
-				// {
-				// 	cache.Add(l);
-				// 	Debug.Log(l);
-				// }
 
 				return str;
 			}
