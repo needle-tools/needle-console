@@ -3,9 +3,9 @@ using UnityEngine;
 
 namespace Demystify.DebugPatch
 {
-	public static class StacktraceHandler
+	public static class UnityDemystify
 	{
-		public static void ApplyModules(ref string stacktrace)
+		public static void Apply(ref string stacktrace)
 		{
 			try
 			{
