@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text.RegularExpressions;
+using UnityEditor;
 using UnityEngine;
 
 namespace Demystify.DebugPatch
@@ -37,10 +39,15 @@ namespace Demystify.DebugPatch
 		private static readonly Lazy<string> Pattern = new Lazy<string>(() =>
 		{
 			var allPatterns = string.Join("|", patterns);
-			Debug.Log("<b>Patterns</b>: " + allPatterns);
+			// this is just to give patching time to being loaded to add syntax highlighting to this call too :)
+			void NextFrame()
+			{
+				Debug.Log("<b>Patterns</b>: " + allPatterns);
+				EditorApplication.update -= NextFrame;
+			}
+			EditorApplication.update += NextFrame;
 			return allPatterns;
 		});
-
 
 		public static void AddSyntaxHighlighting(ref string line)
 		{

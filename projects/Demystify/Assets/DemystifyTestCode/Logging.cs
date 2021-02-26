@@ -1,18 +1,29 @@
-﻿using UnityEditor;
-using UnityEngine;
+﻿using System.Diagnostics;
+using UnityEditor;
+using Debug = UnityEngine.Debug;
 
 namespace Demystify._Tests
 {
 	public class Logging
 	{
 		
-		private static bool once = false;
-
 		[MenuItem("Test/Log")]
-		private static void Test()
+		private static void Log()
 		{
-			once = false;
-			Debug.Log("hello"); 
+			Debug.Log("hello");
+		}
+		
+		[MenuItem("Test/LogWarning")]
+		private static void Warning()
+		{
+			Debug.LogWarning("hello");
+		}
+		
+		
+		[MenuItem("Test/LogError")]
+		private static void Error()
+		{
+			Debug.LogError("hello");
 		}
 		
 	}
