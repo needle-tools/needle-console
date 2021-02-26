@@ -1,0 +1,3 @@
+[submodule "thirdparty/demystifier"]
+	path = thirdparty/demystifier
+	url = https://github.com/needle-tools/Ben.Demystifier
