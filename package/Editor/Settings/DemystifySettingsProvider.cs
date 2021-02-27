@@ -62,9 +62,16 @@ namespace needle.demystify
 			}
 		}
 
+		private static bool SyntaxHighlightSettingsThemeFoldout
+		{
+			get => SessionState.GetBool("Demystify.SyntaxHighlightingThemeFoldout", true);
+			set => SessionState.SetBool("Demystify.SyntaxHighlightingThemeFoldout", value);
+		}
+
 		private static void DrawSyntaxGUI(DemystifySettings settings)
 		{
-			// settings.UseSyntaxHighlighting = EditorGUILayout.ToggleLeft("Syntax Highlighting", settings.UseSyntaxHighlighting);
+			EditorGUILayout.Space(10);
+			EditorGUILayout.LabelField("Syntax Highlighting", EditorStyles.boldLabel);
 			EditorGUI.BeginChangeCheck();
 			settings.SyntaxHighlighting = (Highlighting) EditorGUILayout.EnumPopup("Syntax Highlighting", settings.SyntaxHighlighting);
 			if (EditorGUI.EndChangeCheck())
@@ -74,22 +81,23 @@ namespace needle.demystify
 				var theme = settings.CurrentTheme;
 				if (theme != null)
 				{
-					EditorGUILayout.BeginHorizontal();
-					EditorGUILayout.LabelField(theme.Name, EditorStyles.boldLabel);
-					GUILayout.FlexibleSpace();
-					EditorGUILayout.EndHorizontal();
-					
-					EditorGUI.BeginChangeCheck();
-					var currentPattern = SyntaxHighlighting.CurrentPatternsList;
-					for (var index = 0; index < theme.Entries?.Count; index++)
+					SyntaxHighlightSettingsThemeFoldout = EditorGUILayout.Foldout(SyntaxHighlightSettingsThemeFoldout, "Theme: " + theme.Name);
+					if (SyntaxHighlightSettingsThemeFoldout)
 					{
-						var entry = theme.Entries[index];
-						var usedByCurrentRegex = currentPattern.Any(e => e.Contains(entry.Key));
-						if (!usedByCurrentRegex) continue;
-						// using(new EditorGUI.DisabledScope(!usedByCurrentRegex))
+						EditorGUI.indentLevel++;
+						EditorGUI.BeginChangeCheck();
+						var currentPattern = SyntaxHighlighting.CurrentPatternsList;
+						for (var index = 0; index < theme.Entries?.Count; index++)
 						{
-							entry.Color = EditorGUILayout.ColorField(entry.Key, entry.Color);
+							var entry = theme.Entries[index];
+							var usedByCurrentRegex = currentPattern.Any(e => e.Contains(entry.Key));
+							if (!usedByCurrentRegex) continue;
+							// using(new EditorGUI.DisabledScope(!usedByCurrentRegex))
+							{
+								entry.Color = EditorGUILayout.ColorField(entry.Key, entry.Color);
+							}
 						}
+						EditorGUI.indentLevel--;
 					}
 
 					if (EditorGUI.EndChangeCheck())
@@ -98,21 +106,22 @@ namespace needle.demystify
 					}
 				}
 
-				EditorGUILayout.BeginHorizontal();
-				if (GUILayout.Button("Print Highlighted Log"))
+				if (SyntaxHighlightSettingsThemeFoldout)
 				{
-					var str = GUIUtils.SyntaxHighlightVisualization;
-					ApplySyntaxHighlightingMultiline(ref str);
-					var p = settings.SyntaxHighlighting;
-					settings.SyntaxHighlighting = Highlighting.None;
-					Debug.Log("Example Log: " + "\n\n" + str + "\n\n--------\n");
-					settings.SyntaxHighlighting= p;
+					EditorGUILayout.Space(5);
+					EditorGUILayout.BeginHorizontal();
+					GUILayout.FlexibleSpace();
+					if (GUILayout.Button(new GUIContent("Log Highlighted Message", "For testing when changing colors only")))
+					{
+						var str = GUIUtils.SyntaxHighlightVisualization;
+						ApplySyntaxHighlightingMultiline(ref str);
+						var p = settings.SyntaxHighlighting;
+						settings.SyntaxHighlighting = Highlighting.None;
+						Debug.Log("Example Log: " + "\n\n" + str + "\n\n--------\n");
+						settings.SyntaxHighlighting= p;
+					}
+					EditorGUILayout.EndHorizontal();
 				}
-				// if (GUILayout.Button("Copy Theme"))
-				// {
-				// }
-				// GUILayout.FlexibleSpace();
-				EditorGUILayout.EndHorizontal();
 				
 				// if (GUILayout.Button("Reset Theme"))
 				// {
