@@ -22,10 +22,7 @@ namespace Needle.Demystify
 				                 "Disabled Patches:\n" +
 				                 string.Join("\n", Patches().Where(p => !PatchManager.IsPersistentEnabled(p))) + "\n"
 				                 );
-				return;
 			}
-
-			Enable();
 		}
 
 		internal static IEnumerable<string> Patches()
