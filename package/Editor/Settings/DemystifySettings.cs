@@ -13,11 +13,12 @@ namespace Needle.Demystify
 		Complex = 2,
 	}
 
-	[FilePath("ProjectSettings/UnityDemystifySettings.asset", FilePathAttribute.Location.ProjectFolder)]
+	[FilePath("ProjectSettings/DemystifySettings.asset", FilePathAttribute.Location.ProjectFolder)]
 	internal class DemystifySettings : ScriptableSingleton<DemystifySettings>
 	{
 		internal void Save()
 		{
+			Undo.RegisterCompleteObjectUndo(this, "Save Demystify Settings");
 			base.Save(true);
 		}
 		
