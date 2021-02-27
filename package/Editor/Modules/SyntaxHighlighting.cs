@@ -100,7 +100,10 @@ namespace Needle.Demystify
 		{
 			if (string.IsNullOrEmpty(pattern)) return;
 			
-			static string Eval(Match m)
+#if !UNITY_2019_4
+			static 
+#endif
+			string Eval(Match m)
 			{
 				if (m.Groups.Count <= 1) return m.Value;
 				var str = m.Value;
@@ -118,9 +121,9 @@ namespace Needle.Demystify
 						{
 							var replaced = false;
 							str = Regex.Replace(@str, Regex.Escape(@group.Value),
-								m =>
+								m1 =>
 								{
-									if (replaced) return m.Value;
+									if (replaced) return m1.Value;
 									replaced = true;
 									// return group.Value;
 									return "<color=" + col + ">" + @group.Value + "</color>";
