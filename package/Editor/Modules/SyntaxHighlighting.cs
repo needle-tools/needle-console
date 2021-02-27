@@ -124,6 +124,8 @@ namespace Needle.Demystify
 								m1 =>
 								{
 									if (replaced) return m1.Value;
+									if (m1.Index != group.Index) 
+										return m1.Value;
 									replaced = true;
 									// return group.Value;
 									return "<color=" + col + ">" + @group.Value + "</color>";
@@ -145,7 +147,7 @@ namespace Needle.Demystify
 				return str;
 			}
 
-			line = Regex.Replace(line, pattern, Eval, RegexOptions.Compiled | RegexOptions.Singleline);
+			line = Regex.Replace(line.TrimStart(), pattern, Eval, RegexOptions.Compiled | RegexOptions.Singleline);
 		}
 		
 		
