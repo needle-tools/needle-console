@@ -18,9 +18,7 @@ namespace Needle.Demystify
 		{
 			base.Save(true);
 		}
-
-		public bool IsEnabled = true;
-
+		
 		public bool DevelopmentMode
 		{
 			get => SessionState.GetBool("Demystify.DevelopmentMode", false);

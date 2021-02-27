@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using needle.EditorPatching;
 using UnityEditor;
 using UnityEngine;
@@ -12,12 +13,18 @@ namespace Needle.Demystify
 		[RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
 		private static void Init()
 		{
-			var settings = DemystifySettings.instance;
-			if (!settings.IsEnabled)
+			if (!Patches().All(PatchManager.IsPersistentEnabled) && Patches().Any(PatchManager.IsPersistentEnabled))
 			{
-				Disable();
+				Debug.LogWarning("Not all Demystify patches are enabled. Go to " + DemystifySettingsProvider.SettingsPath +
+				                 " and enable or disable Demystify.\n" +
+				                 "Enabled Patches:\n" +
+				                 string.Join("\n", Patches().Where(PatchManager.IsPersistentEnabled)) + "\n\n" +
+				                 "Disabled Patches:\n" +
+				                 string.Join("\n", Patches().Where(p => !PatchManager.IsPersistentEnabled(p))) + "\n"
+				                 );
 				return;
 			}
+
 			Enable();
 		}
 
@@ -26,19 +33,15 @@ namespace Needle.Demystify
 			yield return typeof(Patch_Exception).FullName;
 			yield return typeof(Patch_StacktraceUtility).FullName;
 		}
-		
+
 		public static void Enable()
 		{
-			var settings = DemystifySettings.instance;
-			settings.IsEnabled = true;
 			foreach (var p in Patches())
 				PatchManager.EnablePatch(p);
 		}
 
 		public static void Disable()
 		{
-			var settings = DemystifySettings.instance;
-			settings.IsEnabled = false;
 			foreach (var p in Patches())
 				PatchManager.DisablePatch(p);
 		}

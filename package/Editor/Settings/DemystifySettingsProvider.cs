@@ -9,13 +9,14 @@ namespace Needle.Demystify
 {
 	public class DemystifySettingsProvider : SettingsProvider
 	{
+		public const string SettingsPath = "Project/Needle/Demystify";
 		[SettingsProvider]
 		public static SettingsProvider CreateDemystifySettings()
 		{
 			try
 			{
 				DemystifySettings.instance.Save();
-				return new DemystifySettingsProvider("Project/Needle/Demystify", SettingsScope.Project);
+				return new DemystifySettingsProvider(SettingsPath, SettingsScope.Project);
 			}
 			catch (System.Exception e)
 			{
@@ -50,7 +51,7 @@ namespace Needle.Demystify
 			using (var s = new EditorGUILayout.ScrollViewScope(scroll))
 			{
 				scroll = s.scrollPosition;
-				DrawActivateGUI();
+				DrawActivateGUI(settings);
 
 				DrawSyntaxGUI(settings);
 
@@ -152,17 +153,21 @@ namespace Needle.Demystify
 			}
 		}
 
-		private static void DrawActivateGUI()
+		private static void DrawActivateGUI(DemystifySettings settings)
 		{
 			if (!UnityDemystify.Patches().All(PatchManager.IsActive))
 			{
-				if (GUILayout.Button("Enable Demystify"))
+				if (GUILayout.Button(new GUIContent("Enable Demystify", 
+					"Enables patches:\n" + string.Join("\n", UnityDemystify.Patches())
+				)))
 					UnityDemystify.Enable();
 				EditorGUILayout.HelpBox("Demystify is disabled, click the Button above to enable it", MessageType.Info);
 			}
 			else
 			{
-				if (GUILayout.Button("Disable Demystify"))
+				if (GUILayout.Button(new GUIContent("Disable Demystify", 
+					"Disables patches:\n" + string.Join("\n", UnityDemystify.Patches())
+					)))
 					UnityDemystify.Disable();
 			}
 		}

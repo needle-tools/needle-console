@@ -12,7 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e6c7fe2ee926422b8ad6af512a6a1695, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  IsEnabled: 1
   FixHyperlinks: 1
   SyntaxHighlighting: 2
   Theme:
