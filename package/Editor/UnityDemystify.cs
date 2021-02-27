@@ -68,10 +68,13 @@ namespace Needle.Demystify
 					if (fixHyperlinks && !string.IsNullOrEmpty(path))
 						str += ")" + path;
 
+					Filepaths.TryMakeRelative(ref str);
+
 					str += "\n";
 				}
 
-				stacktrace = str;
+				if(!string.IsNullOrWhiteSpace(str))
+					stacktrace = "---\n" + str;
 			}
 			catch
 				// (Exception e)

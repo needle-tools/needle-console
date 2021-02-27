@@ -5,17 +5,17 @@ using UnityEngine;
 [ExecuteAlways]
 public class DoStuffThatFails : MonoBehaviour
 {
-    public Object Reference;
+	public Object Reference;
 
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
+	// Start is called before the first frame update
+	void Start()
+	{
+	}
 
-    // Update is called once per frame
-    void Update()
-    {
-        Debug.Log(Reference.name);
-    }
+	// Update is called once per frame
+	void Update()
+	{
+		if (Application.isPlaying)
+			Debug.Log(Reference.name);
+	}
 }
