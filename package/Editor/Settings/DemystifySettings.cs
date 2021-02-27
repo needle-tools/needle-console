@@ -22,18 +22,14 @@ namespace needle.demystify
 			base.Save(true);
 		}
 
-		public DemystifySettings()
-		{
-			DelayedInit();
-		}
-
+		public bool IsEnabled = true;
 		public bool DevelopmentMode = false;
 		public bool FixHyperlinks = true;
 		public Highlighting SyntaxHighlighting = Highlighting.Complex;
 		public bool UseSyntaxHighlighting => SyntaxHighlighting != Highlighting.None;
 
-		[SerializeField] 
-		private Theme Theme;
+		[SerializeField] private Theme Theme;
+
 		public Theme CurrentTheme
 		{
 			get
@@ -57,11 +53,12 @@ namespace needle.demystify
 				CurrentTheme.SetActive();
 		}
 
-		private async void DelayedInit()
+		[InitializeOnLoadMethod]
+		[RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
+		private static void Init()
 		{
-			await Task.Delay(1);
-			if (CurrentTheme.EnsureEntries())
-				Theme.SetActive();
+			instance.CurrentTheme.EnsureEntries();
+			instance.CurrentTheme.SetActive();
 		}
 	}
 
@@ -77,6 +74,7 @@ namespace needle.demystify
 
 		internal void SetActive()
 		{
+			// Debug.Log("Activate");
 			if (this.Entries.Count >= 0)
 			{
 				SyntaxHighlighting.CurrentTheme.Clear();

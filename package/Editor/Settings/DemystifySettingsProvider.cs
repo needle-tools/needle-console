@@ -140,24 +140,16 @@ namespace needle.demystify
 
 		private static void DrawActivateGUI()
 		{
-			static IEnumerable<string> Patches()
+			if (!UnityDemystify.Patches().All(PatchManager.IsActive))
 			{
-				yield return typeof(Patch_Exception).FullName;
-				yield return typeof(Patch_StacktraceUtility).FullName;
-			}
-
-			if (!Patches().All(PatchManager.IsActive))
-			{
-				EditorGUILayout.HelpBox("Unity Demystify is disabled, click the Button below to enable it", MessageType.Info);
 				if (GUILayout.Button("Enable Unity Demystify"))
-					foreach (var p in Patches())
-						PatchManager.EnablePatch(p);
+					UnityDemystify.Enable();
+				EditorGUILayout.HelpBox("Unity Demystify is disabled, click the Button above to enable it", MessageType.Info);
 			}
 			else
 			{
 				if (GUILayout.Button("Disable Unity Demystify"))
-					foreach (var p in Patches())
-						PatchManager.DisablePatch(p);
+					UnityDemystify.Disable();
 			}
 		}
 		

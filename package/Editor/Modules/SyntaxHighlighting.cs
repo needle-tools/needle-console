@@ -98,10 +98,10 @@ namespace needle.demystify
 
 		public static void AddSyntaxHighlighting(string pattern, ref string line)
 		{
+			if (string.IsNullOrEmpty(pattern)) return;
+			
 			static string Eval(Match m)
 			{
-				Profiler.BeginSample("Regex Replace Eval");
-
 				if (m.Groups.Count <= 1) return m.Value;
 				var str = m.Value;
 				var separators = new string[1]; 
@@ -139,8 +139,6 @@ namespace needle.demystify
 					// 		Debug.LogWarning("Missing color entry for " + @group.Name + ", matched for " + @group);
 					// }
 				}
-				Profiler.EndSample();
-
 				return str;
 			}
 
