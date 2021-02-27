@@ -5,7 +5,7 @@ using needle.EditorPatching;
 using UnityEditor;
 using UnityEngine;
 
-namespace needle.demystify
+namespace Needle.Demystify
 {
 	public class DemystifySettingsProvider : SettingsProvider
 	{
@@ -15,7 +15,7 @@ namespace needle.demystify
 			try
 			{
 				DemystifySettings.instance.Save();
-				return new DemystifySettingsProvider("Project/Needle/Unity Demystify", SettingsScope.Project);
+				return new DemystifySettingsProvider("Project/Needle/Demystify", SettingsScope.Project);
 			}
 			catch (System.Exception e)
 			{
@@ -28,6 +28,15 @@ namespace needle.demystify
 		private DemystifySettingsProvider(string path, SettingsScope scopes, IEnumerable<string> keywords = null) : base(path, scopes, keywords)
 		{
 		}
+
+		[MenuItem("Tools/Demystify/Enable Development Mode", true)]
+		private static bool EnableDevelopmentModeValidate() => !DemystifySettings.instance.DevelopmentMode;
+		[MenuItem("Tools/Demystify/Enable Development Mode")]
+		private static void EnableDevelopmentMode() => DemystifySettings.instance.DevelopmentMode = true;
+		[MenuItem("Tools/Demystify/Disable Development Mode", true)]
+		private static bool DisableDevelopmentModeValidate() => DemystifySettings.instance.DevelopmentMode;
+		[MenuItem("Tools/Demystify/Disable Development Mode")]
+		private static void DisableDevelopmentMode() => DemystifySettings.instance.DevelopmentMode = false;
 
 		private Vector2 scroll;
 
@@ -43,18 +52,23 @@ namespace needle.demystify
 				scroll = s.scrollPosition;
 				DrawActivateGUI();
 
-				EditorGUILayout.Space(10);
-				EditorGUILayout.LabelField("Settings", EditorStyles.boldLabel);
-				settings.FixHyperlinks = EditorGUILayout.ToggleLeft("Fix Hyperlinks", settings.FixHyperlinks);
 				DrawSyntaxGUI(settings);
+
+				if(settings.DevelopmentMode)
+				// using(new EditorGUI.DisabledScope(!settings.DevelopmentMode))
+				{
+					EditorGUILayout.Space(10);
+					EditorGUILayout.LabelField("Development Settings", EditorStyles.boldLabel);
+					settings.FixHyperlinks = EditorGUILayout.ToggleLeft(new GUIContent("Convert demystified filepaths to Unity hyperlink format", "Unity expects paths in stacktraces in a specific format to make them clickable (blue). This option will convert the file paths in demystified stacktraces to conform to that format."), settings.FixHyperlinks);
+				}
 			}
 
-			GUILayout.FlexibleSpace();
-			EditorGUILayout.Space(10);
-			using (new EditorGUILayout.HorizontalScope())
-			{
-				settings.DevelopmentMode = EditorGUILayout.ToggleLeft("Development Mode", settings.DevelopmentMode);
-			}
+			// GUILayout.FlexibleSpace();
+			// EditorGUILayout.Space(10);
+			// using (new EditorGUILayout.HorizontalScope())
+			// {
+			// 	settings.DevelopmentMode = EditorGUILayout.ToggleLeft("Development Mode", settings.DevelopmentMode);
+			// }
 
 			if (EditorGUI.EndChangeCheck())
 			{
@@ -112,7 +126,7 @@ namespace needle.demystify
 						GUILayout.FlexibleSpace();
 						if (GUILayout.Button(new GUIContent("Log Highlighted Message", "For testing when changing colors only")))
 						{
-							var str = GUIUtils.SyntaxHighlightVisualization;
+							var str = DummyData.SyntaxHighlightVisualization;
 							ApplySyntaxHighlightingMultiline(ref str);
 							var p = settings.SyntaxHighlighting;
 							settings.SyntaxHighlighting = Highlighting.None;
@@ -142,13 +156,13 @@ namespace needle.demystify
 		{
 			if (!UnityDemystify.Patches().All(PatchManager.IsActive))
 			{
-				if (GUILayout.Button("Enable Unity Demystify"))
+				if (GUILayout.Button("Enable Demystify"))
 					UnityDemystify.Enable();
-				EditorGUILayout.HelpBox("Unity Demystify is disabled, click the Button above to enable it", MessageType.Info);
+				EditorGUILayout.HelpBox("Demystify is disabled, click the Button above to enable it", MessageType.Info);
 			}
 			else
 			{
-				if (GUILayout.Button("Disable Unity Demystify"))
+				if (GUILayout.Button("Disable Demystify"))
 					UnityDemystify.Disable();
 			}
 		}

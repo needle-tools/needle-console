@@ -1,9 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using needle.EditorPatching;
 using UnityEditor;
 using UnityEngine;
 
-namespace needle.demystify
+namespace Needle.Demystify
 {
 	public static class UnityDemystify
 	{
@@ -49,11 +50,14 @@ namespace needle.demystify
 				var str = "";
 				var lines = stacktrace.Split('\n');
 				var settings = DemystifySettings.instance;
+				var fixHyperlinks = settings.FixHyperlinks;
+				// always fix hyperlinks in non development mode
+				fixHyperlinks |= !settings.DevelopmentMode;
 				foreach (var t in lines)
 				{
 					var line = t;
 					// hyperlinks capture 
-					var path = settings.FixHyperlinks ? Hyperlinks.Fix(ref line) : null;
+					var path = fixHyperlinks ? Hyperlinks.Fix(ref line) : null;
 
 					// additional processing
 					if (settings.UseSyntaxHighlighting)
@@ -61,8 +65,9 @@ namespace needle.demystify
 					str += line;
 
 					// hyperlinks apply
-					if (settings.FixHyperlinks && !string.IsNullOrEmpty(path))
+					if (fixHyperlinks && !string.IsNullOrEmpty(path))
 						str += ")" + path;
+
 					str += "\n";
 				}
 

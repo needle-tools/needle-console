@@ -1,6 +1,6 @@
-﻿namespace needle.demystify
+﻿namespace Needle.Demystify
 {
-	public static class GUIUtils
+	internal static class DummyData
 	{
 		public const string SyntaxHighlightVisualization = @"InvalidOperationException: Collection was modified; enumeration operation may not execute.
 System.InvalidOperationException: Collection was modified; enumeration operation may not execute.

@@ -6,7 +6,7 @@ using System.Diagnostics;
 using HarmonyLib;
 using UnityEngine;
 
-namespace needle.demystify
+namespace Needle.Demystify
 {
 	[HarmonyPatch(typeof(Exception))]
 	// ReSharper disable once UnusedType.Global

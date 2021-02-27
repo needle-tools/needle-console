@@ -1,6 +1,6 @@
 ﻿using System.Text.RegularExpressions;
 
-namespace needle.demystify
+namespace Needle.Demystify
 {
 	internal static class Hyperlinks
 	{

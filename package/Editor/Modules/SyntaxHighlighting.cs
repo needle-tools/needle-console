@@ -5,7 +5,7 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.Profiling;
 
-namespace needle.demystify
+namespace Needle.Demystify
 {
 	internal static class SyntaxHighlighting
 	{

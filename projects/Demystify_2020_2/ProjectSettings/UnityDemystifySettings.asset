@@ -13,7 +13,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   IsEnabled: 1
-  DevelopmentMode: 0
   FixHyperlinks: 1
   SyntaxHighlighting: 2
   Theme:
