@@ -1,12 +1,17 @@
 ﻿using System.Text.RegularExpressions;
 
-namespace Demystify.DebugPatch
+namespace needle.demystify
 {
 	internal static class Hyperlinks
 	{
 		private static readonly Regex hyperlinks = new Regex(@"((?<brackets>\))?(?<prefix> in) (?<file>.*?):line (?<line>\d+)(?<post>.*))",
 			RegexOptions.Compiled | RegexOptions.Multiline);
 
+		/// <summary>
+		/// parse demystify path format and reformat to unity hyperlink format
+		/// </summary>
+		/// <param name="line"></param>
+		/// <returns>hyperlink that must be appended to line once further processing is done</returns>
 		public static string Fix(ref string line)
 		{
 			var match = hyperlinks.Match(line);
@@ -24,10 +29,9 @@ namespace Demystify.DebugPatch
 				if (post.Success)
 					newString += post;
 				return newString;
-				// line = line.Replace(match.Value, newString);
 			}
 
-			return "";
+			return string.Empty;
 		}
 
 	}

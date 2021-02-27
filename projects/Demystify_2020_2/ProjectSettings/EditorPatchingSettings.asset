@@ -21,6 +21,8 @@ MonoBehaviour:
   - Demystify.DebugPatch.DemystifyExceptions
   - Demystify.DebugPatch.Patch_Exception
   - Demystify.DebugPatch.Patch_StacktraceUtility
+  - needle.demystify.Patch_Exception
+  - needle.demystify.Patch_StacktraceUtility
   disabledPatchIds:
-  - System.Reflection.MonoMethod
   - needle.EditorPatching.Samples.DisableCameraProjectionSettings
+  - System.Reflection.MonoMethod
