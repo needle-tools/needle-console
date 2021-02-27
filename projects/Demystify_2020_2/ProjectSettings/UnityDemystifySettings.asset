@@ -14,4 +14,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   DevelopmentMode: 0
   FixHyperlinks: 1
-  UseSyntaxHighlighting: 1
+  SyntaxHighlighting: 2

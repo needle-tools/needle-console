@@ -64,7 +64,11 @@ namespace needle.demystify
 
 		private static void DrawSyntaxGUI(DemystifySettings settings)
 		{
-			settings.UseSyntaxHighlighting = EditorGUILayout.ToggleLeft("Syntax Highlighting", settings.UseSyntaxHighlighting);
+			// settings.UseSyntaxHighlighting = EditorGUILayout.ToggleLeft("Syntax Highlighting", settings.UseSyntaxHighlighting);
+			EditorGUI.BeginChangeCheck();
+			settings.SyntaxHighlighting = (Highlighting) EditorGUILayout.EnumPopup("Syntax Highlighting", settings.SyntaxHighlighting);
+			if (EditorGUI.EndChangeCheck())
+				SyntaxHighlighting.OnSyntaxHighlightingModeHasChanged();
 			using (new EditorGUI.DisabledScope(!settings.UseSyntaxHighlighting))
 			{
 				var theme = settings.CurrentTheme;
@@ -76,10 +80,16 @@ namespace needle.demystify
 					EditorGUILayout.EndHorizontal();
 					
 					EditorGUI.BeginChangeCheck();
+					var currentPattern = SyntaxHighlighting.CurrentPatternsList;
 					for (var index = 0; index < theme.Entries?.Count; index++)
 					{
 						var entry = theme.Entries[index];
-						entry.Color = EditorGUILayout.ColorField(entry.Key, entry.Color);
+						var usedByCurrentRegex = currentPattern.Any(e => e.Contains(entry.Key));
+						if (!usedByCurrentRegex) continue;
+						// using(new EditorGUI.DisabledScope(!usedByCurrentRegex))
+						{
+							entry.Color = EditorGUILayout.ColorField(entry.Key, entry.Color);
+						}
 					}
 
 					if (EditorGUI.EndChangeCheck())
@@ -93,10 +103,10 @@ namespace needle.demystify
 				{
 					var str = GUIUtils.SyntaxHighlightVisualization;
 					ApplySyntaxHighlightingMultiline(ref str);
-					var p = settings.UseSyntaxHighlighting;
-					settings.UseSyntaxHighlighting = false;
+					var p = settings.SyntaxHighlighting;
+					settings.SyntaxHighlighting = Highlighting.None;
 					Debug.Log("Example Log: " + "\n\n" + str + "\n\n--------\n");
-					settings.UseSyntaxHighlighting = p;
+					settings.SyntaxHighlighting= p;
 				}
 				// if (GUILayout.Button("Copy Theme"))
 				// {

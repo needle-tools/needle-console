@@ -3,11 +3,17 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using UnityEditor;
-using UnityEditor.Graphs;
 using UnityEngine;
 
 namespace needle.demystify
 {
+	internal enum Highlighting
+	{
+		None = 0,
+		Simple = 1,
+		Complex = 2,
+	}
+
 	[FilePath("ProjectSettings/UnityDemystifySettings.asset", FilePathAttribute.Location.ProjectFolder)]
 	internal class DemystifySettings : ScriptableSingleton<DemystifySettings>
 	{
@@ -23,10 +29,10 @@ namespace needle.demystify
 
 		public bool DevelopmentMode = false;
 		public bool FixHyperlinks = true;
-		public bool UseSyntaxHighlighting = true;
+		public Highlighting SyntaxHighlighting = Highlighting.Complex;
+		public bool UseSyntaxHighlighting => SyntaxHighlighting != Highlighting.None;
 
 		[NonSerialized] private Theme Theme;
-
 		public Theme CurrentTheme
 		{
 			get

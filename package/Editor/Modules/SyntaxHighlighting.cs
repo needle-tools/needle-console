@@ -11,9 +11,8 @@ namespace needle.demystify
 {
 	internal static class SyntaxHighlighting
 	{
-		// https://regex101.com/r/rv7QXz/2
-
-		private static readonly List<string> patterns = new List<string>()
+		// Complex: https://regex101.com/r/rv7QXz/2
+		private static readonly List<string> _complexRegexPatterns = new List<string>()
 		{
 			// @"(?<type>ref|out|async|string|bool|void|object|byte|int|long)",
 			@"at ?((?<new>new)|(((?<return_tuple>\(.*\))|((?<async>async)?( ?(?<return_type>.*?))))) )?((?<namespace>.*) ?(\.|\+))?(?<class>.*?)\.(?<method_name>.+?)(?<params>\(.*?\))\+?(((?<func>\(.*?\) => {.*}))|((?<local_func>.*?)\((?<local_func_params>.*)\)))?",
@@ -22,7 +21,59 @@ namespace needle.demystify
 			// @"(?<type>(<.+?>))",
 			// @"((?<constructor>new\s\w+?)[\.\s])",
 		};
+		
+		// Simple: https://regex101.com/r/sWR1X1/2
+		private static readonly List<string> _simpleRegexPatterns = new List<string>()
+		{
+			@"(?<return_type>.*) (?<class>.*)\.(?<method_name>.+?)(?<params>\(.*?\))\+?",
+		};
+		
+		internal static List<string> CurrentPatternsList
+		{
+			get
+			{
+				switch (DemystifySettings.instance.SyntaxHighlighting)
+				{
+					case Highlighting.None:
+						return null;
+					case Highlighting.Simple:
+						return _simpleRegexPatterns;
+					case Highlighting.Complex:
+						return _complexRegexPatterns;
+					default:
+						throw new ArgumentOutOfRangeException();
+				}
+			}
+		}
 
+		internal static void OnSyntaxHighlightingModeHasChanged() => _currentPattern = null;
+
+		private static string _currentPattern;
+		private static string CurrentPattern
+		{
+			get
+			{
+				if (_currentPattern == null)
+				{
+					_currentPattern = string.Join("|", CurrentPatternsList);
+
+					if (DemystifySettings.instance.DevelopmentMode)
+					{
+						// this is just to give patching time to being loaded to add syntax highlighting to this call too :)
+						void NextFrame()
+						{
+							Debug.Log("<b>Patterns</b>: " + _currentPattern);
+							EditorApplication.update -= NextFrame;
+						}
+
+						EditorApplication.update += NextFrame;
+					}
+				}
+				return _currentPattern;
+			}
+		}
+
+		
 		internal static readonly Dictionary<string, string> DefaultTheme = new Dictionary<string, string>()
 		{
 			{"new", "#F5D96A"},
@@ -41,28 +92,10 @@ namespace needle.demystify
 
 		internal static readonly Dictionary<string, string> CurrentTheme = new Dictionary<string, string>();
 
-		private static readonly Lazy<string> Pattern = new Lazy<string>(() =>
-		{
-			var allPatterns = string.Join("|", patterns);
-
-			if (DemystifySettings.instance.DevelopmentMode)
-			{
-				// this is just to give patching time to being loaded to add syntax highlighting to this call too :)
-				void NextFrame()
-				{
-					Debug.Log("<b>Patterns</b>: " + allPatterns);
-					EditorApplication.update -= NextFrame;
-				}
-
-				EditorApplication.update += NextFrame;
-			}
-			
-			return allPatterns;
-		});
-
 		public static void AddSyntaxHighlighting(ref string line)
 		{
-			AddSyntaxHighlighting(Pattern.Value, ref line);
+			var pattern = CurrentPattern;
+			AddSyntaxHighlighting(pattern, ref line);
 		}
 
 		public static void AddSyntaxHighlighting(string pattern, ref string line)
@@ -113,7 +146,7 @@ namespace needle.demystify
 				return str;
 			}
 
-			line = Regex.Replace(line, Pattern.Value, Eval, RegexOptions.Compiled | RegexOptions.Singleline);
+			line = Regex.Replace(line, pattern, Eval, RegexOptions.Compiled | RegexOptions.Singleline);
 		}
 		
 		
