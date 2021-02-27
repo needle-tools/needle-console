@@ -1,0 +1,13 @@
+{
+	"displayName": "Demystify Extras",
+	"name": "com.needle.unity-demystify.extras",
+	"version": "1.0.0",
+	"unity": "2019.4",
+	"description": "Dev and tests scripts",
+	"author": {
+		"name": "Needle",
+		"email": "contact@needle.tools",
+		"url": "https://needle.tools"
+	  },
+	"category": "Libraries"
+}
