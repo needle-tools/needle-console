@@ -76,7 +76,7 @@ namespace needle.demystify
 			settings.SyntaxHighlighting = (Highlighting) EditorGUILayout.EnumPopup("Syntax Highlighting", settings.SyntaxHighlighting);
 			if (EditorGUI.EndChangeCheck())
 				SyntaxHighlighting.OnSyntaxHighlightingModeHasChanged();
-			using (new EditorGUI.DisabledScope(!settings.UseSyntaxHighlighting))
+			// using (new EditorGUI.DisabledScope(!settings.UseSyntaxHighlighting))
 			{
 				var theme = settings.CurrentTheme;
 				if (theme != null)
@@ -90,7 +90,7 @@ namespace needle.demystify
 						for (var index = 0; index < theme.Entries?.Count; index++)
 						{
 							var entry = theme.Entries[index];
-							var usedByCurrentRegex = currentPattern.Any(e => e.Contains(entry.Key));
+							var usedByCurrentRegex = currentPattern?.Any(e => e.Contains(entry.Key)) ?? true;
 							if (!usedByCurrentRegex) continue;
 							// using(new EditorGUI.DisabledScope(!usedByCurrentRegex))
 							{
@@ -104,24 +104,32 @@ namespace needle.demystify
 					{
 						theme.SetActive();
 					}
+					
+					if (SyntaxHighlightSettingsThemeFoldout)
+					{
+						EditorGUILayout.Space(5);
+						EditorGUILayout.BeginHorizontal();
+						GUILayout.FlexibleSpace();
+						if (GUILayout.Button(new GUIContent("Log Highlighted Message", "For testing when changing colors only")))
+						{
+							var str = GUIUtils.SyntaxHighlightVisualization;
+							ApplySyntaxHighlightingMultiline(ref str);
+							var p = settings.SyntaxHighlighting;
+							settings.SyntaxHighlighting = Highlighting.None;
+							Debug.Log("Example Log: " + "\n\n" + str + "\n\n--------\n");
+							settings.SyntaxHighlighting= p;
+						}
+
+						if (GUILayout.Button(new GUIContent("Reset to Default Theme")))
+						{
+							Undo.RegisterCompleteObjectUndo(settings, "Reset to default theme");
+							settings.SetDefaultTheme();
+						}
+
+						EditorGUILayout.EndHorizontal();
+					}
 				}
 
-				if (SyntaxHighlightSettingsThemeFoldout)
-				{
-					EditorGUILayout.Space(5);
-					EditorGUILayout.BeginHorizontal();
-					GUILayout.FlexibleSpace();
-					if (GUILayout.Button(new GUIContent("Log Highlighted Message", "For testing when changing colors only")))
-					{
-						var str = GUIUtils.SyntaxHighlightVisualization;
-						ApplySyntaxHighlightingMultiline(ref str);
-						var p = settings.SyntaxHighlighting;
-						settings.SyntaxHighlighting = Highlighting.None;
-						Debug.Log("Example Log: " + "\n\n" + str + "\n\n--------\n");
-						settings.SyntaxHighlighting= p;
-					}
-					EditorGUILayout.EndHorizontal();
-				}
 				
 				// if (GUILayout.Button("Reset Theme"))
 				// {

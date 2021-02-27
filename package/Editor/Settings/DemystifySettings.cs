@@ -32,7 +32,8 @@ namespace needle.demystify
 		public Highlighting SyntaxHighlighting = Highlighting.Complex;
 		public bool UseSyntaxHighlighting => SyntaxHighlighting != Highlighting.None;
 
-		[NonSerialized] private Theme Theme;
+		[SerializeField] 
+		private Theme Theme;
 		public Theme CurrentTheme
 		{
 			get
