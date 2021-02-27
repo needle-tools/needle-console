@@ -3,10 +3,8 @@
 
 using System;
 using System.Diagnostics;
-using System.Reflection;
 using HarmonyLib;
 using UnityEngine;
-using Debug = UnityEngine.Debug;
 
 namespace Demystify.DebugPatch
 {
@@ -14,6 +12,9 @@ namespace Demystify.DebugPatch
 	// ReSharper disable once UnusedType.Global
 	public class Patch_Exception
 	{
+		// capture exception stacktrace.
+		// unity is internally looping stackFrames instead of using GetStackTrace
+		// but we capture all other cases in other patches
 		[HarmonyPostfix]
 		[HarmonyPatch("GetStackTrace")]
 		private static void Postfix(object __instance, ref string __result)
@@ -32,6 +33,7 @@ namespace Demystify.DebugPatch
 	// ReSharper disable once UnusedType.Global 
 	public class Patch_StacktraceUtility
 	{
+		// will append Unity side of stacktrace to exceptions
 		[HarmonyPostfix]
 		[HarmonyPatch("ExtractFormattedStackTrace")]
 		private static void Postfix(StackTrace stackTrace, ref string __result)
@@ -39,48 +41,20 @@ namespace Demystify.DebugPatch
 			__result = new EnhancedStackTrace(stackTrace).ToString();
 			UnityDemystify.Apply(ref __result);
 		}
-		
-		
-		private static bool didLog;
+
+		// support for Debug.Log, Warning, Error
 		[HarmonyPrefix]
 		[HarmonyPatch("ExtractStackTrace")]
 		private static bool Postfix(ref string __result)
 		{
-			// var log = !didLog;
-			// didLog = true;
-			StackTrace trace = new StackTrace(1, true);
-			// if (log) Debug.Log("ORIGINAL: \n\n" + trace + "\nend\n\n\n");
+			const int skip = 1;
+			const int skipNoise = 4;
+			StackTrace trace = new StackTrace(skip + skipNoise, true);
 			var enhance = new EnhancedStackTrace(trace);
 			__result = enhance.ToString();
-			// if (log) Debug.Log("ENHANCED: \n\n" + __result + "\nend\n\n\n");
 			UnityDemystify.Apply(ref __result);
-			__result += "\n\nDemystified";
-			// if(log) Debug.Log(__result);
 			return false;
 		}
 
 	}
-	
-	
-	
-	[HarmonyPatch(typeof(StackFrame))]
-	// ReSharper disable once UnusedType.Global 
-	public class Patch_StackFrame
-	{
-		private static bool once;
-		
-		[HarmonyPostfix]
-		[HarmonyPatch("ToString")]
-		private static void Postfix(object __instance, ref string __result)
-		{
-			if (!once)
-			{
-				once = true;
-				Debug.Log("HELLO: " + __result);
-			}
-		}
-		
-	}
-	//
-	// internal static string StacktraceWithHyperlinks(string stacktraceText)
 }
