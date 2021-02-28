@@ -11,19 +11,19 @@ namespace Needle.Demystify
 	{
 		internal static readonly Dictionary<string, string> DefaultThemeDark = new Dictionary<string, string>()
 		{
-			{"new", "#C0FF34"},
-			{"async", "#C9D996"},
-			{"return_tuple", "#C9D996"},
-			{"return_type", "#C9D996"},
-			{"namespace", "#FFFFFF"},
-			{"class", "#9C9C9C"},
-			{"method_name", "#C9D996"},
-			{"params", "#C9D996"},
-			{"func", "#FBAEFF"},
-			{"local_func", "#FBAEFF"},
-			{"local_func_params", "#FBAEFF"},
+			{"new", "#FFE234"},
+			{"async", "#4394F1"},
+			{"return_tuple", "#4394F1"},
+			{"return_type", "#4394F1"},
+			{"namespace", "#DBDBDB"},
+			{"class", "#3EDD9D"},
+			{"method_name", "#4394F1"},
+			{"params", "#4394F1"},
+			{"func", "#4394F1"},
+			{"local_func", "#4394F1"},
+			{"local_func_params", "#4394F1"},
 			{"exception", "#FF3636"},
-			{"link", "#699AFF"}
+			{"link", "#959595"}
 		};
 
 		internal static readonly Dictionary<string, string> DefaultThemeLight = new Dictionary<string, string>()
@@ -40,7 +40,7 @@ namespace Needle.Demystify
 			{"local_func", "#240AE7"},
 			{"local_func_params", "#240AE7"},
 			{"exception", "#FF0000"},
-			{"link", "#9316A1"}
+			{"link", "##939079"}
 		};
 
 		public string Name;
