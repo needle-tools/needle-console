@@ -26,7 +26,7 @@ namespace Needle.Demystify
 					instance.FirstInstall = false;
 					instance.Save();
 					Enable();
-					Debug.Log("Installed Demystify");
+					Debug.Log("Thanks for installing Demystify. You can find Settings under Edit/Project Settings/Needle/Demystify");
 				}
 				InstalledLog();
 			}
@@ -34,12 +34,10 @@ namespace Needle.Demystify
 			if (!Patches().All(PatchManager.IsPersistentEnabled) && Patches().Any(PatchManager.IsPersistentEnabled))
 			{
 				Debug.LogWarning("Not all Demystify patches are enabled. Go to " + DemystifySettingsProvider.SettingsPath +
-				                 " and enable or disable Demystify.\n" +
-				                 "Enabled Patches:\n" +
-				                 string.Join("\n", Patches().Where(PatchManager.IsPersistentEnabled)) + "\n\n" +
-				                 "Disabled Patches:\n" +
-				                 string.Join("\n", Patches().Where(p => !PatchManager.IsPersistentEnabled(p))) + "\n"
-				                 );
+				                 " to enable or disable Demystify.\n" +
+				                 "Patches:\n" +
+				                 string.Join("\n", Patches().Select(p => p + ": " + (PatchManager.IsPersistentEnabled(p) ? "enabled" : "disabled"))) + "\n"
+				);
 			}
 		}
 
@@ -61,7 +59,7 @@ namespace Needle.Demystify
 				PatchManager.DisablePatch(p);
 		}
 
-		public static void Apply(ref string stacktrace)
+		public static void Apply(ref string stacktrace, bool makeHyperlink = false)
 		{
 			try
 			{
@@ -86,13 +84,14 @@ namespace Needle.Demystify
 					if (fixHyperlinks && !string.IsNullOrEmpty(path))
 						str += ")" + path;
 
-					Filepaths.TryMakeRelative(ref str);
+					Filepaths.TryMakeRelative(ref str, makeHyperlink);
 
-					str += "\n";
+					if(!str.EndsWith("\n"))
+						str += "\n";
 				}
 
 				if(!string.IsNullOrWhiteSpace(str))
-					stacktrace = "---\n" + str;
+					stacktrace = str;
 			}
 			catch
 				// (Exception e)

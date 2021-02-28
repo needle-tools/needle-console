@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   FirstInstall: 0
   FixHyperlinks: 1
-  SyntaxHighlighting: 2
+  SyntaxHighlighting: 0
   Theme:
     Name: Default
     Entries:
