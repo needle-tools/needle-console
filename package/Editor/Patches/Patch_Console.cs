@@ -22,13 +22,13 @@ namespace Needle.Demystify
 		private class ConsolePatch : EditorPatch
 		{
 			private static Type console;
-			
+
 			protected override Task OnGetTargetMethods(List<MethodBase> targetMethods)
 			{
 				console = typeof(EditorWindow).Assembly.GetTypes().FirstOrDefault(t => t.FullName == "UnityEditor.ConsoleWindow");
 				var method = console?.GetMethod("StacktraceWithHyperlinks", (BindingFlags) ~0, null, new[] {typeof(string)}, null);
 				// if (DemystifySettings.instance.DevelopmentMode)
-					Debug.Assert(method != null, "Could not find console window method. Console?: " + console);
+				Debug.Assert(method != null, "Could not find console window method. Console?: " + console);
 				targetMethods.Add(method);
 				return Task.CompletedTask;
 			}
@@ -48,7 +48,7 @@ namespace Needle.Demystify
 					// }
 				};
 			}
-			
+
 			private static bool Prefix(ref string stacktraceText)
 			{
 				var textChanged = lastText != stacktraceText;
@@ -58,13 +58,15 @@ namespace Needle.Demystify
 					UnityDemystify.Apply(ref stacktraceText);
 					lastResult = stacktraceText;
 				}
+
 				stacktraceText = lastResult;
 				return true;
 			}
-			
+
 			private static void Postfix(ref string __result)
 			{
-				Hyperlinks.ApplyHyperlinkColor(ref __result);
+				if (DemystifySettings.instance.SyntaxHighlighting != Highlighting.None)
+					Hyperlinks.ApplyHyperlinkColor(ref __result);
 			}
 		}
 	}

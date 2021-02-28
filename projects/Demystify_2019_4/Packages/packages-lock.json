@@ -1,19 +1,21 @@
 {
   "dependencies": {
-    "com.needle.editorpatching": {
-      "version": "file:../../../../../package",
-      "depth": 0,
-      "source": "local",
-      "dependencies": {}
-    },
-    "com.needle.unity-demystify": {
+    "com.needle.demystify": {
       "version": "file:../../../package",
       "depth": 0,
       "source": "local",
+      "dependencies": {
+        "com.needle.editorpatching": "1.0.0"
+      }
+    },
+    "com.needle.demystify.extras": {
+      "version": "file:../../needle.demystify.extras",
+      "depth": 0,
+      "source": "local",
       "dependencies": {}
     },
-    "com.needle.unity-demystify.extras": {
-      "version": "file:../../needle.demystify.extras",
+    "com.needle.editorpatching": {
+      "version": "file:../../../../../package",
       "depth": 0,
       "source": "local",
       "dependencies": {}

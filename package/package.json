@@ -8,8 +8,17 @@
 		"Editor",
 		"Debug",
 		"Ben Adams", 
-		"Stacktrace"
+		"Stacktrace",
+		"Logging",
+		"Log"
 	],
+	"dependencies": {
+		"com.needle.editorpatching" : "1.0.0"
+	},
+    "repository": {
+      "type": "git",
+      "url": "https://github.com/needle-tools/demystify"
+    },
 	"author": {
 		"name": "Needle",
 		"email": "contact@needle.tools",

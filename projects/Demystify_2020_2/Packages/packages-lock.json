@@ -4,7 +4,9 @@
       "version": "file:../../../package",
       "depth": 0,
       "source": "local",
-      "dependencies": {}
+      "dependencies": {
+        "com.needle.editorpatching": "1.0.0"
+      }
     },
     "com.needle.demystify.extras": {
       "version": "file:../../needle.demystify.extras",
