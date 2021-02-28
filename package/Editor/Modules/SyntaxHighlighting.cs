@@ -23,7 +23,8 @@ namespace Needle.Demystify
 		// Simple: https://regex101.com/r/sWR1X1/2
 		private static readonly List<string> _simpleRegexPatterns = new List<string>()
 		{
-			@"(?<return_type>.*) (?<class>.*)\.(?<method_name>.+?)(?<params>\(.*?\))\+?",
+			@"(?<return_type>.*) .+\.(?<class>.*)\.(?<method_name>.+?)(?<params>\(.*?\))\+?",
+			@"(?<exception>.*?\w*Exception:.+)",
 		};
 		
 		internal static List<string> CurrentPatternsList

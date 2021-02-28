@@ -26,7 +26,7 @@ namespace Needle.Demystify
 					instance.FirstInstall = false;
 					instance.Save();
 					Enable();
-					Debug.Log("Thanks for installing Demystify. You can find Settings under Edit/Project Settings/Needle/Demystify");
+					Debug.Log("Thanks for installing Demystify. You can find Settings under Edit/Preferences Needle/Demystify");
 				}
 				InstalledLog();
 			}

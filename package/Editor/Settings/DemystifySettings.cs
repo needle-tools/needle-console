@@ -10,7 +10,7 @@ namespace Needle.Demystify
 		Complex = 2,
 	}
 
-	[FilePath("ProjectSettings/DemystifySettings.asset", FilePathAttribute.Location.ProjectFolder)]
+	[FilePath("Preferences/DemystifySettings.asset", FilePathAttribute.Location.PreferencesFolder)]
 	internal class DemystifySettings : ScriptableSingleton<DemystifySettings>
 	{
 		internal void Save()

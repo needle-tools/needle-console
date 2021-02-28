@@ -9,14 +9,14 @@ namespace Needle.Demystify
 {
 	public class DemystifySettingsProvider : SettingsProvider
 	{
-		public const string SettingsPath = "Project/Needle/Demystify";
+		public const string SettingsPath = "Preferences/Needle/Demystify";
 		[SettingsProvider]
 		public static SettingsProvider CreateDemystifySettings()
 		{
 			try
 			{
 				DemystifySettings.instance.Save();
-				return new DemystifySettingsProvider(SettingsPath, SettingsScope.Project);
+				return new DemystifySettingsProvider(SettingsPath, SettingsScope.User);
 			}
 			catch (System.Exception e)
 			{
