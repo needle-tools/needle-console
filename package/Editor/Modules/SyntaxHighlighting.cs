@@ -94,6 +94,8 @@ namespace Needle.Demystify
 			AddSyntaxHighlighting(pattern, ref line);
 		}
 
+		private static Regex hyperlink = new Regex(@"(?<hyperlink> \(at .*\))", RegexOptions.Compiled | RegexOptions.ExplicitCapture);
+
 		public static void AddSyntaxHighlighting(string pattern, ref string line)
 		{
 			if (string.IsNullOrEmpty(pattern)) return;
@@ -146,7 +148,17 @@ namespace Needle.Demystify
 				return str;
 			}
 
+
+			var link = hyperlink.Match(line);
+			if (link.Success)
+			{
+				line = line.Remove(link.Groups["hyperlink"].Index);
+			}
 			line = Regex.Replace(line.TrimStart(), pattern, Eval, RegexOptions.Compiled | RegexOptions.Singleline | RegexOptions.ExplicitCapture);
+			if (link.Success)
+			{
+				line += link.Value;
+			}
 		}
 	}
 }

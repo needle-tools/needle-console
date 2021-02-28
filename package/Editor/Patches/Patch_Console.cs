@@ -64,7 +64,7 @@ namespace Needle.Demystify
 			
 			private static void Postfix(ref string __result)
 			{
-				// Hyperlinks.ApplyHyperlinkColor(ref __result);
+				Hyperlinks.ApplyHyperlinkColor(ref __result);
 			}
 		}
 	}
