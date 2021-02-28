@@ -23,7 +23,8 @@ namespace Needle.Demystify
 			{"local_func", "#4394F1"},
 			{"local_func_params", "#4394F1"},
 			{"exception", "#FF3636"},
-			{"link", "#959595"}
+			{"link", "#959595"},
+			{"keywords", "#4394F1"},
 		};
 
 		internal static readonly Dictionary<string, string> DefaultThemeLight = new Dictionary<string, string>()
@@ -40,7 +41,8 @@ namespace Needle.Demystify
 			{"local_func", "#240AE7"},
 			{"local_func_params", "#240AE7"},
 			{"exception", "#FF0000"},
-			{"link", "##939079"}
+			{"link", "##939079"},
+			{"keywords", "#240AE7"},
 		};
 
 		public string Name;

@@ -3,13 +3,6 @@ using UnityEngine;
 
 namespace Needle.Demystify
 {
-	internal enum Highlighting
-	{
-		None = 0,
-		Simple = 1,
-		Complex = 2,
-	}
-
 	[FilePath("Preferences/DemystifySettings.asset", FilePathAttribute.Location.PreferencesFolder)]
 	internal class DemystifySettings : ScriptableSingleton<DemystifySettings>
 	{
