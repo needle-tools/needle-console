@@ -42,12 +42,12 @@ namespace Needle.Demystify
 			const string pattern = @"(?<pre><a href=.*?>)(?<path>.*)(?<post><\/a>)";
 			str = Regex.Replace(str, pattern, m =>
 				{
-					if (m.Success)
+					if (m.Success && SyntaxHighlighting.CurrentTheme.TryGetValue("link", out var col))
 					{
 						var pre = m.Groups["pre"].Value;
 						var post = m.Groups["post"].Value;
 						var path = m.Groups["path"].Value;
-						var res = pre + "<color=#ff00ff>" + path + "</color>" + post;
+						var res = $"{pre}<color={col}>{path}</color>{post}";
 						return res;
 					}
 					return m.Value;

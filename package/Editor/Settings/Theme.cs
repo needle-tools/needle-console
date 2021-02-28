@@ -22,6 +22,7 @@ namespace Needle.Demystify
 			{"local_func", "#B09BDD"},
 			{"local_func_params", "#B09BDD"},
 			{"exception", "#ff3333"},
+			{"link", "#4C7EFF"}
 		};
 		
 		public string Name;

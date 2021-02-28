@@ -19,13 +19,13 @@ MonoBehaviour:
     Name: Default
     Entries:
     - Key: new
-      Color: {r: 1, g: 0.5636284, b: 0.21226418, a: 1}
+      Color: {r: 1, g: 0.5647059, b: 0.21176471, a: 1}
     - Key: async
       Color: {r: 0.65882355, g: 0.8352941, b: 0.0627451, a: 1}
     - Key: return_tuple
       Color: {r: 0.65882355, g: 0.8352941, b: 0.0627451, a: 1}
     - Key: return_type
-      Color: {r: 0.65882355, g: 0.8352942, b: 0.0627451, a: 1}
+      Color: {r: 0.65882355, g: 0.8352941, b: 0.0627451, a: 1}
     - Key: namespace
       Color: {r: 0.7019608, g: 0.7019608, b: 0.7019608, a: 1}
     - Key: class
@@ -42,3 +42,5 @@ MonoBehaviour:
       Color: {r: 0.6901961, g: 0.60784316, b: 0.8666667, a: 1}
     - Key: exception
       Color: {r: 1, g: 0.2, b: 0.2, a: 1}
+    - Key: link
+      Color: {r: 0.2980392, g: 0.49561998, b: 1, a: 1}

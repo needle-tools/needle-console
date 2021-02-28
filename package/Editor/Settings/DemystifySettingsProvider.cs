@@ -105,7 +105,7 @@ namespace Needle.Demystify
 						for (var index = 0; index < theme.Entries?.Count; index++)
 						{
 							var entry = theme.Entries[index];
-							var usedByCurrentRegex = currentPattern?.Any(e => e.Contains(entry.Key)) ?? true;
+							var usedByCurrentRegex = entry.Key == "link" || (currentPattern?.Any(e => e.Contains(entry.Key)) ?? true);
 							if (!usedByCurrentRegex) continue;
 							// using(new EditorGUI.DisabledScope(!usedByCurrentRegex))
 							{
