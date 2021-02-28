@@ -13,18 +13,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   enabledPatchIds:
-  - needle.EditorPatching.DeepLinking
-  - Demystify.DebugPatch.DebugExceptionPatch
-  - Demystify.DebugPatch.DebugException
-  - Demystify.DebugPatch.DebugExceptionProvider
-  - Demystify.DebugPatch.ExceptionPatch
-  - Demystify.DebugPatch.DemystifyExceptions
-  - Demystify.DebugPatch.Patch_Exception
-  - Demystify.DebugPatch.Patch_StacktraceUtility
-  - needle.demystify.Patch_Exception
-  - needle.demystify.Patch_StacktraceUtility
   - Needle.Demystify.Patch_Exception
   - Needle.Demystify.Patch_StacktraceUtility
-  disabledPatchIds:
-  - needle.EditorPatching.Samples.DisableCameraProjectionSettings
-  - System.Reflection.MonoMethod
+  disabledPatchIds: []
