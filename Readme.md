@@ -38,12 +38,12 @@ You can also add it directly from GitHub on Unity 2019.4+. Note that you won't b
 - open Package Manager
 - click <kbd>+</kbd>
 - select <kbd>Add from Git URL</kbd>
-- paste `https://github.com/needle-tools/unity-demystify.git?path=/package`
+- paste `https://github.com/needle-tools/demystify.git?path=/package`
 - click <kbd>Add</kbd>
 </details>
 
 ## How To Use 💡
-Please open the <a href="https://github.com/needle-tools/unity-demystify/blob/main/package/Readme.md">Package Readme</a> for more information.
+Please open the <a href="https://github.com/needle-tools/demystify/blob/main/package/Readme.md">Package Readme</a> for more information.
 
 ## Contact ✒️
 <b>[🌵 needle — tools for unity](https://needle.tools)</b> • 
