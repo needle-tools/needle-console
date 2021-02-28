@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
@@ -20,9 +21,11 @@ namespace Needle.Demystify
 
 		private class ConsolePatch : EditorPatch
 		{
+			private static Type console;
+			
 			protected override Task OnGetTargetMethods(List<MethodBase> targetMethods)
 			{
-				var console = typeof(EditorWindow).Assembly.GetTypes().FirstOrDefault(t => t.FullName == "UnityEditor.ConsoleWindow");
+				console = typeof(EditorWindow).Assembly.GetTypes().FirstOrDefault(t => t.FullName == "UnityEditor.ConsoleWindow");
 				var method = console?.GetMethod("StacktraceWithHyperlinks", (BindingFlags) ~0, null, new[] {typeof(string)}, null);
 				// if (DemystifySettings.instance.DevelopmentMode)
 					Debug.Assert(method != null, "Could not find console window method. Console?: " + console);
@@ -32,6 +35,19 @@ namespace Needle.Demystify
 
 			private static string lastText;
 			private static string lastResult;
+
+			public ConsolePatch()
+			{
+				DemystifySettingsProvider.ThemeEdited += () =>
+				{
+					lastText = null;
+					// if (console != null)
+					// {
+					// 	var window = EditorWindow.GetWindow(console);
+					// 	window.Repaint();
+					// }
+				};
+			}
 			
 			private static bool Prefix(ref string stacktraceText)
 			{

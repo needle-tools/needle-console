@@ -43,4 +43,4 @@ MonoBehaviour:
     - Key: exception
       Color: {r: 1, g: 0.2, b: 0.2, a: 1}
     - Key: link
-      Color: {r: 0.2980392, g: 0.49561998, b: 1, a: 1}
+      Color: {r: 0.29803923, g: 0.49411765, b: 1, a: 1}

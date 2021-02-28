@@ -29,6 +29,7 @@ namespace Needle.Demystify
 		public List<Entry> Entries;
 		public bool IsDefault => Name == DefaultThemeName;
 		public const string DefaultThemeName = "Default";
+		
 
 		public Theme(string name) => Name = name;
 
