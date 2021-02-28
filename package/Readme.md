@@ -54,7 +54,6 @@ We provide default syntax highlighting for Light and Dark Theme. You can also ch
 
 ## Known Issues
 
-- in some cases with , double-clicking log messages won't open the editor as usual. We're investigating this one, as it's annoying
 - syntax highlighting has a performance impact, so if you're on a very slow machine you might want to turn it off (demystifying is highly optimized and shouldn't have a noticeable performance impact)
 
 ## Contact ✒️
