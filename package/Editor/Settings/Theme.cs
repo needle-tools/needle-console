@@ -41,7 +41,7 @@ namespace Needle.Demystify
 			{"local_func", "#240AE7"},
 			{"local_func_params", "#240AE7"},
 			{"exception", "#FF0000"},
-			{"link", "##939079"},
+			{"link", "#414141"},
 			{"keywords", "#240AE7"},
 		};
 
