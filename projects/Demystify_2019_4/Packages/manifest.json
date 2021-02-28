@@ -1,8 +1,8 @@
 {
   "dependencies": {
     "com.needle.editorpatching": "file:../../../../../package",
-    "com.needle.unity-demystify": "file:../../../package",
-    "com.needle.unity-demystify.extras": "file:../../needle.demystify.extras",
+    "com.needle.demystify": "file:../../../package",
+    "com.needle.demystify.extras": "file:../../needle.demystify.extras",
     "com.unity.2d.sprite": "1.0.0",
     "com.unity.2d.tilemap": "1.0.0",
     "com.unity.ads": "3.6.1",

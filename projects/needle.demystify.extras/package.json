@@ -1,6 +1,6 @@
 {
 	"displayName": "Demystify Extras",
-	"name": "com.needle.unity-demystify.extras",
+	"name": "com.needle.demystify.extras",
 	"version": "1.0.0",
 	"unity": "2019.4",
 	"description": "Dev and tests scripts",
