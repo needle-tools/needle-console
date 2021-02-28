@@ -76,7 +76,7 @@ namespace Needle.Demystify
 
 					str += line.Trim();
 
-					Filepaths.TryMakeRelative(ref line);
+					// Filepaths.TryMakeRelative(ref line);
 
 					if (!str.EndsWith("\n"))
 						str += "\n";
