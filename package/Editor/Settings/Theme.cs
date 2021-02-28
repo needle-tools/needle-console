@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEditor;
 using UnityEngine;
 
 namespace Needle.Demystify
@@ -8,28 +9,45 @@ namespace Needle.Demystify
 	[Serializable]
 	public class Theme
 	{
-		internal static readonly Dictionary<string, string> DefaultTheme = new Dictionary<string, string>()
+		internal static readonly Dictionary<string, string> DefaultThemeDark = new Dictionary<string, string>()
 		{
-			{"new", "#FF9036"},
-			{"async", "#A8D510"},
-			{"return_tuple", "#A8D510"},
-			{"return_type", "#A8D510"},
-			{"namespace", "#B3B3B3"},
-			{"class", "#FFFFFF"},
-			{"method_name", "#A8D510"},
-			{"params", "#A8D510"},
-			{"func", "#B09BDD"},
-			{"local_func", "#B09BDD"},
-			{"local_func_params", "#B09BDD"},
-			{"exception", "#ff3333"},
-			{"link", "#4C7EFF"}
+			{"new", "#C0FF34"},
+			{"async", "#C9D996"},
+			{"return_tuple", "#C9D996"},
+			{"return_type", "#C9D996"},
+			{"namespace", "#FFFFFF"},
+			{"class", "#9C9C9C"},
+			{"method_name", "#C9D996"},
+			{"params", "#C9D996"},
+			{"func", "#FBAEFF"},
+			{"local_func", "#FBAEFF"},
+			{"local_func_params", "#FBAEFF"},
+			{"exception", "#FF3636"},
+			{"link", "#699AFF"}
 		};
-		
+
+		internal static readonly Dictionary<string, string> DefaultThemeLight = new Dictionary<string, string>()
+		{
+			{"new", "#C600FF"},
+			{"async", "#6C1FB0"},
+			{"return_tuple", "#6C1FB0"},
+			{"return_type", "#6C1FB0"},
+			{"namespace", "#000000"},
+			{"class", "#000000"},
+			{"method_name", "#6C1FB0"},
+			{"params", "#6C1FB0"},
+			{"func", "#000000"},
+			{"local_func", "#000000"},
+			{"local_func_params", "#000000"},
+			{"exception", "#EE0303"},
+			{"link", "#008FB7"}
+		};
+
 		public string Name;
 		public List<Entry> Entries;
 		public bool IsDefault => Name == DefaultThemeName;
 		public const string DefaultThemeName = "Default";
-		
+
 
 		public Theme(string name) => Name = name;
 
@@ -58,7 +76,7 @@ namespace Needle.Demystify
 			if (Entries == null)
 				Entries = new List<Entry>();
 			var changed = false;
-			foreach (var kvp in DefaultTheme)
+			foreach (var kvp in EditorGUIUtility.isProSkin ? DefaultThemeDark : DefaultThemeLight)
 			{
 				var token = kvp.Key;
 				var hex = kvp.Value;

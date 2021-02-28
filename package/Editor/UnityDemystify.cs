@@ -45,6 +45,7 @@ namespace Needle.Demystify
 		{
 			yield return typeof(Patch_Exception).FullName;
 			yield return typeof(Patch_StacktraceUtility).FullName;
+			yield return typeof(Patch_Console).FullName;
 		}
 
 		public static void Enable()
