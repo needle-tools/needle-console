@@ -1,4 +1,6 @@
 ﻿using System;
+using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using UnityEditor;
 using UnityEditorInternal;
@@ -28,6 +30,9 @@ namespace Needle.Demystify
 			set => SessionState.SetBool("Demystify.DevelopmentMode", value);
 		}
 		
+		[SerializeField]
+		internal bool FirstInstall = true;
+		
 		public bool FixHyperlinks = true;
 		public Highlighting SyntaxHighlighting = Highlighting.Complex;
 		public bool UseSyntaxHighlighting => SyntaxHighlighting != Highlighting.None;
@@ -56,55 +61,5 @@ namespace Needle.Demystify
 			if (CurrentTheme.isDirty)
 				CurrentTheme.SetActive();
 		}
-
-		[InitializeOnLoadMethod]
-		[RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
-		private static void Init()
-		{
-			instance.CurrentTheme.EnsureEntries();
-			instance.CurrentTheme.SetActive();
-
-			if (instance.firstInstall)
-			{
-				instance.firstInstall = false;
-				UnityDemystify.Enable();
-			}
-		}
-
-		[SerializeField]
-		private bool firstInstall = true;
 	}
-	
-	#if !UNITY_2020_1_OR_NEWER
-	
-	[System.AttributeUsage(System.AttributeTargets.Class)]
-	internal sealed class FilePathAttribute : System.Attribute
-	{
-		public enum Location
-		{
-			PreferencesFolder,
-			ProjectFolder
-		}
-
-		public string filepath { get; set; }
-
-		public FilePathAttribute(string relativePath, FilePathAttribute.Location location)
-		{
-			if (string.IsNullOrEmpty(relativePath))
-			{
-				Debug.LogError("Invalid relative path! (its null or empty)");
-				return;
-			}
-
-			if (relativePath[0] == '/')
-				relativePath = relativePath.Substring(1);
-#if UNITY_EDITOR
-			if (location == FilePathAttribute.Location.PreferencesFolder)
-				this.filepath = InternalEditorUtility.unityPreferencesFolder + "/" + relativePath;
-			else
-#endif
-				this.filepath = relativePath;
-		}
-	}
-	#endif
 }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using needle.EditorPatching;
 using UnityEditor;
 using UnityEngine;
@@ -10,9 +11,26 @@ namespace Needle.Demystify
 	public static class UnityDemystify
 	{
 		[InitializeOnLoadMethod]
-		[RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
+		[RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterAssembliesLoaded)]
 		private static void Init()
 		{
+			var instance = DemystifySettings.instance;
+			instance.CurrentTheme.EnsureEntries();
+			instance.CurrentTheme.SetActive();
+
+			if (instance.FirstInstall)
+			{
+				instance.FirstInstall = false;
+				Enable();
+				
+				void InstalledLog()
+				{
+					EditorApplication.update -= InstalledLog;
+					Debug.Log("Installed Demystify");
+				}
+				EditorApplication.update += InstalledLog;
+			}
+			
 			if (!Patches().All(PatchManager.IsPersistentEnabled) && Patches().Any(PatchManager.IsPersistentEnabled))
 			{
 				Debug.LogWarning("Not all Demystify patches are enabled. Go to " + DemystifySettingsProvider.SettingsPath +

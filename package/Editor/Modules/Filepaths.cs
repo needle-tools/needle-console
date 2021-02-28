@@ -7,7 +7,7 @@ namespace Needle.Demystify
 	internal static class Filepaths
 	{
 		// pattern: match absolute disc path for cs files
-		private const string Pattern = @"\) \(at (?<filepath>\w{1}\:\/.*\.cs)\:\d{1,}";
+		private const string Pattern = @" \(at (?<filepath>\w{1}\:\/.*\.cs)\:\d{1,}";
 		private static Regex Regex = new Regex(Pattern, RegexOptions.Compiled);
 		
 		public static void TryMakeRelative(ref string line)

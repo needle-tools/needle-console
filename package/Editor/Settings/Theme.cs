@@ -17,7 +17,6 @@ namespace Needle.Demystify
 
 		internal void SetActive()
 		{
-			// Debug.Log("Activate");
 			if (this.Entries.Count >= 0)
 			{
 				SyntaxHighlighting.CurrentTheme.Clear();
