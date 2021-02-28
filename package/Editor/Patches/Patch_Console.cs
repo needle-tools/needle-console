@@ -58,16 +58,13 @@ namespace Needle.Demystify
 					UnityDemystify.Apply(ref stacktraceText);
 					lastResult = stacktraceText;
 				}
-
 				stacktraceText = lastResult;
 				return true;
 			}
 			
-			
 			private static void Postfix(ref string __result)
 			{
-				Hyperlinks.ApplyHyperlinkColor(ref __result);
-				// __result = "test \n123 <a href=\"../needle.demystify.extras/DemystifyTestCode/ExceptionThrower.cs\" line=\"30\"><color=#ff00ff>../needle.demystify.extras/DemystifyTestCode/ExceptionThrower.cs</color></a>";// lastResult;
+				// Hyperlinks.ApplyHyperlinkColor(ref __result);
 			}
 		}
 	}

@@ -21,9 +21,8 @@ namespace Needle.Demystify
 			if (__instance is Exception ex)
 			{
 				__result = ex.ToStringDemystified();
+				Hyperlinks.FixHyperlinks(ref __result);
 			}
-			
-			// UnityDemystify.Apply(ref __result);
 		}
 		
 	}

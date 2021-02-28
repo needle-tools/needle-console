@@ -8,6 +8,21 @@ namespace Needle.Demystify
 		private static readonly Regex hyperlinks = new Regex(@"((?<brackets>\))?(?<prefix> in) (?<file>.*?):line (?<line>\d+)(?<post>.*))",
 			RegexOptions.Compiled | RegexOptions.Multiline);
 
+		public static void FixHyperlinks(ref string stacktrace)
+		{
+			var lines = stacktrace.Split('\n');
+			stacktrace = "";
+			foreach (var t in lines)
+			{
+				var line = t;
+				// hyperlinks capture 
+				var path = Hyperlinks.Fix(ref line);
+				if (!string.IsNullOrEmpty(path))
+					line += ")" + path;
+				stacktrace += line + "\n";
+			}
+		}
+
 		/// <summary>
 		/// parse demystify path format and reformat to unity hyperlink format
 		/// </summary>
@@ -38,6 +53,7 @@ namespace Needle.Demystify
 
 		public static void ApplyHyperlinkColor(ref string stacktrace)
 		{
+			if (string.IsNullOrEmpty(stacktrace)) return;
 			var str = stacktrace;
 			const string pattern = @"(?<open>\(at )(?<pre><a href=.*?>)(?<path>.*)(?<post><\/a>)(?<close>\))";
 			str = Regex.Replace(str, pattern, m =>

@@ -67,38 +67,30 @@ namespace Needle.Demystify
 				var str = "";
 				var lines = stacktrace.Split('\n');
 				var settings = DemystifySettings.instance;
-				var fixHyperlinks = settings.FixHyperlinks;
-				// always fix hyperlinks in non development mode
-				fixHyperlinks |= !settings.DevelopmentMode;
 				foreach (var t in lines)
 				{
 					var line = t;
-					// hyperlinks capture 
-					var path = fixHyperlinks ? Hyperlinks.Fix(ref line) : null;
 
-					// additional processing
 					if (settings.UseSyntaxHighlighting)
 						SyntaxHighlighting.AddSyntaxHighlighting(ref line);
-					str += line;
 
-					// hyperlinks apply
-					if (fixHyperlinks && !string.IsNullOrEmpty(path))
-						str += ")" + path;
+					str += line.Trim();
 
-					Filepaths.TryMakeRelative(ref str);
+					Filepaths.TryMakeRelative(ref line);
 
-					if(!str.EndsWith("\n"))
+					if (!str.EndsWith("\n"))
 						str += "\n";
 				}
 
-				if(!string.IsNullOrWhiteSpace(str))
+				if (!string.IsNullOrWhiteSpace(str))
+				{
 					stacktrace = str;
+				}
 			}
 			catch
 				// (Exception e)
 			{
-				// IGNORE
-				// Debug.LogWarning(e.Message);
+				// ignore
 			}
 		}
 	}

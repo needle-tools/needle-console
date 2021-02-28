@@ -21,7 +21,6 @@ namespace Needle.Demystify
 		[SerializeField]
 		internal bool FirstInstall = true;
 		
-		public bool FixHyperlinks = true;
 		public Highlighting SyntaxHighlighting = Highlighting.Simple;
 		public bool UseSyntaxHighlighting => SyntaxHighlighting != Highlighting.None;
 

@@ -55,13 +55,13 @@ namespace Needle.Demystify
 
 				DrawSyntaxGUI(settings);
 
-				if(settings.DevelopmentMode)
-				// using(new EditorGUI.DisabledScope(!settings.DevelopmentMode))
-				{
-					EditorGUILayout.Space(10);
-					EditorGUILayout.LabelField("Development Settings", EditorStyles.boldLabel);
-					settings.FixHyperlinks = EditorGUILayout.ToggleLeft(new GUIContent("Convert demystified filepaths to Unity hyperlink format", "Unity expects paths in stacktraces in a specific format to make them clickable (blue). This option will convert the file paths in demystified stacktraces to conform to that format."), settings.FixHyperlinks);
-				}
+				// if(settings.DevelopmentMode)
+				// // using(new EditorGUI.DisabledScope(!settings.DevelopmentMode))
+				// {
+				// 	EditorGUILayout.Space(10);
+				// 	EditorGUILayout.LabelField("Development Settings", EditorStyles.boldLabel);
+				// 	settings.FixHyperlinks = EditorGUILayout.ToggleLeft(new GUIContent("Convert demystified filepaths to Unity hyperlink format", "Unity expects paths in stacktraces in a specific format to make them clickable (blue). This option will convert the file paths in demystified stacktraces to conform to that format."), settings.FixHyperlinks);
+				// }
 			}
 
 			// GUILayout.FlexibleSpace();

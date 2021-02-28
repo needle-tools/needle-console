@@ -1,6 +1,9 @@
 ﻿using System.Diagnostics;
+using System.Reflection;
+using System.Text;
 using HarmonyLib;
 using UnityEngine;
+using Debug = UnityEngine.Debug;
 
 namespace Needle.Demystify
 {
@@ -9,25 +12,26 @@ namespace Needle.Demystify
 	public class Patch_StacktraceUtility
 	{
 		// will append Unity side of stacktrace to exceptions
-		[HarmonyPostfix]
+		[HarmonyPrefix]
 		[HarmonyPatch("ExtractFormattedStackTrace")]
-		private static void Postfix(StackTrace stackTrace, ref string __result)
+		private static bool Prefix(StackTrace stackTrace, ref string __result)
 		{
 			__result = new EnhancedStackTrace(stackTrace).ToString();
-			UnityDemystify.Apply(ref __result);
+			Hyperlinks.FixHyperlinks(ref __result);
+			return false;
 		}
 
 		// support for Debug.Log, Warning, Error
 		[HarmonyPrefix]
 		[HarmonyPatch("ExtractStackTrace")]
-		private static bool Postfix(ref string __result)
+		private static bool Prefix(ref string __result)
 		{
 			const int skip = 1;
-			const int skipNoise = 4;
+			const int skipNoise = 4;//4;
 			StackTrace trace = new StackTrace(skip + skipNoise, true);
-			var enhance = new EnhancedStackTrace(trace);
-			__result = enhance.ToString();
-			// UnityDemystify.Apply(ref __result);
+			trace = new EnhancedStackTrace(trace);
+			__result = trace.ToString();
+			Hyperlinks.FixHyperlinks(ref __result);
 			return false;
 		}
 
