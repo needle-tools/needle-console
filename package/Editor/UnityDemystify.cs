@@ -20,15 +20,15 @@ namespace Needle.Demystify
 
 			if (instance.FirstInstall)
 			{
-				instance.FirstInstall = false;
-				Enable();
-				
-				void InstalledLog()
+				async void InstalledLog()
 				{
-					EditorApplication.update -= InstalledLog;
+					await Task.Delay(100);
+					instance.FirstInstall = false;
+					instance.Save();
+					Enable();
 					Debug.Log("Installed Demystify");
 				}
-				EditorApplication.update += InstalledLog;
+				InstalledLog();
 			}
 			
 			if (!Patches().All(PatchManager.IsPersistentEnabled) && Patches().Any(PatchManager.IsPersistentEnabled))
