@@ -14,14 +14,14 @@ namespace Needle.Demystify
 		Complex = 2,
 		TypesOnly = 3,
 	}
-	
+
 	internal static class SyntaxHighlighting
 	{
 		private static readonly Dictionary<Highlighting, List<string>> regexPatterns = new Dictionary<Highlighting, List<string>>()
 		{
 			{Highlighting.None, null},
 			{
-				// Simple: https://regex101.com/r/sWR1X1/2
+				// Simple: https://regex101.com/r/sWR1X1/2 
 				Highlighting.Simple, new List<string>()
 				{
 					@"(?<return_type>.*) .+\.(?<class>.*)\.(?<method_name>.+?)(?<params>\(.*?\))\+?",
@@ -32,19 +32,19 @@ namespace Needle.Demystify
 				// Complex: https://regex101.com/r/rv7QXz/2
 				Highlighting.Complex, new List<string>()
 				{
-					@"((?<new>new)|(((?<return_tuple>\(.*\))|((?<async>async)?( ?(?<return_type>.*?))))) )?((?<namespace>.*) ?(\.|\+))?(?<class>.*?)\.(?<method_name>.+?)(?<params>\(.*?\))\+?(((?<func>\(.*?\) => {.*}))|((?<local_func>.*?)\((?<local_func_params>.*)\)))?",
+					@"((?<new>new)|(((?<return_tuple>\(.*\))|(?<async>async)?( ?(?<return_type>.*)))) )?(?<namespace>.*[\.\+])?(?<class>.*?)\.(?<method_name>.+?)(?<params>\(.*?\))\+?((?<func>\((?<func_params>.*?)\) => { })|((?<local_func>.*?)\((?<local_func_params>.*)\)))?",
 					@"(?<exception>.*?\w*Exception:.+)",
 				}
 			},
 			{
-			// https://regex101.com/r/3Bc9EI/1
-			Highlighting.TypesOnly, new List<string>()
-			{
-				@"(?<keywords>string |bool |int |long |uint |float |double |object |Action |async |Object |byte |in |out |ref |null |static )",
-				@"(?<keywords><string>|<bool>|<int>|<long>|<uint>|<float>|<double>|<object>|<Action>|<async>|<Object>|<byte>|<in>|<out>|<ref>|<null>|<static )",
-				@"(?<exception>.*?\w*Exception:.+)",
+				// https://regex101.com/r/3Bc9EI/1
+				Highlighting.TypesOnly, new List<string>()
+				{
+					@"(?<keywords>string |bool |int |long |uint |float |double |object |Action |async |Object |byte |in |out |ref |null |static )",
+					@"(?<keywords><string>|<bool>|<int>|<long>|<uint>|<float>|<double>|<object>|<Action>|<async>|<Object>|<byte>|<in>|<out>|<ref>|<null>|<static )",
+					@"(?<exception>.*?\w*Exception:.+)",
+				}
 			}
-		}
 		};
 
 		internal static List<string> CurrentPatternsList
@@ -146,7 +146,7 @@ namespace Needle.Demystify
 				return str;
 			}
 
-			line = Regex.Replace(line.TrimStart(), pattern, Eval, RegexOptions.Compiled | RegexOptions.Singleline);
+			line = Regex.Replace(line.TrimStart(), pattern, Eval, RegexOptions.Compiled | RegexOptions.Singleline | RegexOptions.ExplicitCapture);
 		}
 	}
 }

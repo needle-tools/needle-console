@@ -22,7 +22,7 @@ namespace Needle.Demystify
 		internal bool FirstInstall = true;
 		
 		public bool FixHyperlinks = true;
-		public Highlighting SyntaxHighlighting = Highlighting.Complex;
+		public Highlighting SyntaxHighlighting = Highlighting.Simple;
 		public bool UseSyntaxHighlighting => SyntaxHighlighting != Highlighting.None;
 
 		[SerializeField] private Theme Theme;
