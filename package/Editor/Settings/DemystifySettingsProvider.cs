@@ -83,7 +83,7 @@ namespace Needle.Demystify
 			set => SessionState.SetBool("Demystify.SyntaxHighlightingThemeFoldout", value);
 		}
 
-		public static event Action ThemeEdited;
+		public static event Action ThemeEditedOrChanged;
 
 		private static void DrawSyntaxGUI(DemystifySettings settings)
 		{
@@ -92,7 +92,10 @@ namespace Needle.Demystify
 			EditorGUI.BeginChangeCheck();
 			settings.SyntaxHighlighting = (Highlighting) EditorGUILayout.EnumPopup("Syntax Highlighting", settings.SyntaxHighlighting);
 			if (EditorGUI.EndChangeCheck())
+			{
 				SyntaxHighlighting.OnSyntaxHighlightingModeHasChanged();
+				ThemeEditedOrChanged?.Invoke();
+			}
 			// using (new EditorGUI.DisabledScope(!settings.UseSyntaxHighlighting))
 			{
 				var theme = settings.CurrentTheme;
@@ -120,7 +123,7 @@ namespace Needle.Demystify
 					if (EditorGUI.EndChangeCheck())
 					{
 						theme.SetActive();
-						ThemeEdited?.Invoke();
+						ThemeEditedOrChanged?.Invoke();
 					}
 					
 					if (SyntaxHighlightSettingsThemeFoldout)
@@ -142,7 +145,7 @@ namespace Needle.Demystify
 						{
 							Undo.RegisterCompleteObjectUndo(settings, "Reset to default theme");
 							settings.SetDefaultTheme();
-							ThemeEdited?.Invoke();
+							ThemeEditedOrChanged?.Invoke();
 						}
 
 						EditorGUILayout.EndHorizontal();

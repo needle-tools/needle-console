@@ -38,7 +38,7 @@ namespace Needle.Demystify
 
 			public ConsolePatch()
 			{
-				DemystifySettingsProvider.ThemeEdited += () =>
+				DemystifySettingsProvider.ThemeEditedOrChanged += () =>
 				{
 					lastText = null;
 					// if (console != null)

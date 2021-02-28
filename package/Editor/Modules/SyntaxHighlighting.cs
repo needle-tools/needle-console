@@ -40,7 +40,8 @@ namespace Needle.Demystify
 			// https://regex101.com/r/3Bc9EI/1
 			Highlighting.TypesOnly, new List<string>()
 			{
-				@"(?<keywords>string|bool|int|long|uint|float|double|object|Action|async|Object|byte|in|out|ref|null|static)",
+				@"(?<keywords>string |bool |int |long |uint |float |double |object |Action |async |Object |byte |in |out |ref |null |static )",
+				@"(?<keywords><string>|<bool>|<int>|<long>|<uint>|<float>|<double>|<object>|<Action>|<async>|<Object>|<byte>|<in>|<out>|<ref>|<null>|<static )",
 				@"(?<exception>.*?\w*Exception:.+)",
 			}
 		}

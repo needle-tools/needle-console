@@ -39,15 +39,19 @@ namespace Needle.Demystify
 		public static void ApplyHyperlinkColor(ref string stacktrace)
 		{
 			var str = stacktrace;
-			const string pattern = @"(?<pre><a href=.*?>)(?<path>.*)(?<post><\/a>)";
+			const string pattern = @"(?<open>\(at )(?<pre><a href=.*?>)(?<path>.*)(?<post><\/a>)(?<close>\))";
 			str = Regex.Replace(str, pattern, m =>
 				{
 					if (m.Success && SyntaxHighlighting.CurrentTheme.TryGetValue("link", out var col))
 					{
+						var open = m.Groups["open"].Value;
+						var close = m.Groups["close"].Value;
 						var pre = m.Groups["pre"].Value;
 						var post = m.Groups["post"].Value;
 						var path = m.Groups["path"].Value;
-						var res = $"{pre}<color={col}>{path}</color>{post}";
+						var col_0 = $"<color={col}>";
+						var col_1 = "</color>";
+						var res = $"{col_0}{open}{col_1}{pre}{col_0}{path}{col_1}{post}{col_0}{close}{col_1}";
 						return res;
 					}
 					return m.Value;
