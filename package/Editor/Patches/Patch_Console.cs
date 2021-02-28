@@ -33,17 +33,25 @@ namespace Needle.Demystify
 			private static string lastText;
 			private static string lastResult;
 			
-			private static bool Prefix(object __instance, ref string __result, ref string stacktraceText)
+			private static bool Prefix(ref string stacktraceText)
 			{
-				if (lastText != stacktraceText)
+				var textChanged = lastText != stacktraceText;
+				if (textChanged)
 				{
 					lastText = stacktraceText;
 					UnityDemystify.Apply(ref stacktraceText);
 					lastResult = stacktraceText;
 				}
-				
+
 				stacktraceText = lastResult;
 				return true;
+			}
+			
+			
+			private static void Postfix(ref string __result)
+			{
+				Hyperlinks.ApplyHyperlinkColor(ref __result);
+				// __result = "test \n123 <a href=\"../needle.demystify.extras/DemystifyTestCode/ExceptionThrower.cs\" line=\"30\"><color=#ff00ff>../needle.demystify.extras/DemystifyTestCode/ExceptionThrower.cs</color></a>";// lastResult;
 			}
 		}
 	}

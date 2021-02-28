@@ -1,4 +1,5 @@
 ﻿using System.Text.RegularExpressions;
+using UnityEngine;
 
 namespace Needle.Demystify
 {
@@ -34,5 +35,25 @@ namespace Needle.Demystify
 			return string.Empty;
 		}
 
+
+		public static void ApplyHyperlinkColor(ref string stacktrace)
+		{
+			var str = stacktrace;
+			const string pattern = @"(?<pre><a href=.*?>)(?<path>.*)(?<post><\/a>)";
+			str = Regex.Replace(str, pattern, m =>
+				{
+					if (m.Success)
+					{
+						var pre = m.Groups["pre"].Value;
+						var post = m.Groups["post"].Value;
+						var path = m.Groups["path"].Value;
+						var res = pre + "<color=#ff00ff>" + path + "</color>" + post;
+						return res;
+					}
+					return m.Value;
+				},
+				RegexOptions.Compiled);
+			stacktrace = str;
+		}
 	}
 }
