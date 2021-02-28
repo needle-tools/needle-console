@@ -29,18 +29,18 @@ namespace Needle.Demystify
 		internal static readonly Dictionary<string, string> DefaultThemeLight = new Dictionary<string, string>()
 		{
 			{"new", "#C600FF"},
-			{"async", "#6C1FB0"},
-			{"return_tuple", "#6C1FB0"},
-			{"return_type", "#6C1FB0"},
+			{"async", "#240AE7"},
+			{"return_tuple", "#240AE7"},
+			{"return_type", "#240AE7"},
 			{"namespace", "#000000"},
 			{"class", "#000000"},
-			{"method_name", "#6C1FB0"},
-			{"params", "#6C1FB0"},
-			{"func", "#000000"},
-			{"local_func", "#000000"},
-			{"local_func_params", "#000000"},
-			{"exception", "#EE0303"},
-			{"link", "#008FB7"}
+			{"method_name", "#240AE7"},
+			{"params", "#240AE7"},
+			{"func", "#240AE7"},
+			{"local_func", "#240AE7"},
+			{"local_func_params", "#240AE7"},
+			{"exception", "#FF0000"},
+			{"link", "#9316A1"}
 		};
 
 		public string Name;
