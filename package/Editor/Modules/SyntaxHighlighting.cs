@@ -32,7 +32,7 @@ namespace Needle.Demystify
 				// Complex: https://regex101.com/r/rv7QXz/2
 				Highlighting.Complex, new List<string>()
 				{
-					@"((?<new>new)|(((?<return_tuple>\(.*\))|(?<async>async)?( ?(?<return_type>.*)))) )?(?<namespace>.*[\.\+])?(?<class>.*?)\.(?<method_name>.+?)(?<params>\(.*?\))\+?((?<func>\((?<func_params>.*?)\) => { })|((?<local_func>.*?)\((?<local_func_params>.*)\)))?",
+					@"((?<new>new)|(((?<return_tuple>\(.*\))|(?<async>async)? ?(?<return_type>.*))) )?(?<namespace>.*[\.\+])?(?<class>.*)\.(?<method_name>.+?)(?<params>\(.*?\))\+?((?<func>\((?<func_params>.*?)\) => { })|((?<local_func>.*?)\((?<local_func_params>.*)\)))?",
 					@"(?<exception>.*?\w*Exception:.+)",
 				}
 			},
