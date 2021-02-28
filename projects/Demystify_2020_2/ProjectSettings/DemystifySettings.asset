@@ -19,7 +19,7 @@ MonoBehaviour:
     Name: Default
     Entries:
     - Key: new
-      Color: {r: 0.9607843, g: 0.8509804, b: 0.41568628, a: 1}
+      Color: {r: 1, g: 0.5636284, b: 0.21226418, a: 1}
     - Key: async
       Color: {r: 0.65882355, g: 0.8352941, b: 0.0627451, a: 1}
     - Key: return_tuple
