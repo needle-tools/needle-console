@@ -21,19 +21,19 @@ MonoBehaviour:
     - Key: new
       Color: {r: 0.9607843, g: 0.8509804, b: 0.41568628, a: 1}
     - Key: async
-      Color: {r: 0.3882353, g: 1, b: 0.9490196, a: 1}
+      Color: {r: 0.65882355, g: 0.8352941, b: 0.0627451, a: 1}
     - Key: return_tuple
-      Color: {r: 0.3882353, g: 1, b: 0.9490196, a: 1}
+      Color: {r: 0.65882355, g: 0.8352941, b: 0.0627451, a: 1}
     - Key: return_type
-      Color: {r: 0.3882353, g: 1, b: 0.9490196, a: 1}
+      Color: {r: 0.65882355, g: 0.8352942, b: 0.0627451, a: 1}
     - Key: namespace
       Color: {r: 0.7019608, g: 0.7019608, b: 0.7019608, a: 1}
     - Key: class
       Color: {r: 1, g: 1, b: 1, a: 1}
     - Key: method_name
-      Color: {r: 0.3882353, g: 1, b: 0.9490196, a: 1}
+      Color: {r: 0.65882355, g: 0.8352941, b: 0.0627451, a: 1}
     - Key: params
-      Color: {r: 0.3882353, g: 1, b: 0.9490196, a: 1}
+      Color: {r: 0.65882355, g: 0.8352941, b: 0.0627451, a: 1}
     - Key: func
       Color: {r: 0.6901961, g: 0.60784316, b: 0.8666667, a: 1}
     - Key: local_func

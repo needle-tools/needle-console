@@ -8,6 +8,22 @@ namespace Needle.Demystify
 	[Serializable]
 	public class Theme
 	{
+		internal static readonly Dictionary<string, string> DefaultTheme = new Dictionary<string, string>()
+		{
+			{"new", "#F5D96A"},
+			{"async", "#63FFF2"},
+			{"return_tuple", "#63FFF2"},
+			{"return_type", "#63FFF2"},
+			{"namespace", "#B3B3B3"},
+			{"class", "#FFFFFF"},
+			{"method_name", "#63FFF2"},
+			{"params", "#63FFF2"},
+			{"func", "#B09BDD"},
+			{"local_func", "#B09BDD"},
+			{"local_func_params", "#B09BDD"},
+			{"exception", "#ff3333"},
+		};
+		
 		public string Name;
 		public List<Entry> Entries;
 		public bool IsDefault => Name == DefaultThemeName;
@@ -40,7 +56,7 @@ namespace Needle.Demystify
 			if (Entries == null)
 				Entries = new List<Entry>();
 			var changed = false;
-			foreach (var kvp in SyntaxHighlighting.DefaultTheme)
+			foreach (var kvp in DefaultTheme)
 			{
 				var token = kvp.Key;
 				var hex = kvp.Value;

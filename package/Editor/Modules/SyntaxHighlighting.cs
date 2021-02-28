@@ -71,22 +71,6 @@ namespace Needle.Demystify
 			}
 		}
 
-		
-		internal static readonly Dictionary<string, string> DefaultTheme = new Dictionary<string, string>()
-		{
-			{"new", "#F5D96A"},
-			{"async", "#63FFF2"},
-			{"return_tuple", "#63FFF2"},
-			{"return_type", "#63FFF2"},
-			{"namespace", "#B3B3B3"},
-			{"class", "#FFFFFF"},
-			{"method_name", "#63FFF2"},
-			{"params", "#63FFF2"},
-			{"func", "#B09BDD"},
-			{"local_func", "#B09BDD"},
-			{"local_func_params", "#B09BDD"},
-			{"exception", "#ff3333"},
-		};
 
 		internal static readonly Dictionary<string, string> CurrentTheme = new Dictionary<string, string>();
 
