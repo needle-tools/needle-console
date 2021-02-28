@@ -59,7 +59,7 @@ namespace Needle.Demystify
 				PatchManager.DisablePatch(p);
 		}
 
-		public static void Apply(ref string stacktrace, bool makeHyperlink = false)
+		public static void Apply(ref string stacktrace)
 		{
 			try
 			{
@@ -84,7 +84,7 @@ namespace Needle.Demystify
 					if (fixHyperlinks && !string.IsNullOrEmpty(path))
 						str += ")" + path;
 
-					Filepaths.TryMakeRelative(ref str, makeHyperlink);
+					Filepaths.TryMakeRelative(ref str);
 
 					if(!str.EndsWith("\n"))
 						str += "\n";

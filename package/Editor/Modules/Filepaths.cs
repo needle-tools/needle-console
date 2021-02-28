@@ -10,7 +10,7 @@ namespace Needle.Demystify
 		private const string Pattern = @" \(at (?<filepath>\w{1}\:\/.*\.cs)\:\d{1,}";
 		private static Regex Regex = new Regex(Pattern, RegexOptions.Compiled);
 		
-		public static void TryMakeRelative(ref string line, bool makeHyperlink)
+		public static void TryMakeRelative(ref string line)
 		{
 			// unity sometimes fails to make paths relative to the project (e.g. when logging from local packages)
 			try
@@ -22,7 +22,7 @@ namespace Needle.Demystify
 				var filePath = new Uri(pathGroup.Value, UriKind.RelativeOrAbsolute);
 				var appPath = new Uri(Application.dataPath, UriKind.Absolute);
 				var relativePath = appPath.MakeRelativeUri(filePath).ToString();
-				if (makeHyperlink) relativePath = "<a href=\"" + pathGroup.Value + "\">" + relativePath + "</a>";
+				// if (makeHyperlink) relativePath = "<a href=\"" + pathGroup.Value + "\">" + relativePath + "</a>";
 				line = line.Replace(pathGroup.Value, relativePath);
 			}
 			catch
