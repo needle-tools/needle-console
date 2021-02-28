@@ -29,16 +29,15 @@ namespace Needle.Demystify
 			protected override Task OnGetTargetMethods(List<MethodBase> targetMethods)
 			{
 				var console = typeof(EditorWindow).Assembly.GetTypes().FirstOrDefault(t => t.FullName == "UnityEditor.ConsoleWindow");
-				// var method = console?.GetMethod("StacktraceWithHyperlinks", (BindingFlags)~0, null, new[] {typeof(string)}, null);
-				var method = console?.GetMethod("SetActiveEntry", (BindingFlags) ~0);
+				var method = console?.GetMethod("StacktraceWithHyperlinks", (BindingFlags) ~0, null, new[] {typeof(string)}, null);
+				// var method = console?.GetMethod("SetActiveEntry", (BindingFlags) ~0);
 				// if (DemystifySettings.instance.DevelopmentMode)
-					Debug.Assert(method != null, "Could not find console window method. Console?: " + console);
+				Debug.Assert(method != null, "Could not find console window method. Console?: " + console);
 				targetMethods.Add(method);
 				return Task.CompletedTask;
 			}
 
-			private static object active;
-			
+			// https://github.com/Unity-Technologies/UnityCsReference/blob/61f92bd79ae862c4465d35270f9d1d57befd1761/Editor/Mono/LogEntries.bindings.cs#L16
 			// https://github.com/Unity-Technologies/UnityCsReference/blob/61f92bd79ae862c4465d35270f9d1d57befd1761/Editor/Mono/ConsoleWindow.cs#L670
 			/*
 			 * if (m_ListView.selectionChanged || !m_ActiveText.Equals(entry.message))
@@ -48,23 +47,44 @@ namespace Needle.Demystify
 			 * 
 			 */
 
-			private static bool Prefix(object __instance, object entry)
+			// private static bool Prefix(object __instance, object entry)
+			// {
+			// 	if (entry != null && !entry.Equals(active))
+			// 	{
+			// 		active = entry;
+			// 		Debug.Log(entry);
+			// 	}
+			// 	return true;
+			// }
+
+			private static string lastText;
+			private static string modified;
+			
+			private static bool Prefix(object __instance, ref string __result, ref string stacktraceText)
 			{
-				if (entry != null && !entry.Equals(active))
+				if (lastText != stacktraceText)
 				{
-					active = entry;
-					Debug.Log(entry);
+					lastText = stacktraceText;
+					modified = stacktraceText;
+					UnityDemystify.Apply(ref modified, false);
 				}
+				//
+				stacktraceText = modified;
 				return true;
 			}
 
-			//           private static bool Prefix(object __instance, ref string __result, string stacktraceText)
-			//           {
-			//            StringBuilder textWithHyperlinks = new StringBuilder();
-			//            __result = str;
-			// 		UnityDemystify.Apply(ref __result, true);
-			// 		return false;
-			// 	}
+			// private static void Postfix(object __instance, ref string __result, string stacktraceText)
+			// {
+			// 	// if (lastText != __result)
+			// 	// {
+			// 	// 	lastText = __result;
+			// 	// 	modified = __result;
+			// 	// 	UnityDemystify.Apply(ref modified, false);
+			// 	// }
+			// 	//
+			// 	// __result = modified;
+			// 	// return true;
+			// }
 		}
 	}
 }
