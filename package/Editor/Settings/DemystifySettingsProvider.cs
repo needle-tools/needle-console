@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using needle.EditorPatching;
 using UnityEditor;
 using UnityEngine;
@@ -31,13 +33,13 @@ namespace Needle.Demystify
 		}
 
 		[MenuItem("Tools/Demystify/Enable Development Mode", true)]
-		private static bool EnableDevelopmentModeValidate() => !DemystifySettings.instance.DevelopmentMode;
+		private static bool EnableDevelopmentModeValidate() => !DemystifySettings.DevelopmentMode;
 		[MenuItem("Tools/Demystify/Enable Development Mode")]
-		private static void EnableDevelopmentMode() => DemystifySettings.instance.DevelopmentMode = true;
+		private static void EnableDevelopmentMode() => DemystifySettings.DevelopmentMode = true;
 		[MenuItem("Tools/Demystify/Disable Development Mode", true)]
-		private static bool DisableDevelopmentModeValidate() => DemystifySettings.instance.DevelopmentMode;
+		private static bool DisableDevelopmentModeValidate() => DemystifySettings.DevelopmentMode;
 		[MenuItem("Tools/Demystify/Disable Development Mode")]
-		private static void DisableDevelopmentMode() => DemystifySettings.instance.DevelopmentMode = false;
+		private static void DisableDevelopmentMode() => DemystifySettings.DevelopmentMode = false;
 
 		private Vector2 scroll;
 
@@ -52,16 +54,16 @@ namespace Needle.Demystify
 			{
 				scroll = s.scrollPosition;
 				DrawActivateGUI(settings);
-
 				DrawSyntaxGUI(settings);
 
-				// if(settings.DevelopmentMode)
-				// // using(new EditorGUI.DisabledScope(!settings.DevelopmentMode))
-				// {
-				// 	EditorGUILayout.Space(10);
-				// 	EditorGUILayout.LabelField("Development Settings", EditorStyles.boldLabel);
-				// 	settings.FixHyperlinks = EditorGUILayout.ToggleLeft(new GUIContent("Convert demystified filepaths to Unity hyperlink format", "Unity expects paths in stacktraces in a specific format to make them clickable (blue). This option will convert the file paths in demystified stacktraces to conform to that format."), settings.FixHyperlinks);
-				// }
+				if(DemystifySettings.DevelopmentMode)
+				// using(new EditorGUI.DisabledScope(!settings.DevelopmentMode))
+				{
+					EditorGUILayout.Space(10);
+					EditorGUILayout.LabelField("Development Settings", EditorStyles.boldLabel);
+					if (GUILayout.Button("Refresh Themes List"))
+						Themes = null;
+				}
 			}
 
 			// GUILayout.FlexibleSpace();
@@ -77,11 +79,11 @@ namespace Needle.Demystify
 			}
 		}
 
-		private static bool SyntaxHighlightSettingsThemeFoldout
-		{
-			get => SessionState.GetBool("Demystify.SyntaxHighlightingThemeFoldout", true);
-			set => SessionState.SetBool("Demystify.SyntaxHighlightingThemeFoldout", value);
-		}
+		// private static bool SyntaxHighlightSettingsThemeFoldout
+		// {
+		// 	get => SessionState.GetBool("Demystify.SyntaxHighlightingThemeFoldout", true);
+		// 	set => SessionState.SetBool("Demystify.SyntaxHighlightingThemeFoldout", value);
+		// }
 
 		public static event Action ThemeEditedOrChanged;
 		
@@ -100,69 +102,38 @@ namespace Needle.Demystify
 			}
 			// using (new EditorGUI.DisabledScope(!settings.UseSyntaxHighlighting))
 			{
+				DrawThemeOptions();
 				var theme = settings.CurrentTheme;
 				if (theme != null)
 				{
-					SyntaxHighlightSettingsThemeFoldout = EditorGUILayout.Foldout(SyntaxHighlightSettingsThemeFoldout, "Theme: " + theme.Name);
-					if (SyntaxHighlightSettingsThemeFoldout)
-					{
-						EditorGUI.indentLevel++;
-						EditorGUI.BeginChangeCheck();
-						DrawThemeColorOptions(theme);
-						EditorGUI.indentLevel--;
-					}
-
+					EditorGUI.BeginChangeCheck();
+					EditorGUI.indentLevel++;
+					DrawThemeColorOptions(theme);
+					EditorGUI.indentLevel--;
 					if (EditorGUI.EndChangeCheck())
 					{
 						theme.SetActive();
 						ThemeEditedOrChanged?.Invoke();
 					}
-					
-					if (SyntaxHighlightSettingsThemeFoldout)
-					{
-						EditorGUILayout.Space(5);
-						EditorGUILayout.BeginHorizontal();
-						GUILayout.FlexibleSpace();
-						if (GUILayout.Button(new GUIContent("Log Highlighted Message", "For testing when changing colors only")))
-						{
-							var str = DummyData.SyntaxHighlightVisualization;
-							ApplySyntaxHighlightingMultiline(ref str);
-							var p = settings.SyntaxHighlighting;
-							settings.SyntaxHighlighting = Highlighting.None;
-							Debug.Log("Example Log: " + "\n\n" + str + "\n\n--------\n");
-							settings.SyntaxHighlighting= p;
-						}
-
-						if (GUILayout.Button(new GUIContent("Reset to Default Theme")))
-						{
-							Undo.RegisterCompleteObjectUndo(settings, "Reset to default theme");
-							settings.SetDefaultTheme();
-							ThemeEditedOrChanged?.Invoke();
-						}
-
-						EditorGUILayout.EndHorizontal();
-					}
+			
 				}
-
-				
-				// if (GUILayout.Button("Reset Theme"))
-				// {
-				// 	settings.SetDefaultTheme();
-				// }
 			}
 		}
 
-		internal static void DrawThemeColorOptions(Theme theme)
+		internal static void DrawThemeColorOptions(Theme theme, bool skipUnused = true)
 		{
 			var currentPattern = SyntaxHighlighting.CurrentPatternsList;
 			for (var index = 0; index < theme.Entries?.Count; index++)
 			{
 				var entry = theme.Entries[index];
 				var usedByCurrentRegex = AlwaysInclude.Contains(entry.Key) || (currentPattern?.Any(e => e.Contains("?<" + entry.Key)) ?? true);
-				if (!usedByCurrentRegex) continue;
+				if (skipUnused  && !usedByCurrentRegex) continue;
 				// using(new EditorGUI.DisabledScope(!usedByCurrentRegex))
 				{
+					var col = GUI.color;
+					GUI.color = !usedByCurrentRegex || Theme.Ignored(entry.Color) ? Color.gray : col;
 					entry.Color = EditorGUILayout.ColorField(entry.Key, entry.Color);
+					GUI.color = col;
 				}
 			}
 		}
@@ -191,7 +162,7 @@ namespace Needle.Demystify
 		/// <summary>
 		/// this is just for internal use and "visualizing" via GUI
 		/// </summary>
-		private static void ApplySyntaxHighlightingMultiline(ref string str)
+		internal static void ApplySyntaxHighlightingMultiline(ref string str, Dictionary<string, string> colorDict = null)
 		{
 			var lines = str.Split('\n');
 			str = "";
@@ -203,9 +174,69 @@ namespace Needle.Demystify
 				if (pathIndex > 0) line = line.Substring(0, pathIndex - 4);
 				if (!line.TrimStart().StartsWith("at "))
 					line = "at " + line;
-				SyntaxHighlighting.AddSyntaxHighlighting(ref line);
+				SyntaxHighlighting.AddSyntaxHighlighting(ref line, colorDict);
 				line = line.Replace("at ", "");
 				str += line + "\n";
+			}
+		}
+
+		private static string[] ThemeNames;
+		private static Theme[] Themes;
+
+		private static void EnsureThemeOptions()
+		{
+			if (ThemeNames == null || Themes == null)
+			{
+				var themeAssets = AssetDatabase.FindAssets("t:" + nameof(SyntaxHighlightingTheme)).Select(AssetDatabase.GUIDToAssetPath).ToArray();
+				ThemeNames = new string[themeAssets.Length];
+				Themes = new Theme[ThemeNames.Length];
+				for (var index = 0; index < themeAssets.Length; index++)
+				{
+					var path = themeAssets[index];
+					var asset = AssetDatabase.LoadAssetAtPath<SyntaxHighlightingTheme>(path);
+					if (asset.theme == null) asset.theme = new Theme("Unknown");
+					ThemeNames[index] = asset.theme.Name;
+					Themes[index] = asset.theme;
+				}
+			}
+			else if(ThemeNames != null && Themes != null && ThemeNames.Length == Themes.Length)
+			{
+				for (var index = 0; index < Themes.Length; index++)
+				{
+					var t = Themes[index];
+					ThemeNames[index] = t.Name;
+				}
+			}
+		}
+
+		private static int ActiveThemeIndex()
+		{
+			var active = DemystifySettings.instance.CurrentTheme;
+			for (var index = 0; index < Themes.Length; index++) 
+			{
+				var theme = Themes[index];
+				if (theme.Equals(active) || theme.Name == active.Name) return index; 
+			}
+			return -1;
+		}
+
+		private static void DrawThemeOptions()
+		{
+			EnsureThemeOptions(); 
+			EditorGUI.BeginChangeCheck(); 
+			var selected = EditorGUILayout.Popup("Theme", ActiveThemeIndex(), ThemeNames);
+			if(selected >= 0 && selected < Themes.Length)
+				DemystifySettings.instance.CurrentTheme = Themes[selected];
+			if(EditorGUI.EndChangeCheck())
+				DemystifySettings.instance.Save();
+		}
+
+		private class AssetProcessor : AssetPostprocessor
+		{
+			private void OnPreprocessAsset()
+			{
+				ThemeNames = null;
+				Themes = null;
 			}
 		}
 	}

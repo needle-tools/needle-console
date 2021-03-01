@@ -60,7 +60,7 @@ namespace Needle.Demystify
 
 		private static string _currentPattern;
 
-		private static string CurrentPattern
+		internal static string CurrentPattern
 		{
 			get
 			{
@@ -68,7 +68,7 @@ namespace Needle.Demystify
 				{
 					_currentPattern = string.Join("|", CurrentPatternsList);
 
-					if (DemystifySettings.instance.DevelopmentMode)
+					if (DemystifySettings.DevelopmentMode)
 					{
 						// this is just to give patching time to being loaded to add syntax highlighting to this call too :)
 						void NextFrame()
@@ -88,15 +88,16 @@ namespace Needle.Demystify
 
 		internal static readonly Dictionary<string, string> CurrentTheme = new Dictionary<string, string>();
 
-		public static void AddSyntaxHighlighting(ref string line)
+		public static void AddSyntaxHighlighting(ref string line, Dictionary<string, string> colorDict = null)
 		{
 			var pattern = CurrentPattern;
-			AddSyntaxHighlighting(pattern, ref line);
+			if (colorDict == null) colorDict = CurrentTheme;
+			AddSyntaxHighlighting(pattern, colorDict, ref line);
 		}
 
 		private static Regex hyperlink = new Regex(@"(?<hyperlink> \(at .*\))", RegexOptions.Compiled | RegexOptions.ExplicitCapture);
 
-		public static void AddSyntaxHighlighting(string pattern, ref string line)
+		public static void AddSyntaxHighlighting(string pattern, Dictionary<string, string> colorDict, ref string line)
 		{
 			if (string.IsNullOrEmpty(pattern)) return;
 
@@ -112,7 +113,7 @@ namespace Needle.Demystify
 				{
 					var @group = m.Groups[index];
 					if (string.IsNullOrWhiteSpace(@group.Value) || string.IsNullOrEmpty(@group.Name)) continue;
-					if (CurrentTheme.TryGetValue(@group.Name, out var col))
+					if (colorDict.TryGetValue(@group.Name, out var col))
 					{
 						// check if we have to use regex to replace it
 						separators[0] = group.Value;

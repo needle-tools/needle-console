@@ -50,6 +50,7 @@ namespace Needle.Demystify
 		public bool IsDefault => Name == DefaultThemeName;
 		public const string DefaultThemeName = "Default";
 
+		public static bool Ignored(Color color) => color.a < .1f;
 
 		public Theme(string name) => Name = name;
 
@@ -57,14 +58,23 @@ namespace Needle.Demystify
 		{
 			if (this.Entries.Count >= 0)
 			{
-				SyntaxHighlighting.CurrentTheme.Clear();
+				SetActive(SyntaxHighlighting.CurrentTheme);
+				isDirty = false;
+			}
+		}
+		
+		internal void SetActive(Dictionary<string, string> dict)
+		{
+			if (this.Entries.Count >= 0)
+			{
+				dict.Clear();
 				foreach (var entry in this.Entries)
 				{
-					if (entry.Color.a <= 0.01f) continue;
+					if (Ignored(entry.Color)) continue;
 					var html = ColorUtility.ToHtmlStringRGB(entry.Color);
 					if (string.IsNullOrEmpty(html)) continue;
 					if (!html.StartsWith("#")) html = "#" + html;
-					SyntaxHighlighting.CurrentTheme.Add(entry.Key, html);
+					dict.Add(entry.Key, html);
 				}
 
 				isDirty = false;

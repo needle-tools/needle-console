@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Reflection;
 using UnityEditor;
 using UnityEditorInternal;
 using UnityEngine;
@@ -15,7 +14,7 @@ namespace Needle.Demystify
 			base.Save(true);
 		}
 
-		public bool DevelopmentMode
+		public static bool DevelopmentMode
 		{
 			get => SessionState.GetBool("Demystify.DevelopmentMode", false);
 			set => SessionState.SetBool("Demystify.DevelopmentMode", value);
@@ -32,7 +31,6 @@ namespace Needle.Demystify
 		{
 			get
 			{
-				if (Theme == null) SetDefaultTheme();
 				return Theme;
 			}
 			set
@@ -42,13 +40,15 @@ namespace Needle.Demystify
 				UpdateCurrentTheme();
 			}
 		}
-
+ 
 		public void SetDefaultTheme()
 		{
-			CurrentTheme = new Theme(Theme.DefaultThemeName);
+			CurrentTheme = GetNewDefaultThemeInstance();
 			if (CurrentTheme.isDirty)
 				CurrentTheme.SetActive();
 		}
+
+		private static Theme GetNewDefaultThemeInstance() => new Theme(Theme.DefaultThemeName);
 
 		public void UpdateCurrentTheme()
 		{
