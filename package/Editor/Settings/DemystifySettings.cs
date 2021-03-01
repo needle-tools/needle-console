@@ -18,9 +18,6 @@ namespace Needle.Demystify
 			set => SessionState.SetBool("Demystify.DevelopmentMode", value);
 		}
 		
-		[SerializeField]
-		internal bool FirstInstall = true;
-		
 		public Highlighting SyntaxHighlighting = Highlighting.Simple;
 		public bool UseSyntaxHighlighting => SyntaxHighlighting != Highlighting.None;
 

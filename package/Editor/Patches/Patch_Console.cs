@@ -38,14 +38,23 @@ namespace Needle.Demystify
 
 			public ConsolePatch()
 			{
+				EditorWindow window = null;
+				void Init()
+				{
+					EditorApplication.update -= Init;
+					window = EditorWindow.GetWindow(console);
+				}
+
+				EditorApplication.update += Init;
+				
 				DemystifySettingsProvider.ThemeEditedOrChanged += () =>
 				{
 					lastText = null;
-					// if (console != null)
-					// {
-					// 	var window = EditorWindow.GetWindow(console);
-					// 	window.Repaint();
-					// }
+					if (console != null)
+					{
+						if(window)
+							window.Repaint();
+					}
 				};
 			}
 
