@@ -3,6 +3,20 @@ using UnityEngine;
 
 namespace Needle.Demystify
 {
+	[FilePath("Preferences/DemystifySettings.asset", FilePathAttribute.Location.ProjectFolder)]
+	internal class DemystifyProjectSettings : ScriptableSingleton<DemystifyProjectSettings>
+	{
+		internal void Save()
+		{
+			Undo.RegisterCompleteObjectUndo(this, "Save Demystify Project Settings");
+			base.Save(true);
+		}
+		
+		[SerializeField]
+		internal bool FirstInstall = true;
+	}
+	
+
 	[FilePath("Preferences/DemystifySettings.asset", FilePathAttribute.Location.PreferencesFolder)]
 	internal class DemystifySettings : ScriptableSingleton<DemystifySettings>
 	{
@@ -17,9 +31,6 @@ namespace Needle.Demystify
 			get => SessionState.GetBool("Demystify.DevelopmentMode", false);
 			set => SessionState.SetBool("Demystify.DevelopmentMode", value);
 		}
-		
-		[SerializeField]
-		internal bool FirstInstall = true;
 		
 		public Highlighting SyntaxHighlighting = Highlighting.Simple;
 		public bool UseSyntaxHighlighting => SyntaxHighlighting != Highlighting.None;

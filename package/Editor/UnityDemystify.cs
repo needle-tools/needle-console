@@ -14,17 +14,18 @@ namespace Needle.Demystify
 		[RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterAssembliesLoaded)]
 		private static void Init()
 		{
-			var instance = DemystifySettings.instance;
-			instance.CurrentTheme.EnsureEntries();
-			instance.CurrentTheme.SetActive();
+			var settings = DemystifySettings.instance;
+			settings.CurrentTheme.EnsureEntries();
+			settings.CurrentTheme.SetActive();
 
-			if (instance.FirstInstall)
+			var projectSettings = DemystifyProjectSettings.instance;
+			if (projectSettings.FirstInstall)
 			{
 				async void InstalledLog()
 				{
 					await Task.Delay(100);
-					instance.FirstInstall = false;
-					instance.Save();
+					projectSettings.FirstInstall = false;
+					settings.Save();
 					Enable();
 					Debug.Log("Thanks for installing Demystify. You can find Settings under Edit/Preferences Needle/Demystify");
 				}
