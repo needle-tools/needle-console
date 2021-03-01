@@ -46,16 +46,16 @@ namespace Needle.Demystify
 				}
 
 				EditorApplication.update += Init;
-				
-				DemystifySettingsProvider.ThemeEditedOrChanged += () =>
+
+				void Repaint()
 				{
 					lastText = null;
-					if (console != null)
-					{
-						if(window)
-							window.Repaint();
-					}
-				};
+					if(window)
+						window.Repaint();
+				}
+
+				DemystifySettings.ThemeChanged += Repaint;
+				DemystifySettingsProvider.ThemeEditedOrChanged += Repaint;
 			}
 
 			private static bool Prefix(ref string stacktraceText)
