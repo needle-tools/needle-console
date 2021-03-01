@@ -41,11 +41,13 @@ namespace Needle.Demystify
 				DemystifySettingsProvider.ThemeEditedOrChanged += () =>
 				{
 					lastText = null;
-					// if (console != null)
-					// {
-					// 	var window = EditorWindow.GetWindow(console);
-					// 	window.Repaint();
-					// }
+					if (console != null)
+					{
+						var focused = EditorWindow.focusedWindow;
+						var window = EditorWindow.GetWindow(console);
+						window.Repaint();
+						focused.Focus();
+					}
 				};
 			}
 
