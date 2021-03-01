@@ -84,6 +84,8 @@ namespace Needle.Demystify
 		}
 
 		public static event Action ThemeEditedOrChanged;
+		
+		internal static string[] AlwaysInclude = new string[] {"link"};
 
 		private static void DrawSyntaxGUI(DemystifySettings settings)
 		{
@@ -106,17 +108,7 @@ namespace Needle.Demystify
 					{
 						EditorGUI.indentLevel++;
 						EditorGUI.BeginChangeCheck();
-						var currentPattern = SyntaxHighlighting.CurrentPatternsList;
-						for (var index = 0; index < theme.Entries?.Count; index++)
-						{
-							var entry = theme.Entries[index];
-							var usedByCurrentRegex = entry.Key == "link" || (currentPattern?.Any(e => e.Contains("?<" + entry.Key)) ?? true);
-							if (!usedByCurrentRegex) continue;
-							// using(new EditorGUI.DisabledScope(!usedByCurrentRegex))
-							{
-								entry.Color = EditorGUILayout.ColorField(entry.Key, entry.Color);
-							}
-						}
+						DrawThemeColorOptions(theme);
 						EditorGUI.indentLevel--;
 					}
 
@@ -157,6 +149,21 @@ namespace Needle.Demystify
 				// {
 				// 	settings.SetDefaultTheme();
 				// }
+			}
+		}
+
+		internal static void DrawThemeColorOptions(Theme theme)
+		{
+			var currentPattern = SyntaxHighlighting.CurrentPatternsList;
+			for (var index = 0; index < theme.Entries?.Count; index++)
+			{
+				var entry = theme.Entries[index];
+				var usedByCurrentRegex = AlwaysInclude.Contains(entry.Key) || (currentPattern?.Any(e => e.Contains("?<" + entry.Key)) ?? true);
+				if (!usedByCurrentRegex) continue;
+				// using(new EditorGUI.DisabledScope(!usedByCurrentRegex))
+				{
+					entry.Color = EditorGUILayout.ColorField(entry.Key, entry.Color);
+				}
 			}
 		}
 

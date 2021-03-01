@@ -33,17 +33,7 @@ namespace Needle.Demystify
             EditorGUILayout.Space();
             
             EditorGUI.BeginChangeCheck();
-            var currentPattern = SyntaxHighlighting.CurrentPatternsList;
-            for (var index = 0; index < theme.Entries?.Count; index++)
-            {
-                var entry = theme.Entries[index];
-                var usedByCurrentRegex = entry.Key == "link" || (currentPattern?.Any(e => e.Contains("?<" + entry.Key)) ?? true);
-                if (!usedByCurrentRegex) continue;
-                // using(new EditorGUI.DisabledScope(!usedByCurrentRegex))
-                {
-                    entry.Color = EditorGUILayout.ColorField(entry.Key, entry.Color);
-                }
-            }
+            DemystifySettingsProvider.DrawThemeColorOptions(theme);
 
             EditorGUILayout.Space();
             if (GUILayout.Button("Copy from current"))
@@ -56,7 +46,12 @@ namespace Needle.Demystify
                 DemystifySettings.instance.CurrentTheme = theme;
             }
 
-            serializedObject.ApplyModifiedProperties();
+            if (EditorGUI.EndChangeCheck())
+            {
+                if(theme == DemystifySettings.instance.CurrentTheme) 
+                    DemystifySettings.instance.UpdateCurrentTheme();
+                serializedObject.ApplyModifiedProperties();
+            }
         }
     }
 }

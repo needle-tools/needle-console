@@ -39,10 +39,7 @@ namespace Needle.Demystify
 			{
 				if (value == Theme) return;
 				Theme = value;
-				Theme.EnsureEntries();
-				Theme.SetActive();
-				ThemeChanged?.Invoke();
-				InternalEditorUtility.RepaintAllViews();
+				UpdateCurrentTheme();
 			}
 		}
 
@@ -51,6 +48,14 @@ namespace Needle.Demystify
 			CurrentTheme = new Theme(Theme.DefaultThemeName);
 			if (CurrentTheme.isDirty)
 				CurrentTheme.SetActive();
+		}
+
+		public void UpdateCurrentTheme()
+		{
+			Theme.EnsureEntries();
+			Theme.SetActive();
+			ThemeChanged?.Invoke();
+			InternalEditorUtility.RepaintAllViews();
 		}
 	}
 }
