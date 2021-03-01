@@ -15,4 +15,5 @@ MonoBehaviour:
   enabledPatchIds:
   - Needle.Demystify.Patch_Exception
   - Needle.Demystify.Patch_StacktraceUtility
+  - Needle.Demystify.Patch_Console
   disabledPatchIds: []

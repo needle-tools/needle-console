@@ -19,13 +19,13 @@ namespace Needle.Demystify
 			settings.CurrentTheme.SetActive();
 
 			var projectSettings = DemystifyProjectSettings.instance;
-			if (projectSettings.FirstInstall)
+			if (projectSettings.FirstInstall) 
 			{
 				async void InstalledLog()
 				{
 					await Task.Delay(100);
 					projectSettings.FirstInstall = false;
-					settings.Save();
+					projectSettings.Save();
 					Enable();
 					Debug.Log("Thanks for installing Demystify. You can find Settings under Edit/Preferences Needle/Demystify");
 				}
