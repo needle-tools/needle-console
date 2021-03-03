@@ -9,7 +9,7 @@ namespace Some.Arbitrary.Namespace
 
 		public static Some.Arbitrary.Namespace.Result<T, U> ReturnSomethingWeird<T>()
 		{
-			Debug.Log("TEST");
+			Debug.Log("void UnityEngine.Debug.Log(object message)");
 			return new Some.Arbitrary.Namespace.Result<T, U>();
 		}
 

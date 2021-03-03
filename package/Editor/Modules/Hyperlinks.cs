@@ -8,7 +8,7 @@ namespace Needle.Demystify
 		private static readonly Regex hyperlinks = new Regex(@"((?<brackets>\))?(?<prefix> in) (?<file>.*?):line (?<line>\d+)(?<post>.*))",
 			RegexOptions.Compiled | RegexOptions.Multiline);
 
-		public static void FixLines(ref string stacktrace)
+		public static void FixStacktrace(ref string stacktrace)
 		{
 			var lines = stacktrace.Split('\n');
 			stacktrace = "";

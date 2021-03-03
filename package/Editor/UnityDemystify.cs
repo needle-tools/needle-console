@@ -68,16 +68,23 @@ namespace Needle.Demystify
 				var str = "";
 				var lines = stacktrace.Split('\n');
 				var settings = DemystifySettings.instance;
+				var foundPrefix = false;
 				foreach (var t in lines)
 				{
 					var line = t;
 
-					if (settings.UseSyntaxHighlighting)
+					if (StacktraceMarkerUtil.IsPrefix(line))
+					{
+						// if(!foundPrefix)
+							// str += "---\n";
+						foundPrefix = true;
+						continue;
+					}
+					
+					if (foundPrefix && settings.UseSyntaxHighlighting)
 						SyntaxHighlighting.AddSyntaxHighlighting(ref line);
 
 					str += line.Trim();
-
-					// Filepaths.TryMakeRelative(ref line);
 
 					if (!str.EndsWith("\n"))
 						str += "\n";
