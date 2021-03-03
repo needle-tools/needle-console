@@ -1,6 +1,9 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Text.RegularExpressions;
 using UnityEditor;
+using UnityEditor.Graphs;
 using UnityEngine;
 
 namespace Needle.Demystify
@@ -15,6 +18,12 @@ namespace Needle.Demystify
 	public class SyntaxHighlightingThemeEditor : Editor
 	{
 		private Highlighting previewHighlightingStyle;
+
+		private bool editColors
+		{
+			get => SessionState.GetBool("DemystifyTheme.EditColors", false);
+			set => SessionState.SetBool("DemystifyTheme.EditColors", value);
+		}
 
 		private void OnEnable()
 		{
@@ -44,8 +53,16 @@ namespace Needle.Demystify
 				EditorGUILayout.PropertyField(nameProperty);
 			}
 
-			EditorGUILayout.Space(); 
+			EditorGUILayout.Space();
 
+			editColors = EditorGUILayout.Toggle(new GUIContent("Edit colors in groups", "Enable to edit multiple fields of the same color at once"), editColors);
+			if (editColors)
+			{
+				HandleColorEditing(theme);
+				EditorGUILayout.Space(10);
+			}
+
+			EditorGUILayout.LabelField("Theme Colors", EditorStyles.boldLabel);
 			DemystifySettingsProvider.DrawThemeColorOptions(theme, false);
 
 			EditorGUILayout.Space();
@@ -102,6 +119,44 @@ namespace Needle.Demystify
 				DemystifySettingsProvider.ApplySyntaxHighlightingMultiline(ref str, previewColorDict);;
 				// settings.SyntaxHighlighting = currentStyle;
 				GUILayout.TextArea(str, previewStyle);
+			}
+		}
+
+		private static readonly List<(Color color, List<int> matches)> groups = new List<(Color, List<int>)>();
+		
+		private void HandleColorEditing(Theme theme)
+		{
+			groups.Clear();
+			for (var index = 0; index < theme.Entries.Count; index++)
+			{
+				var col = theme.Entries[index];
+				var group = groups.FirstOrDefault(e => e.color == col.Color);
+				if (group.matches == null)
+				{
+					group = (col.Color, new List<int>());
+					groups.Add(group);
+				}
+				group.matches.Add(index);
+			}
+			
+			EditorGUI.BeginChangeCheck();
+			for (var index = 0; index < groups.Count; index++)
+			{
+				var group = groups[index];
+				group.color = EditorGUILayout.ColorField(group.matches.Count.ToString(), group.color);
+				groups[index] = group;
+			}
+
+			if (EditorGUI.EndChangeCheck())
+			{
+				Undo.RegisterCompleteObjectUndo(target, $"Batch edit {theme.Name} colors");
+				foreach (var group in groups)
+				{
+					foreach (var index in group.matches)
+					{
+						theme.Entries[index].Color = group.color;
+					}
+				}
 			}
 		}
 	}

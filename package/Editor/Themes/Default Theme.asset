@@ -10,10 +10,10 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: ea2a77b76b0b3544bb244979f10aa448, type: 3}
-  m_Name: Like Default Theme
+  m_Name: Default Theme
   m_EditorClassIdentifier: 
   theme:
-    Name: Like Default Theme
+    Name: Default Theme
     Entries:
     - Key: new
       Color: {r: 0.3882353, g: 1, b: 0.9490196, a: 0}

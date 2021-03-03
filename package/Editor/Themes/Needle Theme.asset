@@ -10,10 +10,10 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: ea2a77b76b0b3544bb244979f10aa448, type: 3}
-  m_Name: Syntax Highlighting Theme
+  m_Name: Needle Theme
   m_EditorClassIdentifier: 
   theme:
-    Name: Syntax Highlighting Theme
+    Name: Needle Theme
     Entries:
     - Key: new
       Color: {r: 0.9607843, g: 0.8509804, b: 0.41568628, a: 1}
