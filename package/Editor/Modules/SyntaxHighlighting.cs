@@ -100,10 +100,7 @@ namespace Needle.Demystify
 		{
 			if (string.IsNullOrEmpty(pattern)) return;
 
-#if !UNITY_2019_4
-			static
-#endif
-				string Eval(Match m)
+			string Eval(Match m)
 			{
 				if (m.Groups.Count <= 1) return m.Value;
 				var str = m.Value;
