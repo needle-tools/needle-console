@@ -1,7 +1,9 @@
 {
     "name": "needle.demystify.extras",
     "rootNamespace": "",
-    "references": [],
+    "references": [
+        "GUID:cb2a51ec94f7f1548a3c6b442a77ee74"
+    ],
     "includePlatforms": [
         "Editor"
     ],
