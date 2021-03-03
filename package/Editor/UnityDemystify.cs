@@ -19,7 +19,7 @@ namespace Needle.Demystify
 			settings.CurrentTheme.SetActive();
 
 			var projectSettings = DemystifyProjectSettings.instance;
-			if (projectSettings.FirstInstall) 
+			if (projectSettings.FirstInstall)
 			{
 				async void InstalledLog()
 				{
@@ -29,9 +29,10 @@ namespace Needle.Demystify
 					Enable();
 					Debug.Log("Thanks for installing Demystify. You can find Settings under Edit/Preferences Needle/Demystify");
 				}
+
 				InstalledLog();
 			}
-			
+
 			if (!Patches().All(PatchManager.IsPersistentEnabled) && Patches().Any(PatchManager.IsPersistentEnabled))
 			{
 				Debug.LogWarning("Not all Demystify patches are enabled. Go to " + DemystifySettingsProvider.SettingsPath +
@@ -68,16 +69,23 @@ namespace Needle.Demystify
 				var str = "";
 				var lines = stacktrace.Split('\n');
 				var settings = DemystifySettings.instance;
+				var foundPrefix = false;
 				foreach (var t in lines)
 				{
 					var line = t;
 
-					if (settings.UseSyntaxHighlighting)
+					if (StacktraceMarkerUtil.IsPrefix(line))
+					{
+						StacktraceMarkerUtil.RemoveMarkers(ref line);
+						if(!string.IsNullOrEmpty(settings.Separator))
+							str += settings.Separator + "\n";
+						foundPrefix = true;
+					}
+
+					if (foundPrefix && settings.UseSyntaxHighlighting)
 						SyntaxHighlighting.AddSyntaxHighlighting(ref line);
 
 					str += line.Trim();
-
-					// Filepaths.TryMakeRelative(ref line);
 
 					if (!str.EndsWith("\n"))
 						str += "\n";

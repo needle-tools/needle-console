@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using UnityEditor;
 using UnityEngine;
-using UnityEngine.Profiling;
 
 namespace Needle.Demystify
 {
@@ -29,10 +28,10 @@ namespace Needle.Demystify
 				}
 			},
 			{
-				// Complex: https://regex101.com/r/rv7QXz/2
+				// Complex: https://regex101.com/r/HegsIG/2
 				Highlighting.Complex, new List<string>()
 				{
-					@"((?<new>new)|(((?<return_tuple>\(.*\))|(?<async>async)? ?(?<return_type>.*))) )?(?<namespace>.*[\.\+])?(?<class>.*)\.(?<method_name>.+?)(?<params>\(.*?\))\+?((?<func>\((?<func_params>.*?)\) => { })|((?<local_func>.*?)\((?<local_func_params>.*)\)))?",
+					@"((?<new>new)|(((?<return_tuple>\(.*\))|((?<async>async)?( ?(?<return_type>(.*<.*>)|(?#return non generic)(.*?)))))) )?(?#capture namespaces)(?<namespace>.*(\.|\+))?(?<class>.*?)\.(?<method_name>.+?)(?<params>\(.*?\))\+?((?<func>\((?<func_params>.*?)\) => { })|((?<local_func>.*?)\((?<local_func_params>.*)\)))?",
 					@"(?<exception>.*?\w*Exception:.+)",
 				}
 			},

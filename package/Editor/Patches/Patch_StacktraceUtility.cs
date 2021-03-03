@@ -1,9 +1,6 @@
 ﻿using System.Diagnostics;
-using System.Reflection;
-using System.Text;
 using HarmonyLib;
 using UnityEngine;
-using Debug = UnityEngine.Debug;
 
 namespace Needle.Demystify
 {
@@ -17,7 +14,8 @@ namespace Needle.Demystify
 		private static bool Prefix(StackTrace stackTrace, ref string __result)
 		{
 			__result = new EnhancedStackTrace(stackTrace).ToString();
-			Hyperlinks.FixLines(ref __result);
+			Hyperlinks.FixStacktrace(ref __result);
+			StacktraceMarkerUtil.AddMarker(ref __result);
 			return false;
 		}
 
@@ -31,7 +29,8 @@ namespace Needle.Demystify
 			StackTrace trace = new StackTrace(skip + skipNoise, true);
 			trace = new EnhancedStackTrace(trace);
 			__result = trace.ToString();
-			Hyperlinks.FixLines(ref __result);
+			Hyperlinks.FixStacktrace(ref __result);
+			StacktraceMarkerUtil.AddMarker(ref __result);
 			return false;
 		}
 
