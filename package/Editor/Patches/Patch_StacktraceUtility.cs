@@ -1,9 +1,6 @@
 ﻿using System.Diagnostics;
-using System.Reflection;
-using System.Text;
 using HarmonyLib;
 using UnityEngine;
-using Debug = UnityEngine.Debug;
 
 namespace Needle.Demystify
 {
