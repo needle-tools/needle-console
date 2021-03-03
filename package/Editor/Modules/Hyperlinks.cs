@@ -1,4 +1,5 @@
-﻿using System.Text.RegularExpressions;
+﻿using System;
+using System.Text.RegularExpressions;
 using UnityEngine;
 
 namespace Needle.Demystify
@@ -10,18 +11,20 @@ namespace Needle.Demystify
 
 		public static void FixStacktrace(ref string stacktrace)
 		{
-			var lines = stacktrace.Split('\n');
-			stacktrace = "";
+			var lines = stacktrace.Split(new []{'\n'}, StringSplitOptions.RemoveEmptyEntries);
+			stacktrace = string.Empty;
 			foreach (var t in lines)
 			{
 				var line = t;
 				// hyperlinks capture 
-				var path = Hyperlinks.Fix(ref line);
+				var path = Fix(ref line);
 				if (!string.IsNullOrEmpty(path))
 				{
+					path = path.Replace("\n", "");
 					line += ")" + path;
 					Filepaths.TryMakeRelative(ref line);
 				}
+
 				stacktrace += line + "\n";
 			}
 		}
@@ -73,6 +76,7 @@ namespace Needle.Demystify
 						var res = $"{col_0}{open}{col_1}{pre}{col_0}{path}{col_1}{post}{col_0}{close}{col_1}";
 						return res;
 					}
+
 					return m.Value;
 				},
 				RegexOptions.Compiled);
