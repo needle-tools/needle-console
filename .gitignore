@@ -106,3 +106,4 @@ Ankh.NoLoad
 *.csproj
 *.sln
 projects/*/UserSettings
+projects/**/builds-webgl
