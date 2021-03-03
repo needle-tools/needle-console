@@ -20,7 +20,8 @@ namespace Needle.Demystify
 		
 		public Highlighting SyntaxHighlighting = Highlighting.Simple;
 		public bool UseSyntaxHighlighting => SyntaxHighlighting != Highlighting.None;
-
+		
+		
 		[SerializeField] private Theme Theme;
 
 		public Theme CurrentTheme
@@ -45,5 +46,8 @@ namespace Needle.Demystify
 			if (CurrentTheme.isDirty)
 				CurrentTheme.SetActive();
 		}
+
+
+		public string Separator = "—";
 	}
 }

@@ -77,9 +77,9 @@ namespace Needle.Demystify
 					if (StacktraceMarkerUtil.IsPrefix(line))
 					{
 						StacktraceMarkerUtil.RemoveMarkers(ref line);
-						str += "—\n";
+						if(!string.IsNullOrEmpty(settings.Separator))
+							str += settings.Separator + "\n";
 						foundPrefix = true;
-						// continue;
 					}
 
 					if (foundPrefix && settings.UseSyntaxHighlighting)

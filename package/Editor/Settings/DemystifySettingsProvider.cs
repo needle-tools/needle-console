@@ -55,6 +55,10 @@ namespace Needle.Demystify
 
 				DrawSyntaxGUI(settings);
 
+				EditorGUILayout.Space(10);
+				EditorGUILayout.LabelField("Console Options", EditorStyles.boldLabel);
+				settings.Separator = EditorGUILayout.TextField(new GUIContent("Stacktrace Separator", "Adds a separator to Console stacktrace output between each stacktrace"), settings.Separator);
+
 				// if(settings.DevelopmentMode)
 				// // using(new EditorGUI.DisabledScope(!settings.DevelopmentMode))
 				// {
