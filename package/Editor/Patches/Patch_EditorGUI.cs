@@ -34,14 +34,13 @@ namespace Needle.Demystify
 				{
 					var txt = File.ReadAllLines(path);
 					if (!window) window = PopupWindow.Init();
-					var windowText = GetText(txt, line-1, 3, out var count);
-					Debug.Log(windowText);
+					var windowText = GetText(txt, line-1, 7, out var count);
 					if (windowText == null) Debug.Log(line);
 					window.Text = windowText;
 					window.ShowPopup();
-					var rect = new Rect(Vector2.zero, new Vector2(500, EditorGUIUtility.singleLineHeight * count));
+					var rect = new Rect(Vector2.zero, new Vector2(800, EditorGUIUtility.singleLineHeight * count));
 					var pos = GUIUtility.GUIToScreenPoint(mouse);
-					pos.y -= rect.height + EditorGUIUtility.singleLineHeight;
+					pos.y -= rect.height + EditorGUIUtility.singleLineHeight * 2;
 					rect.position = pos;
 					window.position = rect;
 
