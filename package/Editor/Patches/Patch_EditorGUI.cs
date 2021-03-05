@@ -1,9 +1,7 @@
-using System.IO;
+using System;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using HarmonyLib;
 using UnityEditor;
-using UnityEditor.WindowsStandalone;
 using UnityEngine;
 
 namespace Needle.Demystify
@@ -11,38 +9,88 @@ namespace Needle.Demystify
 	[HarmonyPatch]
 	public class Patch_EditorGUI
 	{
+		private static CodePreview.Window window;
+		private static double lastTimeFoundKey;
+		
 		[HarmonyPrefix]
 		[HarmonyPatch(typeof(EditorGUI), "DoTextField")]
-		private static void DoTextField(TextEditor editor, Rect position)
+		private static void DoTextField(TextEditor editor, Rect position, ref string text)
 		{
+			var settings = DemystifySettings.instance;
+			if (!settings.AllowCodePreview) return;
+			
 			if (!Patch_Console.IsDrawingConsole) return;
 			if (!Patch_Console.ConsoleWindow) return;
 			var evt = Event.current;
+
+			if (evt.type == EventType.Repaint && Patch_Console.ConsoleWindow)
+			{
+				EditorUtility.SetDirty(Patch_Console.ConsoleWindow);
+				Patch_Console.ConsoleWindow.Repaint();
+			}
+
+			if (settings.CodePreviewKeyCode != KeyCode.None)
+			{
+				var time = DateTime.Now.TimeOfDay.TotalSeconds;
+				if (Event.current.keyCode == settings.CodePreviewKeyCode)
+				{
+					lastTimeFoundKey = time;
+				}
+
+				var diff = time - lastTimeFoundKey;
+				if (diff > .3f)
+				{
+					if (window && window.Text != null)
+					{
+						window.Text = null;
+						EditorUtility.SetDirty(window);
+						window.Repaint();
+					}
+					return;
+				}
+			}
+			
 			if (evt == null || (evt.type != EventType.Repaint && evt.type != EventType.MouseMove)) return;
 			var mouse = evt.mousePosition;
 			if (!position.Contains(mouse)) return;
 
+			var prevSelection = editor.selectIndex;
+			var prevSelectionEnd = editor.cursorIndex;
 			editor.MoveCursorToPosition(mouse);
 			editor.SelectCurrentParagraph();
 			var selection = editor.SelectedText;
-			editor.SelectNone();
+			editor.selectIndex = prevSelection;
+			editor.cursorIndex = prevSelectionEnd;
+			
 			var matchCollection = new Regex("(?<=\\b=\")[^\"]*").Matches(selection);
 			if (matchCollection.Count == 2)
 			{
 				var path = matchCollection[0].Value;
-				if (int.TryParse(matchCollection[1].Value, out var line) && File.Exists(path))
+				if (int.TryParse(matchCollection[1].Value, out var line))
 				{
-					var txt = File.ReadAllLines(path);
-					if (!window) window = PopupWindow.Init();
-					var windowText = GetText(txt, line-1, 7, out var count);
-					if (windowText == null) Debug.Log(line);
-					window.Text = windowText;
-					window.ShowPopup();
-					var rect = new Rect(Vector2.zero, new Vector2(800, EditorGUIUtility.singleLineHeight * count));
-					var pos = GUIUtility.GUIToScreenPoint(mouse);
-					pos.y -= rect.height + EditorGUIUtility.singleLineHeight * 2;
-					rect.position = pos;
-					window.position = rect;
+					var prev = CodePreview.GetPreviewText(path, line, out var lines);
+					if (!string.IsNullOrEmpty(prev) && !window)
+					{
+						window = CodePreview.Window.Create();
+					}
+
+					if (window)
+					{
+						var pos = GUIUtility.GUIToScreenPoint(mouse);
+						window.Text = prev;
+						window.Mouse = pos;
+						window.ShowPopup();
+						var cornerTopLeft = GUIUtility.GUIToScreenPoint(new Vector2(0, 0));
+						var rect = new Rect(Vector2.zero, new Vector2(Screen.width - 2, EditorGUIUtility.singleLineHeight * lines));
+						pos.x = cornerTopLeft.x;
+						const int linesDistance = 3;
+						pos.y -= rect.height + EditorGUIUtility.singleLineHeight * linesDistance;
+						pos.y = cornerTopLeft.y - rect.height - 1;
+						rect.position = pos;
+						window.position = rect;
+						EditorUtility.SetDirty(window);
+						window.Repaint();
+					}
 
 					return;
 				}
@@ -50,66 +98,7 @@ namespace Needle.Demystify
 
 			if (window)
 			{
-				Debug.Log(evt + ", " + position);
-				window.Close();
-			}
-		}
-
-		private static string GetText(string[] lines, int line, int padding, out int lineCount)
-		{
-			lineCount = 0;
-			if (lines == null || lines.Length <= 0) return null;
-			padding = Mathf.Max(0, padding);
-			var from = Mathf.Max(0, line - padding);
-			var to = Mathf.Min(lines.Length - 1, line + padding);
-			var str = string.Empty;
-			for (var index = from; index < to; index++)
-			{
-				var l = lines[index];
-				if (index == line) l = "<color=#dddd00>" + l + "</color>";
-				str += l + "\n";
-				lineCount += 1;
-			}
-			return str;
-		}
-
-		private static PopupWindow window;
-
-		private class PopupWindow : EditorWindow
-		{
-			[InitializeOnLoadMethod]
-			private static async void InitStart()
-			{
-				await Task.Delay(100);
-				foreach (var prev in Resources.FindObjectsOfTypeAll<PopupWindow>())
-				{
-					if (prev != null)
-						prev.Close();
-				}
-			}
-
-			internal static PopupWindow Init()
-			{
-				var window = CreateInstance<PopupWindow>();
-				window.ShowPopup();
-				style = EditorStyles.wordWrappedLabel;
-				style.richText = true;
-				return window;
-			}
-
-			public string Text;
-
-			private static GUIStyle style;
-			
-			private void OnGUI()
-			{
-				if (string.IsNullOrEmpty(Text))
-				{
-					Close();
-					return;
-				}
-
-				EditorGUILayout.LabelField(Text, style);
+				window.Text = null;
 			}
 		}
 	}
