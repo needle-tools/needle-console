@@ -17,7 +17,7 @@ namespace Needle.Demystify
 		protected override void OnGetPatches(List<EditorPatch> patches)
 		{
 			patches.Add(new StacktracePatch());
-			patches.Add(new ConsoleGUIPatch());
+			patches.Add(new ConsoleDrawingEvent());
 		}
 
 
@@ -25,17 +25,15 @@ namespace Needle.Demystify
 		internal static Type ConsoleWindowType { get; private set; }
 		internal static EditorWindow ConsoleWindow { get; private set; }
 
-		private class ConsoleGUIPatch : EditorPatch
+		private class ConsoleDrawingEvent : EditorPatch
 		{
-			private static Type console;
-
 			protected override Task OnGetTargetMethods(List<MethodBase> targetMethods)
 			{
-				console = typeof(EditorWindow).Assembly.GetTypes().FirstOrDefault(t => t.FullName == "UnityEditor.ConsoleWindow");
-				var method = console?.GetMethod("OnGUI", (BindingFlags) ~0);
-				Debug.Assert(method != null, "Could not find console OnGUI method. Console?: " + console);
+				ConsoleWindowType ??= typeof(EditorWindow).Assembly.GetTypes().FirstOrDefault(t => t.FullName == "UnityEditor.ConsoleWindow");
+				var method = ConsoleWindowType?.GetMethod("OnGUI", (BindingFlags) ~0);
+				Debug.Assert(method != null, "Could not find console OnGUI method. Console?: " + ConsoleWindowType);
 				targetMethods.Add(method);
-				return Task.CompletedTask;
+				return Task.CompletedTask; 
 			}
 
 			private static void Prefix()
@@ -54,8 +52,7 @@ namespace Needle.Demystify
 
 			protected override Task OnGetTargetMethods(List<MethodBase> targetMethods)
 			{
-				if(ConsoleWindowType == null)
-					ConsoleWindowType = typeof(EditorWindow).Assembly.GetTypes().FirstOrDefault(t => t.FullName == "UnityEditor.ConsoleWindow");
+				ConsoleWindowType ??= typeof(EditorWindow).Assembly.GetTypes().FirstOrDefault(t => t.FullName == "UnityEditor.ConsoleWindow");
 				var method = ConsoleWindowType?.GetMethod("StacktraceWithHyperlinks", (BindingFlags) ~0, null, new[] {typeof(string)}, null);
 				Debug.Assert(method != null, "Could not find console stacktrace method. Console?: " + ConsoleWindowType);
 				targetMethods.Add(method);
