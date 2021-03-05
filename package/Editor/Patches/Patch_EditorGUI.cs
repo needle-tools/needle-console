@@ -11,10 +11,19 @@ namespace Needle.Demystify
 	{
 		private static CodePreview.Window window;
 		private static double lastTimeFoundKey;
+
+		private static void ClearPopupWindow()
+		{
+			if (!window) return;
+			if (window.Text == null) return;
+			window.Text = null;
+			EditorUtility.SetDirty(window);
+			window.Repaint();
+		}
 		
 		[HarmonyPrefix]
 		[HarmonyPatch(typeof(EditorGUI), "DoTextField")]
-		private static void DoTextField(TextEditor editor, Rect position, ref string text)
+		private static void DoTextField(TextEditor editor, Rect position, string text)
 		{
 			var settings = DemystifySettings.instance;
 			if (!settings || !settings.AllowCodePreview) return;
@@ -22,6 +31,12 @@ namespace Needle.Demystify
 			if (!Patch_Console.IsDrawingConsole) return;
 			if (!Patch_Console.ConsoleWindow) return;
 			var evt = Event.current;
+			var mouse = evt.mousePosition;
+			if (!position.Contains(mouse))
+			{
+				ClearPopupWindow();
+				return;
+			}
 
 			if (evt.type == EventType.Repaint && Patch_Console.ConsoleWindow)
 			{
@@ -40,18 +55,12 @@ namespace Needle.Demystify
 				var diff = time - lastTimeFoundKey;
 				if (diff > .3f)
 				{
-					if (window && window.Text != null)
-					{
-						window.Text = null;
-						EditorUtility.SetDirty(window);
-						window.Repaint();
-					}
+					ClearPopupWindow();
 					return;
 				}
 			}
 			
 			if (evt == null || (evt.type != EventType.Repaint && evt.type != EventType.MouseMove)) return;
-			var mouse = evt.mousePosition;
 			if (!position.Contains(mouse)) return;
 
 			var prevSelection = editor.selectIndex;
@@ -104,7 +113,7 @@ namespace Needle.Demystify
 
 			if (window)
 			{
-				window.Text = null;
+				ClearPopupWindow();
 			}
 		}
 	}

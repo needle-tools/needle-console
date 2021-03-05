@@ -26,9 +26,17 @@ namespace Needle.Demystify
 
 		private static string HighlightTextColor => EditorGUIUtility.isProSkin ? "#ffffff" : "#000000";
 		private static string NormalTextColor => EditorGUIUtility.isProSkin ? "#aaaaaa" : "#555555";
+		private static string TypesPatterns;
 
 		private static string GetText(IReadOnlyList<string> lines, int line, int padding, out int lineCount)
 		{
+			if (TypesPatterns == null)
+			{
+				var patterns = SyntaxHighlighting.GetCodeSyntaxHighlightingPatterns();
+				TypesPatterns = string.Join("|", patterns);
+				Debug.Log(TypesPatterns);
+			}
+				
 			lineCount = 0;
 			if (lines == null || lines.Count <= 0) return null;
 			padding = Mathf.Max(0, padding);
@@ -38,8 +46,13 @@ namespace Needle.Demystify
 			for (var index = from; index < to; index++)
 			{
 				var l = lines[index];
-				if (index == line) l = $"<color={HighlightTextColor}><b>{l}</b></color>";
-				else l = $"<color={NormalTextColor}>{l}</color>";
+				// if (index == line) l = $"<color={HighlightTextColor}><b>{l}</b></color>";
+				// else
+				{
+					SyntaxHighlighting.AddSyntaxHighlighting(TypesPatterns, ref l, false);
+					if (index == line) l = "<b>" + l + "</b>";
+					// l = $"<color={NormalTextColor}>{l}</color>";
+				}
 				str += l + "\n";
 				lineCount += 1;
 			}
@@ -71,7 +84,7 @@ namespace Needle.Demystify
 				style.richText = true;
 				return window;
 			}
-
+			
 			public string Text;
 			public Vector2 Mouse;
 
