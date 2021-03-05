@@ -52,6 +52,7 @@ namespace Needle.Demystify
 		{
 			yield return @"(?<comment>\/\/.*)";
 			yield return "\"(?<string_literal>.+)\"";
+			yield return @"(?<define>\s{0,}\#(if|define) \w+)";
 			yield return @"(?<exception> throw new \w*Exception)";
 			yield return @"(?<exception>throw )";
 			yield return @"(?<keywords>new )";
