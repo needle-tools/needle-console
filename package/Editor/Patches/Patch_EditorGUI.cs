@@ -17,7 +17,7 @@ namespace Needle.Demystify
 		private static void DoTextField(TextEditor editor, Rect position, ref string text)
 		{
 			var settings = DemystifySettings.instance;
-			if (!settings.AllowCodePreview) return;
+			if (!settings || !settings.AllowCodePreview) return;
 			
 			if (!Patch_Console.IsDrawingConsole) return;
 			if (!Patch_Console.ConsoleWindow) return;
@@ -81,7 +81,7 @@ namespace Needle.Demystify
 						window.Mouse = pos;
 						window.ShowPopup();
 						var cornerTopLeft = GUIUtility.GUIToScreenPoint(new Vector2(0, 0));
-						var consoleWindow = Patch_Console.ConsoleWindow.position;
+						// var consoleWindow = Patch_Console.ConsoleWindow.position;
 						var rect = new Rect(Vector2.zero, new Vector2(Screen.width - 2, EditorGUIUtility.singleLineHeight * lines));
 						pos.x = cornerTopLeft.x;
 						// const int linesDistance = 3;
