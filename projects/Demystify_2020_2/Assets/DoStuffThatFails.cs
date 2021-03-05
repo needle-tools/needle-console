@@ -5,6 +5,7 @@ using UnityEngine;
 [ExecuteAlways]
 public class DoStuffThatFails : MonoBehaviour
 {
+	[HideInInspector]
 	public Object Reference;
 
 	// Start is called before the first frame update
@@ -12,10 +13,17 @@ public class DoStuffThatFails : MonoBehaviour
 	{
 	}
 
-	// Update is called once per frame
+	[ContextMenu(nameof(RunInvalidOperation))]
+	void RunInvalidOperation()
+	{
+		Reference = null;
+		// ReSharper disable once PossibleNullReferenceException
+		Debug.Log(Reference.name);
+	}
+	
 	void Update()
 	{
 		if (Application.isPlaying)
-			Debug.Log(Reference.name);
+			RunInvalidOperation();
 	}
 }

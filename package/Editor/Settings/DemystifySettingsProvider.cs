@@ -59,6 +59,8 @@ namespace Needle.Demystify
 				EditorGUILayout.Space(10);
 				EditorGUILayout.LabelField("Console Options", EditorStyles.boldLabel);
 				settings.Separator = EditorGUILayout.TextField(new GUIContent("Stacktrace Separator", "Adds a separator to Console stacktrace output between each stacktrace"), settings.Separator);
+				settings.AllowCodePreview = EditorGUILayout.Toggle(new GUIContent("Allow Code Preview", "Show code context in popup window when hovering over console log line with file path"), settings.AllowCodePreview); 
+				settings.CodePreviewKeyCode = (KeyCode)EditorGUILayout.EnumPopup(new GUIContent("Code Preview Key", "If None: code preview popup will open on hover. If any key assigned: code preview popup will only open if that key is pressed on hover"), settings.CodePreviewKeyCode);
 
 				if(DemystifySettings.DevelopmentMode)
 				// using(new EditorGUI.DisabledScope(!settings.DevelopmentMode))
@@ -91,7 +93,7 @@ namespace Needle.Demystify
 
 		public static event Action ThemeEditedOrChanged;
 		
-		internal static string[] AlwaysInclude = new string[] {"link"};
+		internal static string[] AlwaysInclude = new[] {"link", "string_literal", "comment"};
 
 		private static void DrawSyntaxGUI(DemystifySettings settings)
 		{

@@ -11,6 +11,7 @@ namespace Needle.Demystify
 	{
 		internal static readonly Dictionary<string, string> DefaultThemeDark = new Dictionary<string, string>()
 		{
+			{"comment", "#3A903A"},
 			{"new", "#FFE234"},
 			{"async", "#4394F1"},
 			{"return_tuple", "#4394F1"},
@@ -25,10 +26,12 @@ namespace Needle.Demystify
 			{"exception", "#FF3636"},
 			{"link", "#959595"},
 			{"keywords", "#4394F1"},
+			{"string_literal", "#FFB48F"},
 		};
 
 		internal static readonly Dictionary<string, string> DefaultThemeLight = new Dictionary<string, string>()
 		{
+			{"comment", "#2E7228"},
 			{"new", "#C600FF"},
 			{"async", "#240AE7"},
 			{"return_tuple", "#240AE7"},
@@ -42,7 +45,7 @@ namespace Needle.Demystify
 			{"local_func_params", "#240AE7"},
 			{"exception", "#FF0000"},
 			{"link", "#414141"},
-			{"keywords", "#240AE7"},
+			{"keywords", "#FFB48F"},
 		};
 
 		public string Name;

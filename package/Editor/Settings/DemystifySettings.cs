@@ -60,5 +60,7 @@ namespace Needle.Demystify
 		}
 
 		public string Separator = "—";
+		public bool AllowCodePreview = true;
+		public KeyCode CodePreviewKeyCode = KeyCode.None;
 	}
 }

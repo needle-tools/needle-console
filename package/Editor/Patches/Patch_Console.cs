@@ -16,19 +16,45 @@ namespace Needle.Demystify
 
 		protected override void OnGetPatches(List<EditorPatch> patches)
 		{
-			patches.Add(new ConsolePatch());
+			patches.Add(new StacktracePatch());
+			patches.Add(new ConsoleDrawingEvent());
 		}
 
-		private class ConsolePatch : EditorPatch
+
+		internal static bool IsDrawingConsole { get; private set; }
+		internal static Type ConsoleWindowType { get; private set; }
+		internal static EditorWindow ConsoleWindow { get; private set; }
+
+		private class ConsoleDrawingEvent : EditorPatch
 		{
-			private static Type console;
+			protected override Task OnGetTargetMethods(List<MethodBase> targetMethods)
+			{
+				ConsoleWindowType ??= typeof(EditorWindow).Assembly.GetTypes().FirstOrDefault(t => t.FullName == "UnityEditor.ConsoleWindow");
+				var method = ConsoleWindowType?.GetMethod("OnGUI", (BindingFlags) ~0);
+				Debug.Assert(method != null, "Could not find console OnGUI method. Console?: " + ConsoleWindowType);
+				targetMethods.Add(method);
+				return Task.CompletedTask; 
+			}
+
+			private static void Prefix()
+			{
+				IsDrawingConsole = true;
+			}
+
+			private static void Postfix()
+			{
+				IsDrawingConsole = false;
+			}
+		}
+
+		private class StacktracePatch : EditorPatch
+		{
 
 			protected override Task OnGetTargetMethods(List<MethodBase> targetMethods)
 			{
-				console = typeof(EditorWindow).Assembly.GetTypes().FirstOrDefault(t => t.FullName == "UnityEditor.ConsoleWindow");
-				var method = console?.GetMethod("StacktraceWithHyperlinks", (BindingFlags) ~0, null, new[] {typeof(string)}, null);
-				// if (DemystifySettings.instance.DevelopmentMode)
-				Debug.Assert(method != null, "Could not find console window method. Console?: " + console);
+				ConsoleWindowType ??= typeof(EditorWindow).Assembly.GetTypes().FirstOrDefault(t => t.FullName == "UnityEditor.ConsoleWindow");
+				var method = ConsoleWindowType?.GetMethod("StacktraceWithHyperlinks", (BindingFlags) ~0, null, new[] {typeof(string)}, null);
+				Debug.Assert(method != null, "Could not find console stacktrace method. Console?: " + ConsoleWindowType);
 				targetMethods.Add(method);
 				return Task.CompletedTask;
 			}
@@ -36,13 +62,12 @@ namespace Needle.Demystify
 			private static string lastText;
 			private static string lastResult;
 
-			public ConsolePatch()
+			public StacktracePatch()
 			{
-				EditorWindow window = null;
 				void Init()
 				{
 					EditorApplication.update -= Init;
-					window = EditorWindow.GetWindow(console);
+					ConsoleWindow = EditorWindow.GetWindow(ConsoleWindowType);
 				}
 
 				EditorApplication.update += Init;
@@ -50,16 +75,17 @@ namespace Needle.Demystify
 				void Repaint()
 				{
 					lastText = null;
-					if(window)
-						window.Repaint();
-				}
-
-				DemystifySettings.ThemeChanged += Repaint;
-				DemystifySettingsProvider.ThemeEditedOrChanged += Repaint;
+					if (ConsoleWindowType != null)
+					{
+						if(ConsoleWindow)
+							ConsoleWindow.Repaint();
+					}
+				};
 			}
 
 			private static bool Prefix(ref string stacktraceText)
 			{
+				
 				var textChanged = lastText != stacktraceText;
 				if (textChanged)
 				{

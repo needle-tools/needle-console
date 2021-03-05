@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Text.RegularExpressions;
 using UnityEditor;
 using UnityEngine;
+using Debug = UnityEngine.Debug;
 
 namespace Needle.Demystify
 {
@@ -39,12 +41,25 @@ namespace Needle.Demystify
 				// https://regex101.com/r/3Bc9EI/1
 				Highlighting.TypesOnly, new List<string>()
 				{
-					@"(?<keywords>string |bool |int |long |uint |float |double |object |Action |async |Object |byte |in |out |ref |null |static )",
+					@"(?<keywords>string |bool |int |long |uint |float |double |object |Action |async |Object |byte |in |out |ref |null )",
 					@"(?<keywords><string>|<bool>|<int>|<long>|<uint>|<float>|<double>|<object>|<Action>|<async>|<Object>|<byte>|<in>|<out>|<ref>|<null>|<static )",
 					@"(?<exception>.*?\w*Exception:.+)",
 				}
 			}
 		};
+
+		internal static IEnumerable<string> GetCodeSyntaxHighlightingPatterns()
+		{
+			yield return @"(?<comment>\/\/.*)";
+			yield return "\"(?<string_literal>.+)\"";
+			yield return @"(?<exception> throw new \w*Exception)";
+			yield return @"(?<exception>throw )";
+			yield return @"(?<keywords>new )";
+			yield return @" (?<keywords>this|new|base)[\. \(]";
+			yield return @"(?<keywords>var|string|bool|int|long|uint|float|double|object|Action|async|Object|byte|in|out|ref|null)[ \,\)\>]";
+			yield return @"(?<keywords>return|void||await|class|struct|public|private|internal|static|readonly)[ \,\)\>]";
+			yield return @"(?<keywords>(while|foreach|for) ?)\(";
+		}
 
 		internal static List<string> CurrentPatternsList
 		{
@@ -84,6 +99,11 @@ namespace Needle.Demystify
 			}
 		}
 
+		public static string GetPattern(Highlighting highlighting)
+		{
+			return regexPatterns.TryGetValue(highlighting, out var patterns) ? string.Join("|", patterns) : null;
+		}
+
 
 		internal static readonly Dictionary<string, string> CurrentTheme = new Dictionary<string, string>();
 
@@ -94,9 +114,9 @@ namespace Needle.Demystify
 			AddSyntaxHighlighting(pattern, colorDict, ref line);
 		}
 
-		private static Regex hyperlink = new Regex(@"(?<hyperlink> \(at .*\))", RegexOptions.Compiled | RegexOptions.ExplicitCapture);
+		private static readonly Regex hyperlink = new Regex(@"(?<hyperlink> \(at .*\))", RegexOptions.Compiled | RegexOptions.ExplicitCapture);
 
-		public static void AddSyntaxHighlighting(string pattern, Dictionary<string, string> colorDict, ref string line)
+		public static void AddSyntaxHighlighting(string pattern, Dictionary<string, string> colorDict, ref string line, bool trim = true)
 		{
 			if (string.IsNullOrEmpty(pattern)) return;
 
@@ -114,7 +134,7 @@ namespace Needle.Demystify
 						// check if we have to use regex to replace it
 						separators[0] = group.Value;
 						var occ = str.Split(separators, StringSplitOptions.RemoveEmptyEntries);
-						if (occ.Length >= 2)
+						if (occ.Length >= 2 && occ[0] != "\"" && occ[occ.Length-1] != "\"")
 						{
 							var replaced = false;
 							str = Regex.Replace(@str, Regex.Escape(@group.Value),
@@ -151,7 +171,9 @@ namespace Needle.Demystify
 			{
 				line = line.Remove(link.Groups["hyperlink"].Index);
 			}
-			line = Regex.Replace(line.TrimStart(), pattern, Eval, RegexOptions.Compiled | RegexOptions.Singleline | RegexOptions.ExplicitCapture);
+
+			if (trim) line = line.TrimStart();
+			line = Regex.Replace(line, pattern, Eval, RegexOptions.Compiled | RegexOptions.Singleline | RegexOptions.ExplicitCapture);
 			if (link.Success)
 			{
 				line += link.Value;
