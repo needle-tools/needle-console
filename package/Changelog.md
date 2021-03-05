@@ -5,8 +5,9 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 
-## [1.1.0-pre] - 2021-03-05
+## [1.1.0-pre.2] - 2021-03-05
 - added experimental code preview feature
+- added basic syntax highlighting to code preview
 
 ## [1.0.1-pre.7] - 2021-03-03
 - moved demystify dll into runtime assembly
