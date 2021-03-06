@@ -32,6 +32,7 @@ namespace Needle.Demystify
 
 		internal static readonly Dictionary<string, string> DefaultThemeLight = new Dictionary<string, string>()
 		{
+			{"define", "#555555"},
 			{"comment", "#2E7228"},
 			{"new", "#C600FF"},
 			{"async", "#240AE7"},

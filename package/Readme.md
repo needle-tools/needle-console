@@ -83,6 +83,10 @@ We provide default syntax highlighting for Light and Dark Theme. You can also ch
 
   ![](Documentation~/lightskin.png) 
 
+### **Code Preview**
+Hover over lines in stacktrace that contain a filepath to see more context immediately without having to switching context.
+![](Documentation~/codepreview.gif)  
+
 ### **Fixes to source code links** 🧁  
   Sometimes, links to code in embedded/local packages don't work, so while we were at it we fixed that as well. (Case 1304954 for Unity people stepping by) [Issue Tracker](https://issuetracker.unity3d.com/issues/script-file-that-references-package-script-is-opened-when-double-clicking-a-console-message-in-editor-that-comes-from-a-package)
 
