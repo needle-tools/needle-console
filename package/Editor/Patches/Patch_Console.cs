@@ -58,7 +58,6 @@ namespace Needle.Demystify
 
 		private class StacktracePatch : EditorPatch
 		{
-
 			protected override Task OnGetTargetMethods(List<MethodBase> targetMethods)
 			{
 				var method = ConsoleWindowType?.GetMethod("StacktraceWithHyperlinks", (BindingFlags) ~0, null, new[] {typeof(string)}, null);
@@ -79,6 +78,7 @@ namespace Needle.Demystify
 				}
 
 				EditorApplication.update += Init;
+				DemystifySettingsProvider.ThemeEditedOrChanged += Repaint;
 
 				void Repaint()
 				{

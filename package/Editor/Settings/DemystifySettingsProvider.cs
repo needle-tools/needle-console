@@ -6,6 +6,7 @@ using System.Runtime.InteropServices;
 using needle.EditorPatching;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 namespace Needle.Demystify
 {
@@ -20,7 +21,7 @@ namespace Needle.Demystify
 				DemystifySettings.instance.Save();
 				return new DemystifySettingsProvider(SettingsPath, SettingsScope.User);
 			}
-			catch (System.Exception e)
+			catch (Exception e)
 			{
 				Debug.LogException(e);
 			}
@@ -30,6 +31,12 @@ namespace Needle.Demystify
 
 		private DemystifySettingsProvider(string path, SettingsScope scopes, IEnumerable<string> keywords = null) : base(path, scopes, keywords)
 		{
+		}
+
+		public override void OnActivate(string searchContext, VisualElement rootElement)
+		{
+			base.OnActivate(searchContext, rootElement);
+			ThemeNames = null;
 		}
 
 		[MenuItem("Tools/Demystify/Enable Development Mode", true)]
@@ -85,15 +92,15 @@ namespace Needle.Demystify
 			}
 		}
 
-		// private static bool SyntaxHighlightSettingsThemeFoldout
-		// {
-		// 	get => SessionState.GetBool("Demystify.SyntaxHighlightingThemeFoldout", true);
-		// 	set => SessionState.SetBool("Demystify.SyntaxHighlightingThemeFoldout", value);
-		// }
+		private static bool SyntaxHighlightSettingsThemeFoldout
+		{
+			get => SessionState.GetBool("Demystify.SyntaxHighlightingThemeFoldout", true);
+			set => SessionState.SetBool("Demystify.SyntaxHighlightingThemeFoldout", value);
+		}
 
 		public static event Action ThemeEditedOrChanged;
-		
-		internal static string[] AlwaysInclude = new[] {"link", "string_literal", "comment"};
+
+		private static readonly string[] AlwaysInclude = new[] {"keywords", "link", "string_literal", "comment"};
 
 		private static void DrawSyntaxGUI(DemystifySettings settings)
 		{
@@ -106,9 +113,10 @@ namespace Needle.Demystify
 				SyntaxHighlighting.OnSyntaxHighlightingModeHasChanged();
 				ThemeEditedOrChanged?.Invoke();
 			}
-			// using (new EditorGUI.DisabledScope(!settings.UseSyntaxHighlighting))
+			DrawThemePopup();
+			SyntaxHighlightSettingsThemeFoldout = EditorGUILayout.Foldout(SyntaxHighlightSettingsThemeFoldout, "Colors");
+			if (SyntaxHighlightSettingsThemeFoldout)
 			{
-				DrawThemeOptions();
 				var theme = settings.CurrentTheme;
 				if (theme != null)
 				{
@@ -226,15 +234,18 @@ namespace Needle.Demystify
 			return -1;
 		}
 
-		private static void DrawThemeOptions()
+		private static void DrawThemePopup()
 		{
 			EnsureThemeOptions(); 
 			EditorGUI.BeginChangeCheck(); 
 			var selected = EditorGUILayout.Popup("Theme", ActiveThemeIndex(), ThemeNames);
 			if(selected >= 0 && selected < Themes.Length)
 				DemystifySettings.instance.CurrentTheme = Themes[selected];
-			if(EditorGUI.EndChangeCheck())
+			if (EditorGUI.EndChangeCheck())
+			{
 				DemystifySettings.instance.Save();
+				ThemeEditedOrChanged?.Invoke();
+			}
 		}
 
 		private class AssetProcessor : AssetPostprocessor

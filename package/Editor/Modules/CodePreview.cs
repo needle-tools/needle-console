@@ -32,7 +32,7 @@ namespace Needle.Demystify
 			{
 				var patterns = SyntaxHighlighting.GetCodeSyntaxHighlightingPatterns();
 				TypesPatterns = string.Join("|", patterns);
-				if(DemystifySettings.instance.DevelopmentMode)
+				if(DemystifySettings.DevelopmentMode)
 					Debug.Log("Code Preview Patterns: " + TypesPatterns);
 			}
 				
