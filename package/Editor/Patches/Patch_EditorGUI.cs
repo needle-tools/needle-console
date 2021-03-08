@@ -27,12 +27,12 @@ namespace Needle.Demystify
 		[HarmonyPrefix]
 		[HarmonyPatch(typeof(EditorGUI), "DoTextField")]
 		// https://github.com/Unity-Technologies/UnityCsReference/blob/61f92bd79ae862c4465d35270f9d1d57befd1761/Editor/Mono/EditorGUI.cs#L790
-		private static void DoTextField(TextEditor editor, Rect position, string text)
+		private static void DoTextField(TextEditor editor, Rect position, GUIStyle style)
 		{
 			var settings = DemystifySettings.instance;
 			if (!settings || !settings.AllowCodePreview) return;
 			
-			if (!Patch_Console.IsDrawingConsole) return;
+			if (!Patch_Console.IsDrawingConsole && style.name != "CN Message") return;
 			if (!Patch_Console.ConsoleWindow) return;
 			var evt = Event.current;
 			var mouse = evt.mousePosition;
