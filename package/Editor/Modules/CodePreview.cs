@@ -24,8 +24,6 @@ namespace Needle.Demystify
 			return windowText;
 		}
 
-		private static string HighlightTextColor => EditorGUIUtility.isProSkin ? "#ffffff" : "#000000";
-		private static string NormalTextColor => EditorGUIUtility.isProSkin ? "#aaaaaa" : "#555555";
 		private static string TypesPatterns;
 
 		private static string GetText(IReadOnlyList<string> lines, int line, int padding, out int lineCount)
@@ -34,7 +32,8 @@ namespace Needle.Demystify
 			{
 				var patterns = SyntaxHighlighting.GetCodeSyntaxHighlightingPatterns();
 				TypesPatterns = string.Join("|", patterns);
-				Debug.Log(TypesPatterns);
+				if(DemystifySettings.instance.DevelopmentMode)
+					Debug.Log("Code Preview Patterns: " + TypesPatterns);
 			}
 				
 			lineCount = 0;

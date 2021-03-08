@@ -38,7 +38,7 @@ namespace Needle.Demystify
 				Debug.LogWarning("Not all Demystify patches are enabled. Go to " + DemystifySettingsProvider.SettingsPath +
 				                 " to enable or disable Demystify.\n" +
 				                 "Patches:\n" +
-				                 string.Join("\n", Patches().Select(p => p + ": " + (PatchManager.IsPersistentEnabled(p) ? "enabled" : "disabled"))) + "\n"
+				                 string.Join("\n", Patches().Select(p => p + ": " + (PatchManager.IsPersistentEnabled(p) ? "enabled" : "<b>disabled</b>"))) + "\n"
 				);
 			}
 		}
