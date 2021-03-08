@@ -5,7 +5,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 
-## [1.2.0-exp.1] - 2021-03-08
+## [1.2.0-exp.2] - 2021-03-08
 - first version containing theme scriptable objects
 - added CodePreview patch check: check by style name if we're in the right place to draw the preview
 
