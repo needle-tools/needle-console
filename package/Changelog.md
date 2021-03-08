@@ -4,12 +4,14 @@ All notable changes to this package will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
-## [1.2.0-exp] - 2021-03-08
+
+## [1.2.0-exp.1] - 2021-03-08
 - first version containing theme scriptable objects
+- added CodePreview patch check: check by style name if we're in the right place to draw the preview
 
 ## [1.1.0-pre.5] - 2021-03-08
 - code preview popup follows mouse in y as a workaround for a bug when stacktrace was scrolled that caused a wrong popup position
-- slight codepreview ui fixes/improvements
+- slight CodePreview ui fixes/improvements
 
 ## [1.1.0-pre.3] - 2021-03-05
 - added experimental code preview feature
