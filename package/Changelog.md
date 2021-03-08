@@ -4,10 +4,11 @@ All notable changes to this package will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
-## [1.1.0-pre.6] - 2021-03-08
+## [1.1.0-pre.7] - 2021-03-08
 - code preview popup follows mouse in y as a workaround for a bug when stacktrace was scrolled that caused a wrong popup position
 - slight CodePreview ui fixes/improvements
 - add another check: use style name to detect if we should draw CodePreview
+- fix getting ConsoleWindow at startup/before first compile
 
 ## [1.1.0-pre.3] - 2021-03-05
 - added experimental code preview feature
