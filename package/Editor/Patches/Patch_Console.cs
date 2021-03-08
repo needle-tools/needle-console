@@ -33,7 +33,21 @@ namespace Needle.Demystify
 			set => _consoleWindowType = value;
 		}
 
-		internal static EditorWindow ConsoleWindow { get; private set; }
+		private static EditorWindow _consoleWindow;
+
+		internal static EditorWindow ConsoleWindow
+		{
+			get
+			{
+				if (!_consoleWindow)
+				{
+					if(ConsoleWindowType != null)
+						_consoleWindow = EditorWindow.GetWindow(ConsoleWindowType);
+				}
+				return _consoleWindow;
+			}
+			private set => _consoleWindow = value;
+		}
 
 		private class ConsoleDrawingEvent : EditorPatch
 		{
@@ -71,13 +85,6 @@ namespace Needle.Demystify
 
 			public StacktracePatch()
 			{
-				void Init()
-				{
-					EditorApplication.update -= Init;
-					ConsoleWindow = EditorWindow.GetWindow(ConsoleWindowType);
-				}
-
-				EditorApplication.update += Init;
 				DemystifySettingsProvider.ThemeEditedOrChanged += Repaint;
 
 				void Repaint()
