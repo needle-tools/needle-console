@@ -6,6 +6,9 @@ using UnityEngine;
 
 namespace Needle.Demystify
 {
+	/// <summary>
+	/// patch that adds code preview support to console
+	/// </summary>
 	[HarmonyPatch]
 	public class Patch_EditorGUI
 	{
@@ -23,6 +26,7 @@ namespace Needle.Demystify
 		
 		[HarmonyPrefix]
 		[HarmonyPatch(typeof(EditorGUI), "DoTextField")]
+		// https://github.com/Unity-Technologies/UnityCsReference/blob/61f92bd79ae862c4465d35270f9d1d57befd1761/Editor/Mono/EditorGUI.cs#L790
 		private static void DoTextField(TextEditor editor, Rect position, string text)
 		{
 			var settings = DemystifySettings.instance;
@@ -37,7 +41,7 @@ namespace Needle.Demystify
 				ClearPopupWindow();
 				return;
 			}
-
+			
 			if (evt.type == EventType.Repaint && Patch_Console.ConsoleWindow)
 			{
 				EditorUtility.SetDirty(Patch_Console.ConsoleWindow);
@@ -62,6 +66,7 @@ namespace Needle.Demystify
 			
 			if (evt == null || (evt.type != EventType.Repaint && evt.type != EventType.MouseMove)) return;
 			if (!position.Contains(mouse)) return;
+
 
 			var prevSelection = editor.selectIndex;
 			var prevSelectionEnd = editor.cursorIndex;
@@ -89,13 +94,18 @@ namespace Needle.Demystify
 						window.Text = prev;
 						window.Mouse = pos;
 						window.ShowPopup();
+
 						var cornerTopLeft = GUIUtility.GUIToScreenPoint(new Vector2(0, 0));
 						// var consoleWindow = Patch_Console.ConsoleWindow.position;
-						var rect = new Rect(Vector2.zero, new Vector2(Screen.width - 2, EditorGUIUtility.singleLineHeight * lines));
-						pos.x = cornerTopLeft.x;
-						// const int linesDistance = 3;
-						// pos.y -= rect.height + EditorGUIUtility.singleLineHeight * linesDistance;
-						pos.y = cornerTopLeft.y - rect.height - 1;
+						var width = (Screen.width - 2);
+						const int padding = 0;
+						var height = EditorGUIUtility.singleLineHeight * lines;
+						height -= EditorGUIUtility.singleLineHeight;
+						var rect = new Rect(Vector2.zero, new Vector2( width - padding, height));
+						pos.x = cornerTopLeft.x + padding * .5f;
+						const int linesDistance = 4;
+						pos.y -= rect.height + EditorGUIUtility.singleLineHeight * linesDistance;
+						// pos.y = rect.height - 1;
 						// pos.y = consoleWindow.y;// cornerTopLeft.y - rect.height - 1;
 						// rect.height = GUIUtility.GUIToScreenPoint(consoleWindow.position).y - cornerTopLeft.y;
 						// var headerHeight = EditorGUIUtility.singleLineHeight * 2;
