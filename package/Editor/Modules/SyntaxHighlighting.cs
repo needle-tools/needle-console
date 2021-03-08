@@ -52,13 +52,14 @@ namespace Needle.Demystify
 		{
 			yield return @"(?<comment>\/\/.*)";
 			yield return "\"(?<string_literal>.+)\"";
+			yield return @"(?<define>\s{0,}\#(if|define) \w+)";
 			yield return @"(?<exception> throw new \w*Exception)";
 			yield return @"(?<exception>throw )";
 			yield return @"(?<keywords>new )";
 			yield return @" (?<keywords>this|new|base)[\. \(]";
 			yield return @"(?<keywords>var|string|bool|int|long|uint|float|double|object|Action|async|Object|byte|in|out|ref|null)[ \,\)\>]";
 			yield return @"(?<keywords>return|void||await|class|struct|public|private|internal|static|readonly)[ \,\)\>]";
-			yield return @"(?<keywords>(while|foreach|for) ?)\(";
+			yield return @"(?<keywords>(if|while|foreach|for) ?)\(";
 		}
 
 		internal static List<string> CurrentPatternsList

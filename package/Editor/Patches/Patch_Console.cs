@@ -22,14 +22,23 @@ namespace Needle.Demystify
 
 
 		internal static bool IsDrawingConsole { get; private set; }
-		internal static Type ConsoleWindowType { get; private set; }
+		private static Type _consoleWindowType;
+		private static Type ConsoleWindowType
+		{
+			get
+			{
+				if(_consoleWindowType == null) _consoleWindowType = typeof(EditorWindow).Assembly.GetTypes().FirstOrDefault(t => t.FullName == "UnityEditor.ConsoleWindow");
+				return _consoleWindowType;
+			}
+			set => _consoleWindowType = value;
+		}
+
 		internal static EditorWindow ConsoleWindow { get; private set; }
 
 		private class ConsoleDrawingEvent : EditorPatch
 		{
 			protected override Task OnGetTargetMethods(List<MethodBase> targetMethods)
 			{
-				ConsoleWindowType ??= typeof(EditorWindow).Assembly.GetTypes().FirstOrDefault(t => t.FullName == "UnityEditor.ConsoleWindow");
 				var method = ConsoleWindowType?.GetMethod("OnGUI", (BindingFlags) ~0);
 				Debug.Assert(method != null, "Could not find console OnGUI method. Console?: " + ConsoleWindowType);
 				targetMethods.Add(method);
@@ -52,7 +61,6 @@ namespace Needle.Demystify
 
 			protected override Task OnGetTargetMethods(List<MethodBase> targetMethods)
 			{
-				ConsoleWindowType ??= typeof(EditorWindow).Assembly.GetTypes().FirstOrDefault(t => t.FullName == "UnityEditor.ConsoleWindow");
 				var method = ConsoleWindowType?.GetMethod("StacktraceWithHyperlinks", (BindingFlags) ~0, null, new[] {typeof(string)}, null);
 				Debug.Assert(method != null, "Could not find console stacktrace method. Console?: " + ConsoleWindowType);
 				targetMethods.Add(method);

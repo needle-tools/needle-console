@@ -20,32 +20,35 @@ namespace Needle.Demystify
 				cache.Add(filePath, content);
 			}
 
-			var windowText = GetText(cache[filePath], lineNumber - 1, 7, out lines);
+			var windowText = GetText(cache[filePath], lineNumber - 1, 8, out lines);
 			return windowText;
 		}
 
-		private static string HighlightTextColor => EditorGUIUtility.isProSkin ? "#ffffff" : "#000000";
-		private static string NormalTextColor => EditorGUIUtility.isProSkin ? "#aaaaaa" : "#555555";
 		private static string TypesPatterns;
 
-		private static string GetText(IReadOnlyList<string> lines, int line, int padding, out int lineCount)
+		private static string GetText(IReadOnlyList<string> lines, int line, int showLinesAboveAndBelow, out int lineCount)
 		{
 			if (TypesPatterns == null)
 			{
 				var patterns = SyntaxHighlighting.GetCodeSyntaxHighlightingPatterns();
 				TypesPatterns = string.Join("|", patterns);
-				Debug.Log(TypesPatterns);
+				if(DemystifySettings.instance.DevelopmentMode)
+					Debug.Log("Code Preview Patterns: " + TypesPatterns);
 			}
 				
 			lineCount = 0;
 			if (lines == null || lines.Count <= 0) return null;
-			padding = Mathf.Max(0, padding);
-			var from = Mathf.Max(0, line - padding);
-			var to = Mathf.Min(lines.Count - 1, line + padding);
+			showLinesAboveAndBelow = Mathf.Max(0, showLinesAboveAndBelow);
+			var from = Mathf.Max(0, line - showLinesAboveAndBelow);
+			var to = Mathf.Min(lines.Count - 1, line + showLinesAboveAndBelow);
 			var str = string.Empty;
+			var lastLineWasEmpty = false;
 			for (var index = from; index < to; index++)
 			{
 				var l = lines[index];
+				var empty = string.IsNullOrWhiteSpace(l);
+				if (lastLineWasEmpty && empty) continue;
+				lastLineWasEmpty = empty;
 				// if (index == line) l = $"<color={HighlightTextColor}><b>{l}</b></color>";
 				// else
 				{
@@ -100,7 +103,8 @@ namespace Needle.Demystify
 					return;
 				}
 
-				DrawBorders(Color.gray, 1);
+				EditorGUI.DrawRect(new Rect(0,0, position.width,position.height), new Color(0,0,0,.2f));
+				DrawBorders(Color.gray * .8f, 1);
 				EditorGUILayout.LabelField(Text, style);
 			}
 

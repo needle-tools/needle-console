@@ -11,6 +11,7 @@ namespace Needle.Demystify
 	{
 		internal static readonly Dictionary<string, string> DefaultThemeDark = new Dictionary<string, string>()
 		{
+			{"define", "#888888"},
 			{"comment", "#3A903A"},
 			{"new", "#FFE234"},
 			{"async", "#4394F1"},
@@ -31,6 +32,7 @@ namespace Needle.Demystify
 
 		internal static readonly Dictionary<string, string> DefaultThemeLight = new Dictionary<string, string>()
 		{
+			{"define", "#555555"},
 			{"comment", "#2E7228"},
 			{"new", "#C600FF"},
 			{"async", "#240AE7"},
