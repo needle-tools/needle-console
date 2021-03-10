@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Net;
 using System.Text.RegularExpressions;
 using UnityEngine;
 
@@ -22,6 +23,8 @@ namespace Needle.Demystify
 				var filePath = new Uri(pathGroup.Value, UriKind.RelativeOrAbsolute);
 				var appPath = new Uri(Application.dataPath, UriKind.Absolute);
 				var relativePath = appPath.MakeRelativeUri(filePath).ToString();
+				relativePath = WebUtility.UrlDecode(relativePath);
+				// relativePath = relativePath.Replace("%20", " ");
 				// if (makeHyperlink) relativePath = "<a href=\"" + pathGroup.Value + "\">" + relativePath + "</a>";
 				line = line.Replace(pathGroup.Value, relativePath);
 			}
