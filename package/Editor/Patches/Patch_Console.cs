@@ -49,10 +49,10 @@ namespace Needle.Demystify
 			private set => _consoleWindow = value;
 		}
 
-		private static Type SplitterStateType = typeof(Editor).Assembly.GetType("UnityEditor.SplitterState");
-		private static FieldInfo SplitterState = ConsoleWindowType.GetField("spl", BindingFlags.NonPublic | BindingFlags.Instance);
-		private static FieldInfo SplitterRealSizes = SplitterStateType.GetField("realSizes", BindingFlags.Public | BindingFlags.Instance);
-		private static FieldInfo TextScroll = ConsoleWindowType.GetField("m_TextScroll", BindingFlags.NonPublic | BindingFlags.Instance);
+		private static readonly Type SplitterStateType = typeof(Editor).Assembly.GetType("UnityEditor.SplitterState");
+		private static readonly FieldInfo SplitterState = ConsoleWindowType.GetField("spl", BindingFlags.NonPublic | BindingFlags.Instance);
+		private static readonly FieldInfo SplitterRealSizes = SplitterStateType.GetField("realSizes", BindingFlags.Public | BindingFlags.Instance);
+		private static readonly FieldInfo TextScroll = ConsoleWindowType.GetField("m_TextScroll", BindingFlags.NonPublic | BindingFlags.Instance);
 
 		public static Rect GetStackScrollViewRect()
 		{
