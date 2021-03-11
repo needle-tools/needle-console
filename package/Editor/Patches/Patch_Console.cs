@@ -59,7 +59,11 @@ namespace Needle.Demystify
 			var rect = ConsoleWindow.position;
 
 			var splitState = SplitterState.GetValue(ConsoleWindow);
-			var splitRealSizes = (float[])SplitterRealSizes.GetValue(splitState);
+#if UNITY_2020_2_OR_NEWER
+			var splitRealSizes = (float[]) SplitterRealSizes.GetValue(splitState);
+#else
+			var splitRealSizes = (int[]) SplitterRealSizes.GetValue(splitState);
+#endif
 
 			var stackViewSize = splitRealSizes[1];
 
