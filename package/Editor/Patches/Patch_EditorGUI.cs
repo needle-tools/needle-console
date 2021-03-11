@@ -65,8 +65,10 @@ namespace Needle.Demystify
 			}
 			
 			if (evt == null || (evt.type != EventType.Repaint && evt.type != EventType.MouseMove)) return;
-			if (!position.Contains(mouse)) return;
+			
+			var stackViewRect = Patch_Console.GetStackScrollViewRect();
 
+			if (!stackViewRect.Contains(mouse)) return;
 
 			var prevSelection = editor.selectIndex;
 			var prevSelectionEnd = editor.cursorIndex;

@@ -49,6 +49,32 @@ namespace Needle.Demystify
 			private set => _consoleWindow = value;
 		}
 
+		private static Type SplitterStateType = typeof(Editor).Assembly.GetType("UnityEditor.SplitterState");
+		private static FieldInfo SplitterState = ConsoleWindowType.GetField("spl", BindingFlags.NonPublic | BindingFlags.Instance);
+		private static FieldInfo SplitterRealSizes = SplitterStateType.GetField("realSizes", BindingFlags.Public | BindingFlags.Instance);
+		private static FieldInfo TextScroll = ConsoleWindowType.GetField("m_TextScroll", BindingFlags.NonPublic | BindingFlags.Instance);
+
+		public static Rect GetStackScrollViewRect()
+		{
+			var rect = ConsoleWindow.position;
+
+			var splitState = SplitterState.GetValue(ConsoleWindow);
+			var splitRealSizes = (float[])SplitterRealSizes.GetValue(splitState);
+
+			var stackViewSize = splitRealSizes[1];
+
+			rect.x = 0;
+			rect.y = GetStackTextScroll().y;
+			rect.height = stackViewSize;
+			
+			return rect;
+		}
+		
+		private static Vector2 GetStackTextScroll()
+		{
+			return (Vector2)TextScroll.GetValue(ConsoleWindow);
+		}
+		
 		private class ConsoleDrawingEvent : EditorPatch
 		{
 			protected override Task OnGetTargetMethods(List<MethodBase> targetMethods)
