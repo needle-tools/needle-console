@@ -94,6 +94,9 @@ Hover over lines in stacktrace that contain a filepath to see more context immed
 
 - syntax highlighting has a performance impact, so if you're on a very slow machine you might want to turn it off (demystifying is highly optimized and shouldn't have a noticeable performance impact)
 
+## Support 💚
+This project is supported via donations. If you or your team have found it useful, please consider supporting further development through [patreon](https://www.patreon.com/needletools)
+
 ## Contact ✒️
 <b>[🌵 needle — tools for unity](https://needle.tools)</b> • 
 [@NeedleTools](https://twitter.com/NeedleTools) • 

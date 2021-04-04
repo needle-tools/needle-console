@@ -45,6 +45,9 @@ You can also add it directly from GitHub on Unity 2019.4+. Note that you won't b
 ## How To Use 💡
 Please open the <a href="https://github.com/needle-tools/demystify/blob/main/package/Readme.md">Package Readme</a> for more information.
 
+## Support 💚
+This project is supported via donations. If you or your team have found it useful, please consider supporting further development through [patreon](https://www.patreon.com/needletools)
+
 ## Contact ✒️
 <b>[🌵 needle — tools for unity](https://needle.tools)</b> • 
 [@NeedleTools](https://twitter.com/NeedleTools) • 
