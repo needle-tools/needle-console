@@ -60,7 +60,7 @@ namespace Needle.Demystify
 		public static void Disable()
 		{
 			foreach (var p in Patches())
-				PatchManager.DisablePatch(p);
+				PatchManager.DisablePatch(p, false);
 		}
 
 		public static void Apply(ref string stacktrace)
