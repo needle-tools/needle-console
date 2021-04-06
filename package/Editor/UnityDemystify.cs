@@ -15,8 +15,6 @@ namespace Needle.Demystify
 		private static void Init()
 		{
 			var settings = DemystifySettings.instance;
-			settings.CurrentTheme.EnsureEntries();
-			settings.CurrentTheme.SetActive();
 
 			var projectSettings = DemystifyProjectSettings.instance;
 			if (projectSettings.FirstInstall)
@@ -24,9 +22,9 @@ namespace Needle.Demystify
 				async void InstalledLog()
 				{
 					await Task.Delay(100);
+					Enable();
 					projectSettings.FirstInstall = false;
 					projectSettings.Save();
-					Enable();
 					Debug.Log("Thanks for installing Demystify. You can find Settings under Edit/Preferences Needle/Demystify");
 				}
 
@@ -40,6 +38,12 @@ namespace Needle.Demystify
 				                 "Patches:\n" +
 				                 string.Join("\n", Patches().Select(p => p + ": " + (PatchManager.IsPersistentEnabled(p) ? "enabled" : "<b>disabled</b>"))) + "\n"
 				);
+			}
+
+			if (settings.CurrentTheme != null)
+			{
+				settings.CurrentTheme.EnsureEntries();
+				settings.CurrentTheme.SetActive();
 			}
 		}
 
