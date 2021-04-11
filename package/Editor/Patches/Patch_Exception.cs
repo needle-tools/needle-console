@@ -24,6 +24,8 @@ namespace Needle.Demystify
 				Hyperlinks.FixStacktrace(ref __result);
 				StacktraceMarkerUtil.AddMarker(ref __result);
 			}
+			
+			
 		}
 		
 	}

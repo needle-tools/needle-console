@@ -23,7 +23,7 @@ namespace Needle.Demystify
 
 		internal static bool IsDrawingConsole { get; private set; }
 		private static Type _consoleWindowType;
-		private static Type ConsoleWindowType
+		internal static Type ConsoleWindowType
 		{
 			get
 			{
