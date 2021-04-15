@@ -159,7 +159,7 @@ namespace Needle.Demystify
 				if (GUILayout.Button(new GUIContent("Enable Demystify", 
 					"Enables patches:\n" + string.Join("\n", UnityDemystify.Patches())
 				)))
-					UnityDemystify.Enable();
+					UnityDemystify.Enable(true);
 				EditorGUILayout.HelpBox("Demystify is disabled, click the Button above to enable it", MessageType.Info);
 			}
 			else
