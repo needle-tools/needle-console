@@ -12,7 +12,7 @@ namespace Needle.Demystify
 	{
 		[InitializeOnLoadMethod]
 		[RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterAssembliesLoaded)]
-		private static void Init()
+		private static async void Init()
 		{
 			var settings = DemystifySettings.instance;
 
@@ -46,6 +46,7 @@ namespace Needle.Demystify
 				settings.CurrentTheme.SetActive();
 			}
 
+			while (!PatchManager.IsInitialized) await Task.Delay(1);
 			Enable(false);
 		}
 
