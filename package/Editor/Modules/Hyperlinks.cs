@@ -98,6 +98,7 @@ namespace Needle.Demystify
 			// if (fileNameIndexStart > 0)
 			// 	path = path.Substring(fileNameIndexStart + 1);
 
+			var isPackageCache = path.Contains("PackageCache");
 			var match = capturePackageNameInPath.Match(path);
 			if (match.Success)
 			{
@@ -105,8 +106,8 @@ namespace Needle.Demystify
 				var file = match.Groups["fileName"].Value;
 				if (!string.IsNullOrEmpty(package) && !string.IsNullOrEmpty(file))
 				{
-					// Debug.Log(path);
 					path = package + "/" + file;
+					if (isPackageCache) path = "PackageCache/" + path;
 				}
 			}
 
