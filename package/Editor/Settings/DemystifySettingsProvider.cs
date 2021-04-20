@@ -68,6 +68,7 @@ namespace Needle.Demystify
 				settings.Separator = EditorGUILayout.TextField(new GUIContent("Stacktrace Separator", "Adds a separator to Console stacktrace output between each stacktrace"), settings.Separator);
 				settings.AllowCodePreview = EditorGUILayout.Toggle(new GUIContent("Allow Code Preview", "Show code context in popup window when hovering over console log line with file path"), settings.AllowCodePreview); 
 				settings.CodePreviewKeyCode = (KeyCode)EditorGUILayout.EnumPopup(new GUIContent("Code Preview Key", "If None: code preview popup will open on hover. If any key assigned: code preview popup will only open if that key is pressed on hover"), settings.CodePreviewKeyCode);
+				settings.ShortenFilePaths = EditorGUILayout.Toggle(new GUIContent("Shorten File Paths", "When enabled demystify tries to shorten package paths to <package_name>@<version> <fileName><line>"), settings.ShortenFilePaths); 
 
 				if(DemystifySettings.DevelopmentMode)
 				// using(new EditorGUI.DisabledScope(!settings.DevelopmentMode))
