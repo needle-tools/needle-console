@@ -4,6 +4,11 @@ All notable changes to this package will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## [1.2.0-exp.6] - 2021-04-20
+- Rename dlls to avoid collisions
+- Change Unity path syntax from ``(at`` to ``in`` 
+- Add option to shorten PackageCache file paths (default is enabled, can be disabled in ``Preferences/Demystify``)
+
 ## [1.2.0-exp.5] - 2021-04-15
 - Fix issue with first installation
 - Fix "Enable patches" button not working when patches have been persistently disabled
