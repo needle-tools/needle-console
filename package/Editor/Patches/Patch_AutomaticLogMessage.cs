@@ -34,7 +34,7 @@ namespace Needle.Demystify
 			// ReSharper disable once UnusedMember.Local
 			private static void Postfix(ref string __result)
 			{
-				if (string.IsNullOrEmpty(__result) || __result == "Null")
+				if (__result != null && __result.Length <= 0)// || __result == "Null")
 				{
 					__result = string.Empty;
 					var stacktrace = new StackTrace();
