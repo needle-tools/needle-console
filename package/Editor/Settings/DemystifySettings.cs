@@ -64,5 +64,6 @@ namespace Needle.Demystify
 		public KeyCode CodePreviewKeyCode = KeyCode.None;
 
 		public bool ShortenFilePaths = true;
+		public bool ShowFileName = true;
 	}
 }

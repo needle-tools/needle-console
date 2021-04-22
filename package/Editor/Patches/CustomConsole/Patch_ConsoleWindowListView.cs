@@ -18,7 +18,7 @@ using UnityEngine;
 
 namespace Needle.Demystify
 {
-	public class Patch_ConsoleWindow : EditorPatchProvider
+	public class Patch_ConsoleWindowListView : EditorPatchProvider
 	{
 		public override string Description => "Custom Console List View";
 
@@ -31,14 +31,13 @@ namespace Needle.Demystify
 		{
 			protected override Task OnGetTargetMethods(List<MethodBase> targetMethods)
 			{
-				PatchManager.AllowDebugLogs = true;
 				var method = Patch_Console.ConsoleWindowType.GetMethod("OnGUI", BindingFlags.NonPublic | BindingFlags.Instance);
 				targetMethods.Add(method);
 				return Task.CompletedTask;
 			}
 
 			private static IEnumerable<CodeInstruction> Transpiler(MethodBase method, ILGenerator il, IEnumerable<CodeInstruction> instructions)
-			{
+			{ 
 				
 				// var skipLabel = il.DefineLabel();
 
@@ -90,50 +89,18 @@ namespace Needle.Demystify
 					if (inst.opcode == OpCodes.Call && inst.operand is MethodInfo m)
 					{
 						if (m.DeclaringType == typeof(LogEntries) && m.Name == "GetLinesAndModeFromEntryInternal")
-						{
+						{ 
 							yield return inst;
 							// load text is one element before
-							var ldStr = arr[index - 1];
+							var ldStr = arr[index - 1]; 
 							yield return new CodeInstruction(OpCodes.Ldloc, loadListViewElementIndex);
 							yield return ldStr;
-							// yield return new CodeInstruction(OpCodes.Ldstr, "TEST");
-							yield return CodeInstruction.Call(typeof(ListViewPatch), nameof(ModifyText));
-							continue;
+							yield return CodeInstruction.Call(typeof(ConsoleListView), nameof(ConsoleListView.ModifyText));
+							continue; 
 						}
 					}
 
 					yield return inst; 
-				}
-			}
-
-			private static readonly LogEntry tempEntry = new LogEntry();
-			private static void ModifyText(ListViewElement element, ref string text)
-			{
-				// LogEntries.SetFilteringText("PatchManager");
-				if (LogEntries.GetEntryInternal(element.row, tempEntry)) 
-				{
-					var file = tempEntry.file;
-					if (!string.IsNullOrWhiteSpace(file) && File.Exists(file))
-					{
-						var fileName = Path.GetFileNameWithoutExtension(file);
-
-						string GetText()
-						{
-							return "[<b>" + fileName + "</b>]";
-						}
-
-						var endTimeIndex = text.IndexOf("] ", StringComparison.InvariantCulture);
-						// no time:
-						if (endTimeIndex == -1)
-						{
-							text = $"{GetText()} {text}";
-						}
-						// contains time:
-						else
-						{
-							text = $"{text.Substring(0, endTimeIndex + 1)} {GetText()}{text.Substring(endTimeIndex + 1)}";
-						}
-					}
 				}
 			}
 

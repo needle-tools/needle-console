@@ -57,6 +57,12 @@ namespace Needle.Demystify
 			yield return typeof(Patch_Console).FullName;
 			yield return typeof(Patch_EditorGUI).FullName;
 			yield return typeof(Patch_AutomaticLogMessage).FullName;
+			var settings = DemystifySettings.instance;
+			if (settings.ShowFileName)
+			{
+				yield return "Needle.Demystify.Patch_ConsoleWindowListView";
+				yield return "Needle.Demystify.Patch_ConsoleWindowMenuItem";
+			}
 		}
 
 		public static void Enable(bool force = false)
