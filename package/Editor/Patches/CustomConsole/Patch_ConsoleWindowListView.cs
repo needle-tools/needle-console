@@ -9,6 +9,7 @@ using System.Reflection.Emit;
 using System.Runtime.InteropServices.ComTypes;
 using System.Threading.Tasks;
 using HarmonyLib;
+using ICSharpCode.NRefactory.Ast;
 using needle.EditorPatching;
 using NUnit.Framework.Internal;
 using UnityEditor;
@@ -25,6 +26,70 @@ namespace Needle.Demystify
 		protected override void OnGetPatches(List<EditorPatch> patches)
 		{
 			patches.Add(new ListViewPatch());
+			// patches.Add(new EnumeratorPatch());
+			// patches.Add(new ListViewStatePatch());
+		}
+
+		// https://github.com/Unity-Technologies/UnityCsReference/blob/61f92bd79ae862c4465d35270f9d1d57befd1761/Editor/Mono/GUI/ListViewGUILayout.cs#L183
+
+
+		private class ListViewStatePatch : EditorPatch
+		{
+			protected override Task OnGetTargetMethods(List<MethodBase> targetMethods)
+			{
+				var method = typeof(GettingLogEntriesScope).GetConstructor(BindingFlags.Public | BindingFlags.Instance, null, new[]{typeof(ListViewState)}, null);
+				Debug.Log(method);
+				targetMethods.Add(method);
+				return Task.CompletedTask;
+			}
+
+			private static void Postfix(ListViewState listView)
+			{
+				listView.totalRows = Mathf.Min(2, listView.totalRows);
+			}
+		}
+		
+		private class EnumeratorPatch : EditorPatch
+		{
+			protected override Task OnGetTargetMethods(List<MethodBase> targetMethods)
+			{
+				var method = typeof(ListViewShared.ListViewElementsEnumerator).GetMethod("MoveNext");
+				targetMethods.Add(method);
+				return Task.CompletedTask;
+			}
+
+			private static int count;
+
+			private static void Prefix(int ___xPos)
+			{
+				if (___xPos <= -1)
+					count = 0;
+			}
+			
+			// https://github.com/Unity-Technologies/UnityCsReference/blob/61f92bd79ae862c4465d35270f9d1d57befd1761/Editor/Mono/GUI/ListViewShared.cs#L411
+			private static void Postfix(ListViewShared.ListViewElementsEnumerator __instance, ref bool __result, ref ListViewElement ___element, ListViewShared.InternalLayoutedListViewState ___ilvState)
+			{
+				if (__result)
+				{
+					if (___element.row == 0) count = 0;
+					
+					if (___element.row % 2 == 0)
+					{
+						count += 1;
+						// if(___ilvState != null && ___ilvState.@group != null)
+						// 	___ilvState.@group.AddY(-___ilvState.rectHeight);
+						__instance.MoveNext(); 
+					}
+					else
+					{
+						var el = ___element.position;
+						el.y -= el.height * count;
+						// ___element.row -= count;
+						// ___element.row = Mathf.Max(___element.row, 0);
+						___element.position = el;
+					}
+				}
+			}
 		}
 
 		private class ListViewPatch : EditorPatch
