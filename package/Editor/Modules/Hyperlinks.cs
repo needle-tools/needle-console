@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Text.RegularExpressions;
 using UnityEngine;
 
@@ -66,11 +67,12 @@ namespace Needle.Demystify
 				{
 					if (m.Success && SyntaxHighlighting.CurrentTheme.TryGetValue("link", out var col))
 					{
-						var open = m.Groups["open"].Value;
-						var close = m.Groups["close"].Value;
+						var open = "in ";// m.Groups["open"].Value;
+						var close = string.Empty;// m.Groups["close"].Value;
 						var pre = m.Groups["pre"].Value;
 						var post = m.Groups["post"].Value;
 						var path = m.Groups["path"].Value;
+						ModifyFilePath(ref path);
 						var col_0 = $"<color={col}>";
 						var col_1 = "</color>";
 						var res = $"{col_0}{open}{col_1}{pre}{col_0}{path}{col_1}{post}{col_0}{close}{col_1}";
@@ -81,6 +83,34 @@ namespace Needle.Demystify
 				},
 				RegexOptions.Compiled);
 			stacktrace = str;
+		}
+
+		private static readonly Regex capturePackageNameInPath = new Regex(@".+[/\\](?<packageName>\w+\...+?)[/\\](.*)?[/\\](?<fileName>.*)$", RegexOptions.Compiled);
+		
+		private static void ModifyFilePath(ref string path)
+		{
+			if (DemystifySettings.instance.ShortenFilePaths == false) return;
+			// Debug.Log(path);
+			// var lineNumberStart = path.LastIndexOf(':');
+			// if(lineNumberStart > 0)
+			// 	path = path.Substring(0, lineNumberStart);
+			// var fileNameIndexStart = path.LastIndexOf('/');
+			// if (fileNameIndexStart > 0)
+			// 	path = path.Substring(fileNameIndexStart + 1);
+
+			var isPackageCache = path.Contains("PackageCache");
+			var match = capturePackageNameInPath.Match(path);
+			if (match.Success)
+			{
+				var package = match.Groups["packageName"].Value;
+				var file = match.Groups["fileName"].Value;
+				if (!string.IsNullOrEmpty(package) && !string.IsNullOrEmpty(file))
+				{
+					path = package + "/" + file;
+					if (isPackageCache) path = "PackageCache/" + path;
+				}
+			}
+
 		}
 	}
 }

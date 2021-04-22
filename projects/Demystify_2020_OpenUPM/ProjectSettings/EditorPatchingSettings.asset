@@ -14,9 +14,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   DebugLog: 0
   enabledPatchIds:
+  - needle.EditorPatching.HarmonyInstanceRegistry
   - Needle.Demystify.Patch_Exception
   - Needle.Demystify.Patch_StacktraceUtility
   - Needle.Demystify.Patch_Console
   - Needle.Demystify.Patch_EditorGUI
-  - needle.EditorPatching.HarmonyInstanceRegistry
   disabledPatchIds: []
