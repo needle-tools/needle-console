@@ -56,6 +56,7 @@ namespace Needle.Demystify
 			yield return typeof(Patch_StacktraceUtility).FullName;
 			yield return typeof(Patch_Console).FullName;
 			yield return typeof(Patch_EditorGUI).FullName;
+			yield return typeof(Patch_AutomaticLogMessage).FullName;
 		}
 
 		public static void Enable(bool force = false)

@@ -26,5 +26,12 @@ namespace Demystify._Tests
 			Debug.LogError("hello");
 		}
 		
+		[InitializeOnLoadMethod]
+		[MenuItem("Test/LogEmptyMessage")]
+		private static void LogEmpty()
+		{
+			Debug.Log(string.Empty);
+			Debug.LogError(null);
+		}
 	}
 }
