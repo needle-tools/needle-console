@@ -16,10 +16,12 @@ namespace Needle.Demystify
 	{ 
 		protected override void OnGetPatches(List<EditorPatch> patches)
 		{
-			patches.Add(new Patch());
+			patches.Add(new Patch_LogMessage());
 		}
 
-		private class Patch : EditorPatch
+		// TODO: does not work with LogFormat yet
+		
+		private class Patch_LogMessage : EditorPatch
 		{
 			protected override Task OnGetTargetMethods(List<MethodBase> targetMethods)
 			{

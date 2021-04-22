@@ -12,7 +12,7 @@ namespace Demystify._Tests
     {
         public static void Main()
         {
-            Exception exception = null;
+            // Exception exception = null;
             try
             {
                 new Program();

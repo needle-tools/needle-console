@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics;
 using UnityEditor;
+using UnityEngine;
 using Debug = UnityEngine.Debug;
 
 namespace Demystify._Tests
@@ -31,7 +32,9 @@ namespace Demystify._Tests
 		private static void LogEmpty()
 		{
 			Debug.Log(string.Empty);
+			Debug.LogWarning("");
 			Debug.LogError(null);
+			Debug.LogFormat(LogType.Log, LogOption.NoStacktrace, null, "");
 		}
 	}
 }
