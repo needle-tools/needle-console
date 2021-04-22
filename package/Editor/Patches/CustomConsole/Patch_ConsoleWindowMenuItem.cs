@@ -34,6 +34,8 @@ namespace Needle.Demystify
 					data => { DemystifySettings.instance.ShortenFilePaths = !DemystifySettings.instance.ShortenFilePaths; }, null);
 				menu.AddItem(new GUIContent(prefix + "Show Filename"), DemystifySettings.instance.ShowFileName,
 					data => { DemystifySettings.instance.ShowFileName = !DemystifySettings.instance.ShowFileName; }, null);
+				menu.AddItem(new GUIContent(prefix + "Auto Filter"), DemystifySettings.instance.AutoFilter,
+					data => { DemystifySettings.instance.AutoFilter = !DemystifySettings.instance.AutoFilter; }, null);
 			}
 		}
 	}

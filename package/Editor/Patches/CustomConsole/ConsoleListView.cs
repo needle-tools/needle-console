@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using HarmonyLib;
 using UnityEditor;
 using UnityEngine;
 
@@ -23,10 +25,12 @@ namespace Needle.Demystify
 				if (!string.IsNullOrWhiteSpace(filePath) && File.Exists(filePath))
 				{
 					var fileName = Path.GetFileNameWithoutExtension(filePath);
+					const string colorPrefix = "<color=grey>";
+					const string colorPostfix = "</color>";
 
 					string GetText()
 					{
-						return "[" + fileName + "]";
+						return colorPrefix + "[" + fileName + "]" + colorPostfix;
 					}
 
 					var endTimeIndex = text.IndexOf("] ", StringComparison.InvariantCulture);
@@ -38,13 +42,35 @@ namespace Needle.Demystify
 					// contains time:
 					else
 					{
-						text = $"{text.Substring(0, endTimeIndex + 1)} {GetText()}{text.Substring(endTimeIndex + 1)}";
+						text = $"{colorPrefix}{text.Substring(0, endTimeIndex + 1)}{colorPostfix} {GetText()}{text.Substring(endTimeIndex + 1)}";
 					}
 
-					// this is only for filtering
-					text += "\n" + FilterPrefix + fileName;// Path.GetFullPath(filePath);
+
+					if (DemystifySettings.instance.AutoFilter)
+					{
+						// text = element.row + " - " + text;
+
+						// this is only for filtering
+						var filter = Path.GetFullPath(filePath); // Path.GetDirectoryName(filePath) + fileName;
+						// path = path.Substring((int)(path.Length * .5f));
+						filter = FilterPrefix + MakeFilterable(filter);
+						// text = filter;
+						// return;
+
+						// many spaces to hide the search match highlight for invisible text
+						text +=
+							$"\n                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                {FilterPrefix}{MakeFilterable(filter)}";
+					}
 				}
 			}
+		}
+
+		private static string MakeFilterable(string str)
+		{
+			str = str.Replace("\\", "/");
+			// str = str.Replace("/", ".");
+			str = str.Replace(":", string.Empty);
+			return str;
 		}
 
 		[InitializeOnLoadMethod]
@@ -58,23 +84,36 @@ namespace Needle.Demystify
 
 		private static void OnSelectionChanged()
 		{
+			if (!DemystifySettings.instance || !DemystifySettings.instance.AutoFilter) return;
+			
 			var sel = Selection.activeObject;
 			if (!sel) return;
 
 			void SetFilter(string filter)
 			{
+				const int maxLength = 50;
+				if (filter.Length > maxLength)
+					filter = filter.Substring(filter.Length - maxLength);
+				// filter = MakeFilterable(filter);
 				LogEntries.SetFilteringText(FilterPrefix + filter);
 				if (Patch_Console.ConsoleWindow)
+				{
+					Patch_Console.ConsoleWindow.GetType().GetField("m_SearchText", AccessTools.allDeclared).SetValue(Patch_Console.ConsoleWindow, filter);
 					Patch_Console.ConsoleWindow.Repaint();
+				}
 			}
 
 			if (EditorUtility.IsPersistent(sel))
 			{
 				var path = AssetDatabase.GetAssetPath(sel);
-				var file = Path.GetFileName(path);
+				path = Path.GetFullPath(path);
+				path = MakeFilterable(path);
+				// path = Path.GetFileName(path);
+				// path = path.Substring((int)(path.Length * .5f));
+				// var file = Path.GetFileName(path);
 				if (previousFilter == null)
 					previousFilter = LogEntries.GetFilteringText();
-				SetFilter(file);
+				SetFilter(path);
 			}
 			else
 			{
@@ -85,20 +124,29 @@ namespace Needle.Demystify
 					foreach (var comp in tempComponents)
 					{
 						if (comp is Transform) continue;
-						var instanceId = comp.GetInstanceID();
-						var path = AssetDatabase.GetAssetPath(instanceId);
-						Debug.Log(instanceId + " Found " + path);
+						// var instanceId = comp.GetInstanceID();
+						// var path = AssetDatabase.GetAssetPath(instanceId);
+						// // Debug.Log(instanceId + " Found " + path);
 
-						var filter = "t:" + comp.GetType().Name;
+						var filter = comp.GetType().Name;
 						var res = AssetDatabase.FindAssets(filter);
-						Debug.Log("assets: " + string.Join("\n", res));
-						
-						if (!string.IsNullOrEmpty(path))
+						foreach (var guid in res)
 						{
-							var file = Path.GetFileName(path);
-							SetFilter(file);
-							break;
+							var path = AssetDatabase.GUIDToAssetPath(guid);
+							if (path.EndsWith(".cs"))
+							{
+								path = MakeFilterable(path);
+								// Debug.Log(file);
+								SetFilter(path);
+							}
 						}
+						// Debug.Log("assets: " + string.Join("\n", res));
+						//
+						// if (!string.IsNullOrEmpty(path))
+						// {
+						// 	Debug.Log(file);
+						// 	break;
+						// }
 
 						// SetFilter(string.Empty);
 					}
