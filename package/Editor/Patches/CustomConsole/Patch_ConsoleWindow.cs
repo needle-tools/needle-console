@@ -2,6 +2,7 @@
 using System.CodeDom;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
@@ -38,29 +39,13 @@ namespace Needle.Demystify
 
 			private static IEnumerable<CodeInstruction> Transpiler(MethodBase method, ILGenerator il, IEnumerable<CodeInstruction> instructions)
 			{
-				// CodeInstruction label = null
-				// foreach (var i in instructions)
-				// {
-				// 	if (i.labels.Count > 0)
-				// 	{
-				// 		Debug.Log(string.Join(", ", i.labels.Select(e => e.ToString())));
-				// 	}
-				//
-				// 	yield return i;
-				// 	// if (i.labels.Any(l => l))
-				// 	// {
-				// 	// 	label = i;
-				// 	// 	break;
-				// 	// }
-				// }
-
-				var skipLabel = il.DefineLabel();
+				
+				// var skipLabel = il.DefineLabel();
 
 				var arr = instructions.ToArray();
-				CodeInstruction enumeratorInstruction = null;
+				// CodeInstruction enumeratorInstruction = null;
 				
 				var loadListViewElementIndex = -1;
-				
 				for (var index = 0; index < arr.Length; index++)
 				{
 					var inst = arr[index];
@@ -82,13 +67,6 @@ namespace Needle.Demystify
 					// }
 
 
-					if (loadListViewElementIndex == -1 || inst.IsStloc() && inst.operand is LocalBuilder)
-					{
-						var loc = inst.operand as LocalBuilder;
-						if(loc?.LocalType == typeof(ListViewElement))
-							loadListViewElementIndex = loc.LocalIndex;
-					}
-
 					// if (inst.IsStloc() && inst.operand != null && inst.operand is LocalBuilder loc && loc.LocalType == typeof(ListViewElement))
 					// {
 					// 	yield return inst;
@@ -100,12 +78,20 @@ namespace Needle.Demystify
 					// 	continue;
 					// }
 
+
+					// get local index for current list view element
+					if (loadListViewElementIndex == -1 || inst.IsStloc() && inst.operand is LocalBuilder)
+					{
+						var loc = inst.operand as LocalBuilder;
+						if(loc?.LocalType == typeof(ListViewElement))
+							loadListViewElementIndex = loc.LocalIndex;
+					}
+					
 					if (inst.opcode == OpCodes.Call && inst.operand is MethodInfo m)
 					{
 						if (m.DeclaringType == typeof(LogEntries) && m.Name == "GetLinesAndModeFromEntryInternal")
 						{
 							yield return inst;
-							// Debug.Log(inst);
 							// load text is one element before
 							var ldStr = arr[index - 1];
 							yield return new CodeInstruction(OpCodes.Ldloc, loadListViewElementIndex);
@@ -115,42 +101,58 @@ namespace Needle.Demystify
 							continue;
 						}
 					}
-					
-					// if (enumeratorInstruction == null && inst.operand != null && inst.IsStloc() && inst.operand is LocalBuilder lb)
-					// {
-					// 	if (lb.LocalType?.IsAssignableFrom(typeof(IEnumerator)) ?? false)
-					// 	{
-					// 		Debug.Log("FOUND " + lb);
-					// 	}
-					// 	
-					// }
-
 
 					yield return inst; 
 				}
 			}
 
+			private static readonly LogEntry tempEntry = new LogEntry();
 			private static void ModifyText(ListViewElement element, ref string text)
 			{
-				text = "[Needle] " + element.row + "\t" + text;
-			}
-
-			private static bool OnDrawElement(ListViewElement element)
-			{
-				if (Event.current.type == EventType.Repaint)
+				// LogEntries.SetFilteringText("PatchManager");
+				if (LogEntries.GetEntryInternal(element.row, tempEntry)) 
 				{
-					int mode = 0;
-					string text = null;
-					LogEntries.GetLinesAndModeFromEntryInternal(element.row, 1, ref mode, ref text);
-					var rect = element.position;
-					rect.x = rect.width - 100;
-					GUI.Label(rect, "TEST");
-				}
+					var file = tempEntry.file;
+					if (!string.IsNullOrWhiteSpace(file) && File.Exists(file))
+					{
+						var fileName = Path.GetFileNameWithoutExtension(file);
 
-				return true;
-				// Debug.Log(element.row);
-				// return element.row % 2 == 0;
+						string GetText()
+						{
+							return "[<b>" + fileName + "</b>]";
+						}
+
+						var endTimeIndex = text.IndexOf("] ", StringComparison.InvariantCulture);
+						// no time:
+						if (endTimeIndex == -1)
+						{
+							text = $"{GetText()} {text}";
+						}
+						// contains time:
+						else
+						{
+							text = $"{text.Substring(0, endTimeIndex + 1)} {GetText()}{text.Substring(endTimeIndex + 1)}";
+						}
+					}
+				}
 			}
+
+			// private static bool OnDrawElement(ListViewElement element)
+			// {
+			// 	if (Event.current.type == EventType.Repaint)
+			// 	{
+			// 		int mode = 0;
+			// 		string text = null;
+			// 		LogEntries.GetLinesAndModeFromEntryInternal(element.row, 1, ref mode, ref text);
+			// 		var rect = element.position;
+			// 		rect.x = rect.width - 100;
+			// 		GUI.Label(rect, "TEST");
+			// 	}
+			//
+			// 	return true;
+			// 	// Debug.Log(element.row);
+			// 	// return element.row % 2 == 0;
+			// }
 
 			// private static Vector2 scroll;
 			// private static GUIStyle Box = "CN Box";
@@ -191,15 +193,15 @@ namespace Needle.Demystify
 			// 	return false;
 			// }
 
-			private static class LogHelper
-			{
-				public static string GetLines(string message)
-				{
-					var line = message.IndexOf("\n");
-					var sub = message.Substring(0, line);
-					return sub;
-				}
-			}
+			// private static class LogHelper
+			// {
+			// 	public static string GetLines(string message)
+			// 	{
+			// 		var line = message.IndexOf("\n");
+			// 		var sub = message.Substring(0, line);
+			// 		return sub;
+			// 	}
+			// }
 		}
 	}
 }
