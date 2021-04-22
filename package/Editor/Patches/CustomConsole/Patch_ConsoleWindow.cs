@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
+using System.Runtime.InteropServices.ComTypes;
 using System.Threading.Tasks;
 using HarmonyLib;
 using needle.EditorPatching;
@@ -57,10 +58,13 @@ namespace Needle.Demystify
 
 				var arr = instructions.ToArray();
 				CodeInstruction enumeratorInstruction = null;
+				
+				var loadListViewElementIndex = -1;
+				
 				for (var index = 0; index < arr.Length; index++)
 				{
 					var inst = arr[index];
-					// if(index > 450 && index < 1000)
+					// if(index > 350 && index < 500)
 					// 	Debug.Log("<color=grey>" + index + ": " + inst + "</color>");
 					// if (inst.opcode == OpCodes.Unbox_Any && inst.operand != null && inst.ToString() == "UnityEditor.ListViewElement")
 					// {
@@ -77,17 +81,40 @@ namespace Needle.Demystify
 					// 	}
 					// }
 
-					if (inst.IsStloc() && inst.operand != null && inst.operand is LocalBuilder loc && loc.LocalType == typeof(ListViewElement))
+
+					if (loadListViewElementIndex == -1 || inst.IsStloc() && inst.operand is LocalBuilder)
 					{
-						yield return inst;
-						Debug.Log("STORING " + inst + ", " + loc.LocalIndex);
-						yield return new CodeInstruction(OpCodes.Ldloc, loc.LocalIndex);
-						yield return CodeInstruction.Call(typeof(ListViewPatch), nameof(OnDrawElement), new[] {typeof(ListViewElement)});
-						yield return new CodeInstruction(OpCodes.Brfalse, skipLabel);
-						arr[653].labels.Add(skipLabel);
-						continue;
+						var loc = inst.operand as LocalBuilder;
+						if(loc?.LocalType == typeof(ListViewElement))
+							loadListViewElementIndex = loc.LocalIndex;
 					}
-					
+
+					// if (inst.IsStloc() && inst.operand != null && inst.operand is LocalBuilder loc && loc.LocalType == typeof(ListViewElement))
+					// {
+					// 	yield return inst;
+					// 	Debug.Log("STORING " + inst + ", " + loc.LocalIndex);
+					// 	yield return new CodeInstruction(OpCodes.Ldloc, loc.LocalIndex);
+					// 	yield return CodeInstruction.Call(typeof(ListViewPatch), nameof(OnDrawElement), new[] {typeof(ListViewElement)});
+					// 	yield return new CodeInstruction(OpCodes.Brfalse, skipLabel);
+					// 	arr[653].labels.Add(skipLabel);
+					// 	continue;
+					// }
+
+					if (inst.opcode == OpCodes.Call && inst.operand is MethodInfo m)
+					{
+						if (m.DeclaringType == typeof(LogEntries) && m.Name == "GetLinesAndModeFromEntryInternal")
+						{
+							yield return inst;
+							// Debug.Log(inst);
+							// load text is one element before
+							var ldStr = arr[index - 1];
+							yield return new CodeInstruction(OpCodes.Ldloc, loadListViewElementIndex);
+							yield return ldStr;
+							// yield return new CodeInstruction(OpCodes.Ldstr, "TEST");
+							yield return CodeInstruction.Call(typeof(ListViewPatch), nameof(ModifyText));
+							continue;
+						}
+					}
 					
 					// if (enumeratorInstruction == null && inst.operand != null && inst.IsStloc() && inst.operand is LocalBuilder lb)
 					// {
@@ -99,8 +126,13 @@ namespace Needle.Demystify
 					// }
 
 
-					yield return inst;
+					yield return inst; 
 				}
+			}
+
+			private static void ModifyText(ListViewElement element, ref string text)
+			{
+				text = "[Needle] " + element.row + "\t" + text;
 			}
 
 			private static bool OnDrawElement(ListViewElement element)
