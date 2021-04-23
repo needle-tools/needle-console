@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics;
 using HarmonyLib;
 using UnityEngine;
+using Debug = UnityEngine.Debug;
 
 namespace Needle.Demystify
 {
@@ -24,9 +25,28 @@ namespace Needle.Demystify
 		[HarmonyPatch("ExtractStackTrace")]
 		private static bool Prefix(ref string __result)
 		{
-			const int skip = 1;
-			const int skipNoise = 4;//4;
-			StackTrace trace = new StackTrace(skip + skipNoise, true);
+			const int baseSkip = 1;
+			// const int skipNoise = 4;//4;
+
+			var skipCalls = 0;
+			var rawStacktrace = new StackTrace();
+			for (var i = 0; i < rawStacktrace.FrameCount; i++)
+			{
+				var frame = rawStacktrace.GetFrame(i);
+				var method = frame.GetMethod();
+				if (method == null) break;
+				if (method.DeclaringType == typeof(Patch_StacktraceUtility) 
+				    || method.DeclaringType == typeof(StackTraceUtility)
+				    || method.DeclaringType == typeof(Debug)
+				    || method.DeclaringType?.Name == "DebugLogHandler")
+				{
+					skipCalls += 1;
+					continue;
+				}
+				break;
+			}
+
+			var trace = new StackTrace(baseSkip + skipCalls, true);
 			trace = new EnhancedStackTrace(trace);
 			__result = trace.ToString();
 			Hyperlinks.FixStacktrace(ref __result);
