@@ -5,6 +5,11 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 
+## [1.3.0-exp] - 2021-04-23
+- Add prefix to console entries with file name (only visual in console)
+- Add Demystify settings menu to console window
+- Add experimental support for automatic filtering of console entries based on selection in project or hierarchy view. Is disabled by default.
+
 ## [1.2.0-exp.7] - 2021-04-22
 - First implementation of logging full Method name when Debug.Log is empty or null
 
