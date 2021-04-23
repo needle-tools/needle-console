@@ -4,6 +4,10 @@ All notable changes to this package will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+
+## [1.2.0-exp.7] - 2021-04-22
+- First implementation of logging full Method name when Debug.Log is empty or null
+
 ## [1.2.0-exp.6] - 2021-04-20
 - Rename dlls to avoid collisions
 - Change Unity path syntax from ``(at`` to ``in`` 
