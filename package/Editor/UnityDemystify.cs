@@ -31,15 +31,6 @@ namespace Needle.Demystify
 				InstalledLog();
 			}
 
-			if (!Patches().All(PatchManager.IsPersistentEnabled) && Patches().Any(PatchManager.IsPersistentEnabled))
-			{
-				Debug.LogWarning("Not all Demystify patches are enabled. Go to " + DemystifySettingsProvider.SettingsPath +
-				                 " to enable or disable Demystify.\n" +
-				                 "Patches:\n" +
-				                 string.Join("\n", Patches().Select(p => p + ": " + (PatchManager.IsPersistentEnabled(p) ? "enabled" : "<b>disabled</b>"))) + "\n"
-				);
-			}
-
 			if (settings.CurrentTheme != null)
 			{
 				settings.CurrentTheme.EnsureEntries();
@@ -48,6 +39,15 @@ namespace Needle.Demystify
 
 			while (!PatchManager.IsInitialized) await Task.Delay(1);
 			Enable(false);
+
+			if (!Patches().All(PatchManager.IsPersistentEnabled) && Patches().Any(PatchManager.IsPersistentEnabled))
+			{
+				Debug.LogWarning("Not all Demystify patches are enabled. Go to " + DemystifySettingsProvider.SettingsPath +
+				                 " to enable or disable Demystify.\n" +
+				                 "Patches:\n" +
+				                 string.Join("\n", Patches().Select(p => p + ": " + (PatchManager.IsPersistentEnabled(p) ? "enabled" : "<b>disabled</b>"))) + "\n"
+				);
+			}
 		}
 
 		internal static IEnumerable<string> Patches()
