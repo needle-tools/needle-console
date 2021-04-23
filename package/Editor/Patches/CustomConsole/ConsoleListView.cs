@@ -25,7 +25,7 @@ namespace Needle.Demystify
 				if (!string.IsNullOrWhiteSpace(filePath) && File.Exists(filePath))
 				{
 					var fileName = Path.GetFileNameWithoutExtension(filePath);
-					const string colorPrefix = "<color=grey>";
+					const string colorPrefix = "<color=#999999>";
 					const string colorPostfix = "</color>";
 
 					string GetText()
@@ -42,7 +42,7 @@ namespace Needle.Demystify
 					// contains time:
 					else
 					{
-						text = $"{colorPrefix}{text.Substring(0, endTimeIndex + 1)}{colorPostfix} {GetText()}{text.Substring(endTimeIndex + 1)}";
+						text = $"{text.Substring(0, endTimeIndex + 1)} {GetText()}{text.Substring(endTimeIndex + 1)}";
 					}
 
 
@@ -53,13 +53,13 @@ namespace Needle.Demystify
 						// this is only for filtering
 						var filter = Path.GetFullPath(filePath); // Path.GetDirectoryName(filePath) + fileName;
 						// path = path.Substring((int)(path.Length * .5f));
-						filter = FilterPrefix + MakeFilterable(filter);
+						filter = MakeFilterable(filter);
 						// text = filter;
 						// return;
 
 						// many spaces to hide the search match highlight for invisible text
 						text +=
-							$"\n                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                {FilterPrefix}{MakeFilterable(filter)}";
+							$"\n                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                {filter}";
 					}
 				}
 			}
@@ -85,17 +85,17 @@ namespace Needle.Demystify
 		private static void OnSelectionChanged()
 		{
 			if (!DemystifySettings.instance || !DemystifySettings.instance.AutoFilter) return;
-			
+
 			var sel = Selection.activeObject;
 			if (!sel) return;
 
 			void SetFilter(string filter)
 			{
+				filter = MakeFilterable(filter);
 				const int maxLength = 50;
 				if (filter.Length > maxLength)
 					filter = filter.Substring(filter.Length - maxLength);
-				// filter = MakeFilterable(filter);
-				LogEntries.SetFilteringText(FilterPrefix + filter);
+				LogEntries.SetFilteringText(filter);
 				if (Patch_Console.ConsoleWindow)
 				{
 					Patch_Console.ConsoleWindow.GetType().GetField("m_SearchText", AccessTools.allDeclared).SetValue(Patch_Console.ConsoleWindow, filter);
@@ -106,8 +106,30 @@ namespace Needle.Demystify
 			if (EditorUtility.IsPersistent(sel))
 			{
 				var path = AssetDatabase.GetAssetPath(sel);
-				path = Path.GetFullPath(path);
-				path = MakeFilterable(path);
+				// path = Path.GetFullPath(path);
+				var fileInfo = new FileInfo(path);
+
+				string PrependParentDirectories(string filter, DirectoryInfo info, int maxLevel, int level = 0)
+				{
+					if (level >= maxLevel) return filter;
+					if (info == null) return filter;
+					filter = info.Name + "/" + filter;
+					return PrependParentDirectories(filter, info.Parent, maxLevel, ++level);
+				}
+				if (fileInfo.Exists)
+				{
+					path = PrependParentDirectories(fileInfo.Name, fileInfo.Directory, 1);// fileInfo.Directory?.Name + "/" + fileInfo.Name;
+				}
+				else
+				{
+					var dirInfo = new DirectoryInfo(path);
+					path = PrependParentDirectories(dirInfo.Name, dirInfo.Parent, 2);
+					// path = dirInfo.Parent?.Name + "/" + dirInfo.Name;
+				}
+				// var dir = new DirectoryInfo(path).Name;
+				// var file = Path.GetFileName(path);
+				// path = dir + "/" + file;
+				
 				// path = Path.GetFileName(path);
 				// path = path.Substring((int)(path.Length * .5f));
 				// var file = Path.GetFileName(path);
@@ -135,7 +157,6 @@ namespace Needle.Demystify
 							var path = AssetDatabase.GUIDToAssetPath(guid);
 							if (path.EndsWith(".cs"))
 							{
-								path = MakeFilterable(path);
 								// Debug.Log(file);
 								SetFilter(path);
 							}

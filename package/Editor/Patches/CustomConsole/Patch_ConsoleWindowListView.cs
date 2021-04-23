@@ -1,17 +1,10 @@
-﻿using System;
-using System.CodeDom;
-using System.Collections;
-using System.Collections.Generic;
-using System.IO;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
-using System.Runtime.InteropServices.ComTypes;
 using System.Threading.Tasks;
 using HarmonyLib;
-using ICSharpCode.NRefactory.Ast;
 using needle.EditorPatching;
-using NUnit.Framework.Internal;
 using UnityEditor;
 using UnityEngine;
 // ReSharper disable UnusedType.Global
