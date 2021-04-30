@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using needle.EditorPatching;
+using Unity.Profiling;
 using UnityEditor;
 using UnityEngine;
 
@@ -80,38 +82,52 @@ namespace Needle.Demystify
 				PatchManager.DisablePatch(p, false);
 		}
 
+		private static readonly StringBuilder builder = new StringBuilder();
 		public static void Apply(ref string stacktrace)
 		{
 			try
 			{
-				var str = "";
-				var lines = stacktrace.Split('\n');
-				var settings = DemystifySettings.instance;
-				var foundPrefix = false;
-				foreach (var t in lines)
+				using (new ProfilerMarker("Demystify.Apply").Auto())
 				{
-					var line = t;
-
-					if (StacktraceMarkerUtil.IsPrefix(line))
+					string[] lines = null;
+					using(new ProfilerMarker("Split Lines").Auto())
+						lines = stacktrace.Split('\n');
+					var settings = DemystifySettings.instance;
+					var foundPrefix = false;
+					foreach (var t in lines)
 					{
-						StacktraceMarkerUtil.RemoveMarkers(ref line);
-						if(!string.IsNullOrEmpty(settings.Separator))
-							str += settings.Separator + "\n";
-						foundPrefix = true;
+						var line = t;
+
+						using (new ProfilerMarker("Remove Markers").Auto())
+						{
+							if (StacktraceMarkerUtil.IsPrefix(line))
+							{
+								StacktraceMarkerUtil.RemoveMarkers(ref line);
+								if(!string.IsNullOrEmpty(settings.Separator))
+									builder.AppendLine(settings.Separator);
+								foundPrefix = true;
+							}
+						}
+
+						if (foundPrefix && settings.UseSyntaxHighlighting)
+							SyntaxHighlighting.AddSyntaxHighlighting(ref line);
+
+						var l = line.Trim();
+						if (!string.IsNullOrEmpty(l))
+						{
+							if (!l.EndsWith("\n"))
+								builder.AppendLine(l);
+							else 
+								builder.Append(l);
+						}
 					}
 
-					if (foundPrefix && settings.UseSyntaxHighlighting)
-						SyntaxHighlighting.AddSyntaxHighlighting(ref line);
-
-					str += line.Trim();
-
-					if (!str.EndsWith("\n"))
-						str += "\n";
-				}
-
-				if (!string.IsNullOrWhiteSpace(str))
-				{
-					stacktrace = str;
+					var res = builder.ToString();
+					if (!string.IsNullOrWhiteSpace(res))
+					{
+						stacktrace = res;
+					}
+					builder.Clear();
 				}
 			}
 			catch

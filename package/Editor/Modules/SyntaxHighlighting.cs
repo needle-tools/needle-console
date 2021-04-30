@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Text.RegularExpressions;
 using Unity.Profiling;
 using UnityEditor;
@@ -117,7 +118,8 @@ namespace Needle.Demystify
 		}
 
 		private static readonly Regex hyperlink = new Regex(@"(?<hyperlink> \(at .*\))", RegexOptions.Compiled | RegexOptions.ExplicitCapture);
-
+		private static readonly Dictionary<string, Regex> highlight = new Dictionary<string, Regex>();
+		
 		public static void AddSyntaxHighlighting(string pattern, Dictionary<string, string> colorDict, ref string line, bool trim = true)
 		{
 			using (new ProfilerMarker("Demystify.AddSyntaxHighlighting").Auto())
@@ -188,7 +190,10 @@ namespace Needle.Demystify
 				}
 
 				if (trim) line = line.TrimStart();
-				line = Regex.Replace(line, pattern, Eval, RegexOptions.Compiled | RegexOptions.Singleline | RegexOptions.ExplicitCapture);
+
+				if (!highlight.ContainsKey(pattern))
+					highlight.Add(pattern, new Regex(pattern, RegexOptions.Compiled | RegexOptions.Singleline | RegexOptions.ExplicitCapture));
+				line = highlight[pattern].Replace(line, Eval);
 				if (link.Success)
 				{
 					line += link.Value;
