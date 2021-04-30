@@ -4,6 +4,11 @@ All notable changes to this package will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## [1.3.0-exp.2] - 2021-04-
+- Show Filename: Always prefix file path from engine (when FilePath prefix is enabled) even when file does not exist. That way it will show native file paths as well if Unity logs obscure messages/internal logs
+- Show Filename: Try parse method name from stacktrace
+- Added some profiler markers and started optimization to reduce allocations
+
 ## [1.3.0-exp.1] - 2021-04-27
 - Moved assemblies into Editor folder to avoid compilation warnings regarding renamed assemblies
 - Fix issue with stacktrace utility patch skipping too many frames
