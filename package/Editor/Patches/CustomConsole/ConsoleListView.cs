@@ -22,7 +22,7 @@ namespace Needle.Demystify
 			if (LogEntries.GetEntryInternal(element.row, tempEntry))
 			{
 				var filePath = tempEntry.file;
-				if (!string.IsNullOrWhiteSpace(filePath) && File.Exists(filePath))
+				if (!string.IsNullOrWhiteSpace(filePath))// && File.Exists(filePath))
 				{
 					var fileName = Path.GetFileNameWithoutExtension(filePath);
 					const string colorPrefix = "<color=#999999>";
