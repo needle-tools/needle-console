@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text.RegularExpressions;
+using Unity.Profiling;
 using UnityEditor;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
@@ -119,66 +120,81 @@ namespace Needle.Demystify
 
 		public static void AddSyntaxHighlighting(string pattern, Dictionary<string, string> colorDict, ref string line, bool trim = true)
 		{
-			if (string.IsNullOrEmpty(pattern)) return;
-
-			string Eval(Match m)
+			using (new ProfilerMarker("Demystify.AddSyntaxHighlighting").Auto())
 			{
-				if (m.Groups.Count <= 1) return m.Value;
-				var str = m.Value;
-				var separators = new string[1];
-				for (var index = m.Groups.Count - 1; index >= 1; index--)
+				if (string.IsNullOrEmpty(pattern)) return;
+
+				var evalMarker = new ProfilerMarker("EvalMatch");
+				string Eval(Match m)
 				{
-					var @group = m.Groups[index];
-					if (string.IsNullOrWhiteSpace(@group.Value) || string.IsNullOrEmpty(@group.Name)) continue;
-					if (colorDict.TryGetValue(@group.Name, out var col))
+					using (evalMarker.Auto())
 					{
-						// check if we have to use regex to replace it
-						separators[0] = group.Value;
-						var occ = str.Split(separators, StringSplitOptions.RemoveEmptyEntries);
-						if (occ.Length >= 2 && occ[0] != "\"" && occ[occ.Length-1] != "\"")
+						if (m.Groups.Count <= 1) return m.Value;
+						var str = m.Value;
+						var separators = new string[1];
+						for (var index = m.Groups.Count - 1; index >= 1; index--)
 						{
-							var replaced = false;
-							str = Regex.Replace(@str, Regex.Escape(@group.Value),
-								m1 =>
+							var @group = m.Groups[index];
+							if (string.IsNullOrWhiteSpace(@group.Value) || string.IsNullOrEmpty(@group.Name)) continue;
+							if (colorDict.TryGetValue(@group.Name, out var col))
+							{
+								// check if we have to use regex to replace it
+								separators[0] = group.Value;
+								var occ = str.Split(separators, StringSplitOptions.RemoveEmptyEntries);
+								if (occ.Length >= 2 && occ[0] != "\"" && occ[occ.Length-1] != "\"")
 								{
-									if (replaced) return m1.Value;
-									if (m1.Index != group.Index)
-										return m1.Value;
-									replaced = true;
-									// return group.Value;
-									return "<color=" + col + ">" + @group.Value + "</color>";
-								},
-								RegexOptions.Compiled);
+									var replaced = false;
+									using (new ProfilerMarker("Regex.Replace").Auto())
+									{
+										var _pattern = @group.Value;
+										using (new ProfilerMarker("Regex.Escape").Auto())
+											_pattern = Regex.Escape(_pattern);
+										str = Regex.Replace(@str, _pattern,
+											m1 =>
+											{
+												if (replaced) return m1.Value;
+												if (m1.Index != group.Index)
+													return m1.Value;
+												replaced = true;
+												// return group.Value;
+												using (new ProfilerMarker("Concat").Auto())
+													return "<color=" + col + ">" + @group.Value + "</color>";
+											}, RegexOptions.Compiled);
+									}
+								}
+								else
+								{
+									using(new ProfilerMarker("String.Replace").Auto())
+										str = str.Replace(group.Value, "<color=" + col + ">" + @group.Value + "</color>");
+								}
+							}
+							// else if()
+							// {
+							// 	if (int.TryParse(@group.Name, out _)) continue;
+							// 	if (!string.IsNullOrWhiteSpace(@group.Name) && @group.Name.Length > 1)
+							// 		Debug.LogWarning("Missing color entry for " + @group.Name + ", matched for " + @group);
+							// }
 						}
-						else
-						{
-							str = str.Replace(group.Value, "<color=" + col + ">" + @group.Value + "</color>");
-						}
+
+						return str;
 					}
-					// else if()
-					// {
-					// 	if (int.TryParse(@group.Name, out _)) continue;
-					// 	if (!string.IsNullOrWhiteSpace(@group.Name) && @group.Name.Length > 1)
-					// 		Debug.LogWarning("Missing color entry for " + @group.Name + ", matched for " + @group);
-					// }
 				}
 
-				return str;
-			}
 
+				var link = hyperlink.Match(line);
+				if (link.Success)
+				{
+					line = line.Remove(link.Groups["hyperlink"].Index);
+				}
 
-			var link = hyperlink.Match(line);
-			if (link.Success)
-			{
-				line = line.Remove(link.Groups["hyperlink"].Index);
+				if (trim) line = line.TrimStart();
+				line = Regex.Replace(line, pattern, Eval, RegexOptions.Compiled | RegexOptions.Singleline | RegexOptions.ExplicitCapture);
+				if (link.Success)
+				{
+					line += link.Value;
+				}
 			}
-
-			if (trim) line = line.TrimStart();
-			line = Regex.Replace(line, pattern, Eval, RegexOptions.Compiled | RegexOptions.Singleline | RegexOptions.ExplicitCapture);
-			if (link.Success)
-			{
-				line += link.Value;
-			}
+			
 		}
 	}
 }
