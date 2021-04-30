@@ -2,7 +2,10 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 using HarmonyLib;
+using JetBrains.Annotations;
+using Unity.Profiling;
 using UnityEditor;
 using UnityEngine;
 
@@ -13,55 +16,117 @@ namespace Needle.Demystify
 		private static readonly LogEntry tempEntry = new LogEntry();
 		private const string FilterPrefix = "";
 
+		private static readonly string[] onlyUseMethodNameFromLinesWithout = new[]
+		{
+			"UnityEngine.UnitySynchronizationContext",
+			"UnityEngine.Debug",
+			"UnityEngine.Logger",
+			"UnityEngine.DebugLogHandler",
+			"System.Runtime.CompilerServices",
+			"MoveNext"
+		};
+
+		private static bool TryGetMethodName(string message, out string methodName, [CanBeNull] string fileName = null)
+		{
+			using (new ProfilerMarker("ConsoleList.ParseMethodName").Auto())
+			{
+				var matches = Regex.Matches(message, @".*[\.](?<method_name>.*?)\(", RegexOptions.Compiled);
+				if (matches.Count > 0)
+				{
+					for (var i = matches.Count - 1; i >= 0; i--)
+					{
+						var last = matches[i];
+						var line = last.Value;
+						if (fileName != null && !line.Contains(fileName)) continue;
+						if (onlyUseMethodNameFromLinesWithout.Any(line.Contains)) continue;
+						var methodNameG = last.Groups["method_name"];
+						if (methodNameG.Success)
+						{
+							methodName = methodNameG.Value;
+							return true;
+						}
+					}
+				}
+
+				methodName = null;
+				return false;
+			}
+		}
+
+		private static readonly Dictionary<string, string> cachedInfo = new Dictionary<string, string>();
+
 		// called from console list with current list view element and console text
 		internal static void ModifyText(ListViewElement element, ref string text)
 		{
-			if (!DemystifySettings.instance.ShowFileName) return;
-
-			// LogEntries.SetFilteringText("PatchManager");
-			if (LogEntries.GetEntryInternal(element.row, tempEntry))
+			using (new ProfilerMarker("ConsoleList.ModifyText").Auto())
 			{
-				var filePath = tempEntry.file;
-				if (!string.IsNullOrWhiteSpace(filePath))// && File.Exists(filePath))
+				if (!DemystifySettings.instance.ShowFileName) return;
+				
+				var key = text;
+				if (cachedInfo.ContainsKey(key))
 				{
-					var fileName = Path.GetFileNameWithoutExtension(filePath);
-					const string colorPrefix = "<color=#999999>";
-					const string colorPostfix = "</color>";
+					text = cachedInfo[key];
+					if(DemystifySettings.instance.AutoFilter && LogEntries.GetEntryInternal(element.row, tempEntry))
+						HandleAutoFilter(tempEntry.file, ref text);
+					return;
+				}
 
-					string GetText()
+				if (LogEntries.GetEntryInternal(element.row, tempEntry))
+				{
+					var filePath = tempEntry.file;
+					if (!string.IsNullOrWhiteSpace(filePath)) // && File.Exists(filePath))
 					{
-						return colorPrefix + "[" + fileName + "]" + colorPostfix;
-					}
 
-					var endTimeIndex = text.IndexOf("] ", StringComparison.InvariantCulture);
-					// no time:
-					if (endTimeIndex == -1)
-					{
-						text = $"{GetText()} {text}";
-					}
-					// contains time:
-					else
-					{
-						text = $"{text.Substring(0, endTimeIndex + 1)} {GetText()}{text.Substring(endTimeIndex + 1)}";
-					}
+						var fileName = Path.GetFileNameWithoutExtension(filePath);
+						const string colorPrefix = "<color=#999999>";
+						const string colorPostfix = "</color>";
 
+						string GetText()
+						{
+							var str = fileName;
+							if (TryGetMethodName(tempEntry.message, out var methodName))
+							{
+								str += "." + methodName;
+							}
 
-					if (DemystifySettings.instance.AutoFilter)
-					{
-						// text = element.row + " - " + text;
+							return colorPrefix + "[" + str + "]" + colorPostfix;
+						}
 
-						// this is only for filtering
-						var filter = Path.GetFullPath(filePath); // Path.GetDirectoryName(filePath) + fileName;
-						// path = path.Substring((int)(path.Length * .5f));
-						filter = MakeFilterable(filter);
-						// text = filter;
-						// return;
+						var endTimeIndex = text.IndexOf("] ", StringComparison.InvariantCulture);
+						// no time:
+						if (endTimeIndex == -1)
+						{
+							text = $"{GetText()} {text}";
+						}
+						// contains time:
+						else
+						{
+							text = $"{text.Substring(0, endTimeIndex + 1)} {GetText()}{text.Substring(endTimeIndex + 1)}";
+						}
 
-						// many spaces to hide the search match highlight for invisible text
-						text +=
-							$"\n                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                {filter}";
+						cachedInfo.Add(key, text);
+						HandleAutoFilter(filePath, ref text);
 					}
 				}
+			}
+		}
+
+		private static void HandleAutoFilter(string filePath, ref string text)
+		{
+			if (DemystifySettings.instance.AutoFilter)
+			{
+				// text = element.row + " - " + text;
+
+				// this is only for filtering
+				var filter = Path.GetFullPath(filePath); // Path.GetDirectoryName(filePath) + fileName;
+				// path = path.Substring((int)(path.Length * .5f));
+				filter = MakeFilterable(filter);
+				// text = filter;
+				// return;
+
+				// many spaces to hide the search match highlight for invisible text
+				text +=
+					$"\n                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                {filter}";
 			}
 		}
 
@@ -116,9 +181,10 @@ namespace Needle.Demystify
 					filter = info.Name + "/" + filter;
 					return PrependParentDirectories(filter, info.Parent, maxLevel, ++level);
 				}
+
 				if (fileInfo.Exists)
 				{
-					path = PrependParentDirectories(fileInfo.Name, fileInfo.Directory, 1);// fileInfo.Directory?.Name + "/" + fileInfo.Name;
+					path = PrependParentDirectories(fileInfo.Name, fileInfo.Directory, 1); // fileInfo.Directory?.Name + "/" + fileInfo.Name;
 				}
 				else
 				{
@@ -129,7 +195,7 @@ namespace Needle.Demystify
 				// var dir = new DirectoryInfo(path).Name;
 				// var file = Path.GetFileName(path);
 				// path = dir + "/" + file;
-				
+
 				// path = Path.GetFileName(path);
 				// path = path.Substring((int)(path.Length * .5f));
 				// var file = Path.GetFileName(path);
