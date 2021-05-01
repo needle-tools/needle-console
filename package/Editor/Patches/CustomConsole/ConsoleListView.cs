@@ -21,8 +21,7 @@ namespace Needle.Demystify
 			"UnityEngine.Debug",
 			"UnityEngine.Logger",
 			"UnityEngine.DebugLogHandler",
-			"System.Runtime.CompilerServices",
-			"MoveNext"
+			"System.Runtime.CompilerServices"
 		};
 
 		private static bool TryGetMethodName(string message, out string methodName)
@@ -40,7 +39,7 @@ namespace Needle.Demystify
 						if (!line.Contains(".cs")) continue;
 						Match match;
 						using (new ProfilerMarker("Regex").Auto())
-							match = Regex.Match(line, @".*?(\..*?){0,}[\.\:](?<method_name>.*?)\(.*\.cs", RegexOptions.Compiled | RegexOptions.ExplicitCapture); 
+							match = Regex.Match(line, @".*?(\..*?){0,}[\.\:](?<method_name>.*?)\(.*\.cs(:\d{1,})?", RegexOptions.Compiled | RegexOptions.ExplicitCapture); 
 						using (new ProfilerMarker("Handle Match").Auto())
 						{
 							// var match = matches[i];
