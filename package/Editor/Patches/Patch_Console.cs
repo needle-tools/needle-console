@@ -23,11 +23,13 @@ namespace Needle.Demystify
 
 		internal static bool IsDrawingConsole { get; private set; }
 		private static Type _consoleWindowType;
+
 		internal static Type ConsoleWindowType
 		{
 			get
 			{
-				if(_consoleWindowType == null) _consoleWindowType = typeof(EditorWindow).Assembly.GetTypes().FirstOrDefault(t => t.FullName == "UnityEditor.ConsoleWindow");
+				if (_consoleWindowType == null)
+					_consoleWindowType = typeof(EditorWindow).Assembly.GetTypes().FirstOrDefault(t => t.FullName == "UnityEditor.ConsoleWindow");
 				return _consoleWindowType;
 			}
 			set => _consoleWindowType = value;
@@ -41,9 +43,10 @@ namespace Needle.Demystify
 			{
 				if (!_consoleWindow)
 				{
-					if(ConsoleWindowType != null)
+					if (ConsoleWindowType != null)
 						_consoleWindow = EditorWindow.GetWindow(ConsoleWindowType);
 				}
+
 				return _consoleWindow;
 			}
 			private set => _consoleWindow = value;
@@ -70,15 +73,15 @@ namespace Needle.Demystify
 			rect.x = 0;
 			rect.y = GetStackTextScroll().y;
 			rect.height = stackViewSize;
-			
+
 			return rect;
 		}
-		
+
 		private static Vector2 GetStackTextScroll()
 		{
-			return (Vector2)TextScroll.GetValue(ConsoleWindow);
+			return (Vector2) TextScroll.GetValue(ConsoleWindow);
 		}
-		
+
 		private class ConsoleDrawingEvent : EditorPatch
 		{
 			protected override Task OnGetTargetMethods(List<MethodBase> targetMethods)
@@ -86,7 +89,7 @@ namespace Needle.Demystify
 				var method = ConsoleWindowType?.GetMethod("OnGUI", (BindingFlags) ~0);
 				Debug.Assert(method != null, "Could not find console OnGUI method. Console?: " + ConsoleWindowType);
 				targetMethods.Add(method);
-				return Task.CompletedTask; 
+				return Task.CompletedTask;
 			}
 
 			private static void Prefix()
@@ -122,14 +125,21 @@ namespace Needle.Demystify
 					lastText = null;
 					if (ConsoleWindowType != null)
 					{
-						if(ConsoleWindow)
+						if (ConsoleWindow)
 							ConsoleWindow.Repaint();
 					}
-				};
+				}
+
+				;
 			}
 
 			private static bool Prefix(ref string stacktraceText)
 			{
+				var prev = GUI.color;
+				const float brightness = .4f;
+				GUI.color = new Color(brightness, brightness, brightness);
+				GUI.DrawTexture(new Rect(0,0,10000,1), Texture2D.whiteTexture);
+				GUI.color = prev;
 				
 				var textChanged = lastText != stacktraceText;
 				if (textChanged)
