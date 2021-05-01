@@ -4,7 +4,6 @@ using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using HarmonyLib;
-using JetBrains.Annotations;
 using Unity.Profiling;
 using UnityEditor;
 using UnityEngine;
@@ -26,27 +25,36 @@ namespace Needle.Demystify
 			"MoveNext"
 		};
 
-		private static bool TryGetMethodName(string message, out string methodName, [CanBeNull] string fileName = null)
+		private static bool TryGetMethodName(string message, out string methodName)
 		{
 			using (new ProfilerMarker("ConsoleList.ParseMethodName").Auto())
 			{
-				var matches = Regex.Matches(message, @".*[\.](?<method_name>.*?)\(", RegexOptions.Compiled);
-				if (matches.Count > 0)
+				var rd = new StringReader(message);
+				var linesRead = 0;
+				while (true)
 				{
-					for (var i = matches.Count - 1; i >= 0; i--)
+					var line = rd.ReadLine(); 
+					if (line == null) break;
+					if (onlyUseMethodNameFromLinesWithout.Any(line.Contains)) continue; 
+					if (!line.Contains(".cs")) continue;
+					Match match;
+					using (new ProfilerMarker("Regex").Auto())
+						match = Regex.Match(line, @".*?(\..*?){0,}[\.\:](?<method_name>.*?)\(.*\.cs", RegexOptions.Compiled | RegexOptions.ExplicitCapture); 
+					using (new ProfilerMarker("Handle Match").Auto())
 					{
-						var last = matches[i];
-						var line = last.Value;
-						if (fileName != null && !line.Contains(fileName)) continue;
-						if (onlyUseMethodNameFromLinesWithout.Any(line.Contains)) continue;
-						var methodNameG = last.Groups["method_name"];
-						if (methodNameG.Success)
+						// var match = matches[i];
+						var group = match.Groups["method_name"];
+						if (group.Success)
 						{
-							methodName = methodNameG.Value;
+							methodName = group.Value.Trim();
 							return true;
 						}
 					}
+
+					linesRead += 1;
+					if (linesRead > 15) break;
 				}
+				
 
 				methodName = null;
 				return false;
@@ -76,36 +84,48 @@ namespace Needle.Demystify
 					var filePath = tempEntry.file;
 					if (!string.IsNullOrWhiteSpace(filePath)) // && File.Exists(filePath))
 					{
-
-						var fileName = Path.GetFileNameWithoutExtension(filePath);
-						const string colorPrefix = "<color=#999999>";
-						const string colorPostfix = "</color>";
-
-						string GetText()
+						try
 						{
-							var str = fileName;
-							if (TryGetMethodName(tempEntry.message, out var methodName))
+							var fileName = Path.GetFileNameWithoutExtension(filePath);
+							const string colorPrefix = "<color=#999999>";
+							const string colorPostfix = "</color>";
+
+							string GetText()
 							{
-								str += "." + methodName;
+								var str = fileName;
+								if (TryGetMethodName(tempEntry.message, out var methodName))
+								{
+									str += "." + methodName; 
+								}
+
+								return colorPrefix + "[" + str + "]" + colorPostfix;
 							}
 
-							return colorPrefix + "[" + str + "]" + colorPostfix;
-						}
+							var endTimeIndex = text.IndexOf("] ", StringComparison.InvariantCulture);
+							// no time:
+							if (endTimeIndex == -1)
+							{
+								text = $"{GetText()} {text}";
+							}
+							// contains time:
+							else
+							{
+								text = $"{text.Substring(0, endTimeIndex + 1)} {GetText()}{text.Substring(endTimeIndex + 1)}";
+							}
 
-						var endTimeIndex = text.IndexOf("] ", StringComparison.InvariantCulture);
-						// no time:
-						if (endTimeIndex == -1)
-						{
-							text = $"{GetText()} {text}";
+							cachedInfo.Add(key, text);
+							HandleAutoFilter(filePath, ref text);
 						}
-						// contains time:
-						else
+						catch (ArgumentException)
 						{
-							text = $"{text.Substring(0, endTimeIndex + 1)} {GetText()}{text.Substring(endTimeIndex + 1)}";
+							// sometimes filepath contains illegal characters and is not actually a path
+							cachedInfo.Add(key, text);
 						}
-
-						cachedInfo.Add(key, text);
-						HandleAutoFilter(filePath, ref text);
+						catch (Exception e)
+						{
+							Debug.LogException(e);
+							cachedInfo.Add(key, text);
+						}
 					}
 				}
 			}
