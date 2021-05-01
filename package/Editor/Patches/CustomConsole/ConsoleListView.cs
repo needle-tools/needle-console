@@ -29,32 +29,33 @@ namespace Needle.Demystify
 		{
 			using (new ProfilerMarker("ConsoleList.ParseMethodName").Auto())
 			{
-				var rd = new StringReader(message);
-				var linesRead = 0;
-				while (true)
+				using (var rd = new StringReader(message))
 				{
-					var line = rd.ReadLine(); 
-					if (line == null) break;
-					if (onlyUseMethodNameFromLinesWithout.Any(line.Contains)) continue; 
-					if (!line.Contains(".cs")) continue;
-					Match match;
-					using (new ProfilerMarker("Regex").Auto())
-						match = Regex.Match(line, @".*?(\..*?){0,}[\.\:](?<method_name>.*?)\(.*\.cs", RegexOptions.Compiled | RegexOptions.ExplicitCapture); 
-					using (new ProfilerMarker("Handle Match").Auto())
+					var linesRead = 0;
+					while (true)
 					{
-						// var match = matches[i];
-						var group = match.Groups["method_name"];
-						if (group.Success)
+						var line = rd.ReadLine(); 
+						if (line == null) break;
+						if (onlyUseMethodNameFromLinesWithout.Any(line.Contains)) continue; 
+						if (!line.Contains(".cs")) continue;
+						Match match;
+						using (new ProfilerMarker("Regex").Auto())
+							match = Regex.Match(line, @".*?(\..*?){0,}[\.\:](?<method_name>.*?)\(.*\.cs", RegexOptions.Compiled | RegexOptions.ExplicitCapture); 
+						using (new ProfilerMarker("Handle Match").Auto())
 						{
-							methodName = group.Value.Trim();
-							return true;
+							// var match = matches[i];
+							var group = match.Groups["method_name"];
+							if (group.Success)
+							{
+								methodName = group.Value.Trim();
+								return true;
+							}
 						}
-					}
 
-					linesRead += 1;
-					if (linesRead > 15) break;
+						linesRead += 1;
+						if (linesRead > 15) break;
+					}
 				}
-				
 
 				methodName = null;
 				return false;
