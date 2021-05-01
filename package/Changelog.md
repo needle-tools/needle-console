@@ -4,7 +4,12 @@ All notable changes to this package will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
-## [1.3.0-exp.2] - 2021-04-
+## [1.3.0-exp.3] - 2021-05-01
+- Show Filename: Catch Exception when file name contained invalid characters
+- Show Filename: Performance improvement
+- Add light gray line above console stacktrace to visually better separate listview from content
+
+## [1.3.0-exp.2] - 2021-04-30
 - Show Filename: Always prefix file path from engine (when FilePath prefix is enabled) even when file does not exist. That way it will show native file paths as well if Unity logs obscure messages/internal logs
 - Show Filename: Try parse method name from stacktrace
 - Added some profiler markers and started optimization to reduce allocations
