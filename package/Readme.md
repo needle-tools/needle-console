@@ -59,7 +59,7 @@ Settings can be configured under ``Edit > Preferences > Needle > Demystify``.
 ### **Demystified Stacktraces** 🔮 for any log message and exceptions.  
   It *just works*, you don't need to do anything.  
   Logs going into Editor logfiles will also be demystified.  
-  Runtime logs will _not_ be demystified (by design).
+  Standalone logs (when logging in builds) will _not_ be demystified (by design).
 
 ### **Syntax Highlighting** 🎨
 
