@@ -8,6 +8,10 @@ namespace Needle.Demystify
 	[FilePath("Preferences/DemystifySettings.asset", FilePathAttribute.Location.PreferencesFolder)]
 	internal class DemystifySettings : ScriptableSingleton<DemystifySettings>
 	{
+		public static event Action Changed;
+
+		internal static void RaiseChangedEvent() => Changed?.Invoke();
+		
 		internal void Save()
 		{
 			Undo.RegisterCompleteObjectUndo(this, "Save Demystify Settings");
@@ -56,6 +60,7 @@ namespace Needle.Demystify
 			Theme.EnsureEntries();
 			Theme.SetActive();
 			ThemeChanged?.Invoke();
+			RaiseChangedEvent();
 			InternalEditorUtility.RepaintAllViews();
 		}
 
@@ -66,5 +71,6 @@ namespace Needle.Demystify
 		public bool ShortenFilePaths = true;
 		public bool ShowFileName = true;
 		public bool AutoFilter = false;
+		public string ColorMarker = " ▌";// "┃";
 	}
 }

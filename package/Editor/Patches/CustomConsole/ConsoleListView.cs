@@ -12,8 +12,20 @@ namespace Needle.Demystify
 {
 	internal static class ConsoleListView
 	{
+		[InitializeOnLoadMethod]
+		private static void Init()
+		{
+			cachedInfo.Clear();
+			Selection.selectionChanged += OnSelectionChanged;
+			
+			// clear cache when colors change
+			DemystifyProjectSettings.ColorSettingsChanged += () =>
+			{
+				cachedInfo.Clear();
+			};
+		}
+		
 		private static readonly LogEntry tempEntry = new LogEntry();
-		private const string FilterPrefix = "";
 
 		private static readonly string[] onlyUseMethodNameFromLinesWithout = new[]
 		{
@@ -66,6 +78,9 @@ namespace Needle.Demystify
 		// called from console list with current list view element and console text
 		internal static void ModifyText(ListViewElement element, ref string text)
 		{
+			// var rect = element.position;
+			// GUI.DrawTexture(rect, Texture2D.whiteTexture);//, ScaleMode.StretchToFill, true, 1, Color.red, Vector4.one, Vector4.zero);
+			
 			using (new ProfilerMarker("ConsoleList.ModifyText").Auto())
 			{
 				if (!DemystifySettings.instance.ShowFileName) return;
@@ -90,27 +105,40 @@ namespace Needle.Demystify
 							const string colorPrefix = "<color=#999999>";
 							const string colorPostfix = "</color>";
 
+							var colorKey = fileName;
 							string GetText()
 							{
 								var str = fileName;
 								if (TryGetMethodName(tempEntry.message, out var methodName))
 								{
+									// colorKey += methodName;
 									str += "." + methodName; 
 								}
 
-								return colorPrefix + "[" + str + "]" + colorPostfix;
+								str = colorPrefix + "[" + str + "]" + colorPostfix;
+								// str = "<b>" + str + "</b>";
+								// str = "\t" + str;
+								// str = colorPrefix + str + colorPostfix;
+								return str;
 							}
 
 							var endTimeIndex = text.IndexOf("] ", StringComparison.InvariantCulture);
+
+							var colorMarker = DemystifySettings.instance.ColorMarker;// " ▍";
+							LogColor.AddColor(colorKey, ref colorMarker);
+							
 							// no time:
 							if (endTimeIndex == -1)
 							{
-								text = $"{GetText()} {text}";
+								// LogColor.AddColor(colorKey, ref text);
+								text = $"{colorMarker}{GetText()} {text}";
 							}
 							// contains time:
 							else
 							{
-								text = $"{text.Substring(0, endTimeIndex + 1)} {GetText()}{text.Substring(endTimeIndex + 1)}";
+								var message = text.Substring(endTimeIndex + 1);
+								// LogColor.AddColor(colorKey, ref message);
+								text = $"{colorMarker} {colorPrefix}{text.Substring(0, endTimeIndex + 1)}{colorPostfix} {GetText()}{message}";
 							}
 
 							cachedInfo.Add(key, text);
@@ -156,12 +184,6 @@ namespace Needle.Demystify
 			// str = str.Replace("/", ".");
 			str = str.Replace(":", string.Empty);
 			return str;
-		}
-
-		[InitializeOnLoadMethod]
-		private static void Init()
-		{
-			Selection.selectionChanged += OnSelectionChanged;
 		}
 
 		private static string previousFilter;

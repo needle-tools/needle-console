@@ -70,7 +70,15 @@ namespace Needle.Demystify
 				settings.CodePreviewKeyCode = (KeyCode)EditorGUILayout.EnumPopup(new GUIContent("Code Preview Key", "If None: code preview popup will open on hover. If any key assigned: code preview popup will only open if that key is pressed on hover"), settings.CodePreviewKeyCode);
 				settings.ShortenFilePaths = EditorGUILayout.Toggle(new GUIContent("Shorten File Paths", "When enabled demystify tries to shorten package paths to <package_name>@<version> <fileName><line>"), settings.ShortenFilePaths); 
 				settings.ShowFileName = EditorGUILayout.Toggle(new GUIContent("Show Filename", "When enabled demystify will prefix console log entries with the file name of the log source"), settings.ShowFileName); 
-				settings.AutoFilter = EditorGUILayout.Toggle(new GUIContent("Auto Filter", "When enabled demystify will set the search filter for project asset selection and hierarchy selection (first component it finds)"), settings.AutoFilter); 
+				
+				EditorGUILayout.LabelField("Experimental", EditorStyles.boldLabel);
+				settings.AutoFilter = EditorGUILayout.Toggle(new GUIContent("Auto Filter", "When enabled demystify will set the search filter for project asset selection and hierarchy selection (first component it finds)"), settings.AutoFilter);
+
+				using (var scope = new EditorGUI.ChangeCheckScope())
+				{
+					settings.ColorMarker = EditorGUILayout.TextField(new GUIContent("Color Marker", "Colored marker added before console log"), settings.ColorMarker);
+					if(scope.changed) DemystifyProjectSettings.RaiseColorsChangedEvent();
+				}
 
 				if(DemystifySettings.DevelopmentMode)
 				// using(new EditorGUI.DisabledScope(!settings.DevelopmentMode))
@@ -92,6 +100,7 @@ namespace Needle.Demystify
 			if (EditorGUI.EndChangeCheck())
 			{
 				settings.Save();
+				DemystifySettings.RaiseChangedEvent();
 			}
 		}
 
