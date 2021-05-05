@@ -71,6 +71,6 @@ namespace Needle.Demystify
 		public bool ShortenFilePaths = true;
 		public bool ShowFileName = true;
 		public bool AutoFilter = false;
-		public string ColorMarker = " ▌";// "┃";
+		public string ColorMarker = "┃";// "┃";
 	}
 }

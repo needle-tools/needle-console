@@ -12,14 +12,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: afdf0214f431a58499bf178c72b5bc72, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  DebugLog: 0
+  DebugLog: 1
   enabledPatchIds:
-  - Needle.Demystify.Patch_Exception
-  - Needle.Demystify.Patch_StacktraceUtility
-  - Needle.Demystify.Patch_Console
-  - Needle.Demystify.Patch_EditorGUI
   - needle.EditorPatching.HarmonyInstanceRegistry
   - Needle.Demystify.Patch_LogMessage
+  - Needle.Demystify.Patch_ConsoleWindowListView
+  - Needle.Demystify.Patch_ConsoleWindowMenuItem
+  - Needle.Demystify.Patch_EditorGUI
+  - Needle.Demystify.Patch_Exception
+  - Needle.Demystify.Patch_StacktraceUtility
   - Needle.Demystify.Patch_AutomaticLogMessage
+  - Needle.Demystify.Patch_Console
   disabledPatchIds:
   - System.Reflection.MonoMethod
+  - Needle.Demystify.Patch_ConsoleWindow

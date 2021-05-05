@@ -106,6 +106,10 @@ namespace Needle.Demystify
 							const string colorPostfix = "</color>";
 
 							var colorKey = fileName;
+							var colorMarker = DemystifySettings.instance.ColorMarker;// " ▍";
+							if(!string.IsNullOrWhiteSpace(colorMarker))
+								LogColor.AddColor(colorKey, ref colorMarker);
+							
 							string GetText()
 							{
 								var str = fileName;
@@ -115,30 +119,28 @@ namespace Needle.Demystify
 									str += "." + methodName; 
 								}
 
-								str = colorPrefix + "[" + str + "]" + colorPostfix;
+								// str = colorPrefix + "[" + str + "]" + colorPostfix;
 								// str = "<b>" + str + "</b>";
 								// str = "\t" + str;
-								// str = colorPrefix + str + colorPostfix;
+								str = colorPrefix + str + colorPostfix;// + " |";
 								return str;
 							}
 
 							var endTimeIndex = text.IndexOf("] ", StringComparison.InvariantCulture);
 
-							var colorMarker = DemystifySettings.instance.ColorMarker;// " ▍";
-							LogColor.AddColor(colorKey, ref colorMarker);
 							
 							// no time:
 							if (endTimeIndex == -1)
 							{
 								// LogColor.AddColor(colorKey, ref text);
-								text = $"{colorMarker}{GetText()} {text}";
+								text = $"{colorMarker} {GetText()} {text}";
 							}
 							// contains time:
 							else
 							{
 								var message = text.Substring(endTimeIndex + 1);
 								// LogColor.AddColor(colorKey, ref message);
-								text = $"{colorMarker} {colorPrefix}{text.Substring(0, endTimeIndex + 1)}{colorPostfix} {GetText()}{message}";
+								text = $"{colorPrefix}{text.Substring(1, endTimeIndex-1)}{colorPostfix} {colorMarker} {GetText()} {message}";
 							}
 
 							cachedInfo.Add(key, text);

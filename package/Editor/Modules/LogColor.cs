@@ -19,7 +19,8 @@ namespace Needle.Demystify
 			t = CalculateHash(str) % .7f + .05f;
 			var distToGreen = t - .4f;
 			t += distToGreen;// * 2f;// .3f;
-			// t %= 1.1f;
+			t = Mathf.Abs(t);
+			t %= 1f;
 			var col = Color.HSVToRGB(t, .8f, 2f);
 			return col;
 		}
