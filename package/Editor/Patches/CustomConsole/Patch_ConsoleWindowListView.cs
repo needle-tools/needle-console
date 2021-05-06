@@ -48,7 +48,7 @@ namespace Needle.Demystify
 
 					// if(customDraw && index >= 319 && index <= arr.Length-1) continue;
 					// if(index > 350 && index < 500)
-					// Debug.Log("<color=grey>" + index + ": " + inst + "</color>");
+					Debug.Log("<color=grey>" + index + ": " + inst + "</color>");
 
 					// get local index for current list view element
 					if (loadListViewElementIndex == -1 || inst.IsStloc() && inst.operand is LocalBuilder)

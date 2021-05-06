@@ -131,6 +131,7 @@ namespace Needle.Demystify
 
 							var endTimeIndex = text.IndexOf("] ", StringComparison.InvariantCulture);
 
+							// text = element.row.ToString();
 							
 							// no time:
 							if (endTimeIndex == -1)
