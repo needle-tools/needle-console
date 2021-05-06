@@ -71,7 +71,7 @@ namespace Needle.Demystify
 							var ldStr = arr[index - 1]; 
 							yield return new CodeInstruction(OpCodes.Ldloc, loadListViewElementIndex);
 							yield return ldStr;
-							yield return CodeInstruction.Call(typeof(ConsoleListView), nameof(ConsoleListView.ModifyText));
+							yield return CodeInstruction.Call(typeof(ConsoleText), nameof(ConsoleText.ModifyText));
 							continue; 
 						}
 					}
@@ -80,7 +80,7 @@ namespace Needle.Demystify
 					
 					if (customDraw && index == 318)
 					{
-						yield return CodeInstruction.Call(typeof(ConsoleListView), nameof(ConsoleListView.OnDrawList));
+						yield return CodeInstruction.Call(typeof(ConsoleList), nameof(ConsoleList.OnDrawList));
 					}
 				}
 			}

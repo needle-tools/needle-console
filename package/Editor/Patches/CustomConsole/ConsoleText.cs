@@ -12,7 +12,7 @@ using UnityEngine.UIElements;
 
 namespace Needle.Demystify
 {
-	internal static class ConsoleListView
+	internal static class ConsoleText
 	{
 		[InitializeOnLoadMethod]
 		private static void Init()
@@ -28,56 +28,7 @@ namespace Needle.Demystify
 		}
 		
 		private static readonly LogEntry tempEntry = new LogEntry();
-
-
-		private static Vector2 scroll;
-		internal static void OnDrawList()
-		{
-			try
-			{
-				LogEntries.StartGettingEntries();
-				var count = LogEntries.GetCount();
-				// scroll = EditorGUILayout.BeginScrollView(scroll);
-				var width = Screen.width - 20;
-				var yTop = EditorGUIUtility.singleLineHeight;
-				var lineHeight = EditorGUIUtility.singleLineHeight;
-				var scrollArea = new Rect(0, yTop, Screen.width - 3, Screen.height * .5f);
-				var contentSize = new Rect(0, yTop, width, count * lineHeight);
-				scroll = GUI.BeginScrollView(scrollArea, scroll, contentSize);
-				var position = new Rect(0, 0, width, lineHeight);
-				var element = new ListViewElement();
-				for (var i = 0; i < count; i++)
-				{
-					// if (Event.current.type == EventType.Repaint)
-					{
-						var row = i;
-						element.row = row;
-						element.position = position;
-						
-						LogEntries.GetEntryInternal(i, tempEntry);
-						var mask = 0;
-						var preview = default(string);
-						LogEntries.GetLinesAndModeFromEntryInternal(i, ConsoleWindow.Constants.LogStyleLineCount, ref mask, ref preview);
-
-						// if (!preview.Contains("nop"))
-						// {
-						// 	continue;
-						// }
-						
-						ModifyText(element, ref preview);
-						
-						GUI.Label(position, preview, ConsoleWindow.Constants.LogSmallStyle);
-						position.y += lineHeight;
-					}
-				}
-				// EditorGUILayout.EndScrollView();
-				GUI.EndScrollView();
-			}
-			finally
-			{
-				LogEntries.EndGettingEntries();
-			}
-		}
+		
 
 		private static readonly string[] onlyUseMethodNameFromLinesWithout = new[]
 		{
