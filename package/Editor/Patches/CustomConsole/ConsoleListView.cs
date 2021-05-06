@@ -8,6 +8,7 @@ using Unity.Profiling;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Analytics;
+using UnityEngine.UIElements;
 
 namespace Needle.Demystify
 {
@@ -44,11 +45,15 @@ namespace Needle.Demystify
 				var contentSize = new Rect(0, yTop, width, count * lineHeight);
 				scroll = GUI.BeginScrollView(scrollArea, scroll, contentSize);
 				var position = new Rect(0, 0, width, lineHeight);
+				var element = new ListViewElement();
 				for (var i = 0; i < count; i++)
 				{
 					// if (Event.current.type == EventType.Repaint)
 					{
 						var row = i;
+						element.row = row;
+						element.position = position;
+						
 						LogEntries.GetEntryInternal(i, tempEntry);
 						var mask = 0;
 						var preview = default(string);
@@ -58,6 +63,8 @@ namespace Needle.Demystify
 						// {
 						// 	continue;
 						// }
+						
+						ModifyText(element, ref preview);
 						
 						GUI.Label(position, preview, ConsoleWindow.Constants.LogSmallStyle);
 						position.y += lineHeight;
