@@ -35,6 +35,24 @@ namespace Needle.Demystify
 		private static bool HasFlag(int flags) => (LogEntries.consoleFlags & (int) flags) != 0;
 		private static bool HasMode(int mode, ConsoleWindow.Mode modeToCheck) => (uint) ((ConsoleWindow.Mode) mode & modeToCheck) > 0U;
 
+		private static bool filterTextureInit;
+		private static Texture2D filterDisabledTex, filterEnabledTex;
+
+
+		internal static void OnDrawToolbar()
+		{
+			if (!filterTextureInit)
+			{
+				filterDisabledTex = EditorGUIUtility.FindTexture("animationvisibilitytoggleoff");
+				filterEnabledTex = EditorGUIUtility.FindTexture("animationvisibilitytoggleon");
+			}
+
+			var count = " " + (ConsoleFilter.filteredCount >= 1000 ? "999+" : ConsoleFilter.filteredCount.ToString());
+			ConsoleFilter.enabled = GUILayout.Toggle(ConsoleFilter.enabled,
+				new GUIContent(count, ConsoleFilter.enabled ? filterEnabledTex : filterDisabledTex, ConsoleFilter.filteredCount + " logs hidden"),
+				ConsoleWindow.Constants.MiniButtonRight);
+		}
+
 		internal static bool OnDrawList(ConsoleWindow console)
 		{
 			if (!DrawCustom)
@@ -68,7 +86,7 @@ namespace Needle.Demystify
 				previouslySelectedRow = selectedRow;
 				selectedRow = int.MaxValue;
 			}
-			
+
 
 			SplitterGUILayout.BeginVerticalSplit(spl);
 
@@ -91,7 +109,7 @@ namespace Needle.Demystify
 			else if (contentHeight < scrollAreaHeight)
 				scroll.y = scrollAreaHeight;
 			scroll = GUI.BeginScrollView(scrollArea, scroll, contentSize);
-			
+
 			var position = new Rect(0, 0, width, lineHeight);
 			var element = new ListViewElement();
 			var style = new GUIStyle(ConsoleWindow.Constants.LogSmallStyle);
@@ -101,7 +119,7 @@ namespace Needle.Demystify
 			strRect.height -= position.height * .15f;
 			var tempContent = new GUIContent();
 			var collapsed = HasFlag(collapsedFlag);
-			
+
 
 			try
 			{
@@ -119,7 +137,7 @@ namespace Needle.Demystify
 							element.row = item.row;
 							element.position = position;
 
-							
+
 							// draw background
 							void DrawBackground(Color col)
 							{
@@ -128,6 +146,7 @@ namespace Needle.Demystify
 								GUI.DrawTexture(position, Texture2D.whiteTexture);
 								GUI.color = prevCol;
 							}
+
 							bool IsOdd() => row % 2 != 0;
 							if (entryIsSelected)
 							{
@@ -135,21 +154,24 @@ namespace Needle.Demystify
 							}
 							else if (HasMode(entry.mode, ConsoleWindow.Mode.ScriptCompileError))
 							{
-								DrawBackground(IsOdd() ? new Color(1,0,0,.2f) : new Color(1,.2f,.25f,.25f));
+								DrawBackground(IsOdd() ? new Color(1, 0, 0, .2f) : new Color(1, .2f, .25f, .25f));
 							}
-							else if (HasMode(entry.mode, ConsoleWindow.Mode.ScriptingError | ConsoleWindow.Mode.Error | ConsoleWindow.Mode.StickyError | ConsoleWindow.Mode.AssetImportError))
+							else if (HasMode(entry.mode,
+								ConsoleWindow.Mode.ScriptingError | ConsoleWindow.Mode.Error | ConsoleWindow.Mode.StickyError |
+								ConsoleWindow.Mode.AssetImportError))
 							{
-								DrawBackground(IsOdd() ? new Color(1,0,0,.1f) : new Color(1,.2f,.25f,.15f));
+								DrawBackground(IsOdd() ? new Color(1, 0, 0, .1f) : new Color(1, .2f, .25f, .15f));
 							}
-							else if (HasMode(entry.mode, ConsoleWindow.Mode.ScriptingWarning | ConsoleWindow.Mode.AssetImportWarning | ConsoleWindow.Mode.ScriptCompileWarning))
+							else if (HasMode(entry.mode,
+								ConsoleWindow.Mode.ScriptingWarning | ConsoleWindow.Mode.AssetImportWarning | ConsoleWindow.Mode.ScriptCompileWarning))
 							{
-								DrawBackground(IsOdd() ? new Color(.5f,.5f,0, .08f) : new Color(1, 1f, .1f, .04f));
+								DrawBackground(IsOdd() ? new Color(.5f, .5f, 0, .08f) : new Color(1, 1f, .1f, .04f));
 							}
-							else if(IsOdd())
+							else if (IsOdd())
 							{
 								DrawBackground(new Color(0, 0, 0, .1f));
 							}
-							
+
 							// draw icon
 							GUIStyle iconStyle = ConsoleWindow.GetStyleForErrorMode(entry.mode, true, ConsoleWindow.Constants.LogStyleLineCount == 1);
 							Rect iconRect = position;
@@ -157,7 +179,7 @@ namespace Needle.Demystify
 							iconStyle.Draw(iconRect, false, false, entryIsSelected, false);
 
 							// draw text
-							var preview = item.str;// + " - " + item.entry.mode;
+							var preview = item.str; // + " - " + item.entry.mode;
 							strRect.x = xOffset;
 							ConsoleText.ModifyText(element, ref preview);
 							GUI.Label(strRect, preview, style);
@@ -190,7 +212,7 @@ namespace Needle.Demystify
 									if (previouslySelectedRow == selectedRow)
 									{
 										var td = (DateTime.Now - lastClickTime).Seconds;
-										if(td < 1)
+										if (td < 1)
 											rowDoubleClicked = selectedRow;
 									}
 									else
@@ -198,6 +220,7 @@ namespace Needle.Demystify
 										if (entry.instanceID != 0)
 											EditorGUIUtility.PingObject(entry.instanceID);
 									}
+
 									lastClickTime = DateTime.Now;
 									Event.current.Use();
 									console.Repaint();
@@ -240,7 +263,7 @@ namespace Needle.Demystify
 			if (Event.current.type == EventType.Repaint)
 			{
 				var diffToBottom = (contentHeight - scrollAreaHeight) - scroll.y;
-				wasAtBottom = diffToBottom < 1 || contentHeight < scrollAreaHeight; 
+				wasAtBottom = diffToBottom < 1 || contentHeight < scrollAreaHeight;
 			}
 
 			// Display active text (We want word wrapped text with a vertical scrollbar)

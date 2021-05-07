@@ -48,7 +48,7 @@ namespace Needle.Demystify
 
 					// if(customDraw && index >= 319 && index <= arr.Length-1) continue;
 					// if(index > 350 && index < 500)
-					// Debug.Log("<color=grey>" + index + ": " + inst + "</color>");
+					Debug.Log("<color=grey>" + index + ": " + inst + "</color>");
 
 					// get local index for current list view element
 					if (loadListViewElementIndex == -1 || inst.IsStloc() && inst.operand is LocalBuilder)
@@ -77,67 +77,28 @@ namespace Needle.Demystify
 						inst.labels.Add(skipLabel);
 					}
 
+					// this is right before  SplitterGUILayout.BeginVerticalSplit(spl);
 					if (index == 318)
 					{
 						yield return new CodeInstruction(OpCodes.Ldarg_0);
 						yield return CodeInstruction.Call(typeof(ConsoleList), nameof(ConsoleList.OnDrawList));
 						yield return new CodeInstruction(OpCodes.Brfalse, skipLabel);
 					}
-					else
+					// this is before "EndHorizontal"
+					else if (index == 317)
 					{
-						yield return inst;
+						yield return CodeInstruction.Call(typeof(ConsoleList), nameof(ConsoleList.OnDrawToolbar));
 					}
+					// this is before "GUILayout.FlexibleSpace"
+					// https://github.com/Unity-Technologies/UnityCsReference/blob/61f92bd79ae862c4465d35270f9d1d57befd1761/Editor/Mono/ConsoleWindow.cs#L539
+					else if (index == 209)
+					{
+						yield return CodeInstruction.Call(typeof(ConsoleOptionsFoldout), nameof(ConsoleOptionsFoldout.OnDrawFoldouts));
+					}
+					
+					yield return inst;
 				}
 			}
 		}
-
-		// private class EnumeratorPatch : EditorPatch
-		// {
-		// protected override Task OnGetTargetMethods(List<MethodBase> targetMethods)
-		// {
-		// 	var method = typeof(ListViewShared.ListViewElementsEnumerator).GetMethod("MoveNext");
-		// 	targetMethods.Add(method);
-		// 	return Task.CompletedTask;
-		// }
-		//
-		// private static int count;
-		//
-		// private static void Prefix(int ___xPos)
-		// {
-		// 	if (___xPos <= -1)
-		// 		count = 0;
-		// }
-
-		// // https://github.com/Unity-Technologies/UnityCsReference/blob/61f92bd79ae862c4465d35270f9d1d57befd1761/Editor/Mono/GUI/ListViewShared.cs#L411
-		// private static void Postfix(ListViewShared.ListViewElementsEnumerator __instance, ref bool __result, ref ListViewElement ___element, ListViewShared.InternalLayoutedListViewState ___ilvState)
-		// {
-		// 	if (__result)
-		// 	{
-		// 		if (___element.row == 0) count = 0;
-		// 		
-		// 		if (___element.row % 2 == 0)
-		// 		{
-		// 			count += 1;
-		// 			// ___element.position.height = 0;
-		// 			___element.row += 1;
-		// 			// if(___ilvState != null && ___ilvState.@group != null)
-		// 			// 	___ilvState.@group.AddY(-___ilvState.rectHeight);
-		// 			// __instance.MoveNext();
-		// 		}
-		// 		else
-		// 		{
-		// 			count += 1;
-		// 			___element.row += count;
-		// 			if (___element.row >= ___ilvState.state.totalRows) __result = false;
-		//
-		// 			// var el = ___element.position;
-		// 			// el.y -= el.height * count;
-		// 			// ___element.row -= count;
-		// 			// ___element.row = Mathf.Max(___element.row, 0);
-		// 			// ___element.position = el;
-		// 		}
-		// 	}
-		// }
-		// }
 	}
 }

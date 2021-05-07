@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using Unity.Profiling;
 using UnityEditor;
+using UnityEditorInternal;
 using UnityEngine;
 
 namespace Needle.Demystify
@@ -37,12 +38,24 @@ namespace Needle.Demystify
 		}
 	}
 
-	public class ConsoleFilter
+	public static class ConsoleFilter
 	{
+		internal static bool enabled {
+			set
+			{
+				var _enabled = EditorPrefs.GetBool("ConsoleFilter_Enabled", true);
+				if (value == _enabled) return;
+				EditorPrefs.SetBool("ConsoleFilter_Enabled", value);
+				MarkDirty();
+			}
+			get => EditorPrefs.GetBool("ConsoleFilter_Enabled", true);
+		}
 		private static bool isDirty = true;
 		private static readonly List<IConsoleFilter> registeredFilters = new List<IConsoleFilter>();
 		private static readonly Dictionary<string, bool> cachedLogResultForMask = new Dictionary<string, bool>();
 		private static readonly List<LogEntry> logEntries = new List<LogEntry>();
+		
+		internal static int filteredCount { get; private set; }
 
 		public static void MarkDirty()
 		{
@@ -104,6 +117,7 @@ namespace Needle.Demystify
 					entries.Clear();
 					cachedLogResultForMask.Clear();
 					logEntries.Clear();
+					filteredCount = 0;
 				}
 				
 				isDirty = false;
@@ -149,7 +163,7 @@ namespace Needle.Demystify
 								continue;
 						}
 					}
-					else
+					else if(enabled)
 					{
 						LogEntryInfo info = new LogEntryInfo(entry);
 						var skip = false;
@@ -160,6 +174,7 @@ namespace Needle.Demystify
 							{
 								if (filter.Exclude(preview, mask, i, info))
 								{
+									filteredCount += 1;
 									skip = true;
 									break;
 								}
