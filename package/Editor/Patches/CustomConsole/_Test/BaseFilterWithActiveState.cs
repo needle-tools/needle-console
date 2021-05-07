@@ -7,6 +7,18 @@ namespace Needle.Demystify
 	[Serializable]
 	public abstract class BaseFilterWithActiveState<T> : IConsoleFilter
 	{
+		private bool _isEnabled = true;
+		public bool Enabled
+		{
+			get { return _isEnabled; }
+			set
+			{
+				if (value == _isEnabled) return;
+				_isEnabled = value;
+				ConsoleFilter.MarkDirty();
+			}
+		}
+
 		private List<T> excluded = new List<T>();
 		private List<bool> active = new List<bool>();
 
@@ -49,7 +61,7 @@ namespace Needle.Demystify
 			if (this.active[index] != active)
 			{
 				this.active[index] = active;
-				if (ConsoleFilter.Contains(this))
+				if (Enabled && ConsoleFilter.Contains(this))
 					ConsoleFilter.MarkDirty();
 			}
 		}
@@ -61,7 +73,7 @@ namespace Needle.Demystify
 				excluded.Add(entry);
 				active.Add(isActive);
 				OnChanged();
-				if (ConsoleFilter.Contains(this))
+				if (Enabled && ConsoleFilter.Contains(this))
 					ConsoleFilter.MarkDirty();
 			}
 		}
@@ -71,7 +83,7 @@ namespace Needle.Demystify
 			excluded.RemoveAt(index);
 			active.RemoveAt(index);
 			OnChanged();
-			if (ConsoleFilter.Contains(this))
+			if (Enabled && ConsoleFilter.Contains(this))
 				ConsoleFilter.MarkDirty();
 		}
 

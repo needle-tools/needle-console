@@ -30,9 +30,12 @@ namespace Needle.Demystify
 			EditorGUI.BeginChangeCheck();
 
 			ConsoleList.DrawCustom = EditorGUILayout.Toggle("Draw Custom", ConsoleList.DrawCustom);
+			GUILayout.Space(10);
 
 			DrawFilter("Files", fileFilter);
+			GUILayout.Space(5);
 			DrawFilter("Packages", packageFilter);
+			GUILayout.Space(5);
 
 			if (EditorGUI.EndChangeCheck())
 			{
@@ -44,21 +47,32 @@ namespace Needle.Demystify
 		private void DrawFilter(string header, BaseFilterWithActiveState<string> _filter)
 		{
 			var key = "ConsoleFilter" + header;
-			var foldout = EditorGUILayout.Foldout(SessionState.GetBool(key, true), header);
-			SessionState.SetBool(key, foldout);
-			if (!foldout) return;
-			for (var index = 0; index < _filter.Count; index++)
+			var foldout = false;
+			using (new EditorGUILayout.HorizontalScope())
 			{
-				var file = _filter[index];
-				var label = _filter.GetLabel(index);
-				using (new GUILayout.HorizontalScope())
+				foldout = EditorGUILayout.Foldout(SessionState.GetBool(key, true), header);
+				SessionState.SetBool(key, foldout);
+				GUILayout.FlexibleSpace();
+				_filter.Enabled = EditorGUILayout.Toggle(string.Empty, _filter.Enabled);
+			}
+			
+			if (!foldout) return;
+			GUILayout.Space(3);
+			// using (new EditorGUI.DisabledScope(_filter.Enabled))
+			{
+				for (var index = 0; index < _filter.Count; index++)
 				{
-					var ex = EditorGUILayout.ToggleLeft(new GUIContent(label, file), _filter.IsActive(index));
-					_filter.SetActive(index, ex);
-					if (GUILayout.Button("x", GUILayout.Width(30)))
+					var file = _filter[index];
+					var label = _filter.GetLabel(index);
+					using (new GUILayout.HorizontalScope())
 					{
-						_filter.Remove(index);
-						index -= 1;
+						var ex = EditorGUILayout.ToggleLeft(new GUIContent(label, file), _filter.IsActive(index));
+						_filter.SetActive(index, ex);
+						if (GUILayout.Button("x", GUILayout.Width(30)))
+						{
+							_filter.Remove(index);
+							index -= 1;
+						}
 					}
 				}
 			}

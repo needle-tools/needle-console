@@ -7,6 +7,7 @@ namespace Needle.Demystify
 {
 	public interface IConsoleFilter
 	{
+		bool Enabled { get; set; }
 		bool Exclude(string message, int mask, int row, LogEntryInfo info);
 		void AddLogEntryContextMenuItems(GenericMenu menu, LogEntryInfo clickedLog);
 	}
@@ -155,6 +156,7 @@ namespace Needle.Demystify
 						var skip = false;
 						foreach (var filter in registeredFilters)
 						{
+							if (!filter.Enabled) continue;
 							using (new ProfilerMarker("Filter Exclude").Auto())
 							{
 								if (filter.Exclude(preview, mask, i, info))
