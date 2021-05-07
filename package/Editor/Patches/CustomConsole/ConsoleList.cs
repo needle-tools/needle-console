@@ -184,13 +184,19 @@ namespace Needle.Demystify
 							{
 								if (position.Contains(Event.current.mousePosition))
 								{
+									var entry = currentEntries[k].entry;
 									selectedRow = currentEntries[k].row;
-									selectedText = currentEntries[k].entry.message;
+									selectedText = entry.message;
 									if (previouslySelectedRow == selectedRow)
 									{
 										var td = (DateTime.Now - lastClickTime).Seconds;
 										if(td < 1)
 											rowDoubleClicked = selectedRow;
+									}
+									else
+									{
+										if (entry.instanceID != 0)
+											EditorGUIUtility.PingObject(entry.instanceID);
 									}
 									lastClickTime = DateTime.Now;
 									Event.current.Use();
