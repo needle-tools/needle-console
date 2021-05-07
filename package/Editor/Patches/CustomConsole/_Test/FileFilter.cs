@@ -40,7 +40,7 @@ namespace Needle.Demystify
 			if (string.IsNullOrWhiteSpace(fileName))
 				fileName = "All logs without file";
 			
-			menu.AddItem(new GUIContent("Exclude " + fileName), false, () =>
+			menu.AddItem(new GUIContent("Exclude File " + fileName), false, () =>
 			{
 				Add(clickedLog.file);
 				if (window) window.Repaint();

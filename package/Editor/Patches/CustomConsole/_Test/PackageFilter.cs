@@ -102,28 +102,7 @@ namespace Needle.Demystify
 					else
 						SetActive(index, true);
 				});
-				return;
 			}
-
-
-			// Debug.Log(path);
-			// // abs = "Packages/" +  abs.Substring(Application.dataPath.Length + 1);
-			// var packageInfo = PackageInfo.FindForAssetPath(path);
-			// var isPackage = Folders.IsPackagedAssetPath(path);
-			//
-			//
-			// // Debug.Log(abs);
-			// if (packageInfo == null)
-			// {
-			// 	Debug.Log("No package " + isPackage + "\n" + String.Join("\n", PackageInfo.GetAll().Select(p => p.resolvedPath)));
-			// 	return;
-			// }
-			// Debug.Log(packageInfo.name);
-			//
-			// menu.AddItem(new GUIContent("Exclude Package " + packageInfo.displayName), false, () =>
-			// {
-			// 	Add(clickedLog.file);
-			// });
 		}
 	}
 }

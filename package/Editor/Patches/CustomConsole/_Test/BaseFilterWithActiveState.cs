@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEditor;
 
 namespace Needle.Demystify
@@ -26,6 +27,7 @@ namespace Needle.Demystify
 		public T this[int index] => excluded[index];
 		public bool IsActive(int index) => active[index];
 
+		public int GetActiveCount() => active.Count(e => e);
 		public abstract string GetLabel(int index);
 
 		public bool TryGetIndex(T element, out int index)
