@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using UnityEditor;
 using UnityEditor.PackageManager;
+using UnityEditor.SearchService;
 using UnityEngine;
 using PackageInfo = UnityEditor.PackageManager.PackageInfo;
 
@@ -28,57 +29,74 @@ namespace Needle.Demystify
 
 		public override bool Exclude(string message, int mask, int row, LogEntryInfo info)
 		{
-			if (allPackages == null) allPackages = PackageInfo.GetAll();
-			if (allPackages == null) return false;
+			if (Count <= 0) return false;
+			
 			if (!filePackageDict.TryGetValue(info.file, out var index))
 			{
 				index = -1;
-				for (var i = 0; i < Count; i++)
+				if (TryGetPackage(info.file, out var package))
 				{
-					if (index >= 0) break;
-					var filtered = this[i];
-					Debug.Log(filtered);
-					foreach (var pack in allPackages)
+					for (var i = 0; i < Count; i++)
 					{
-						if (filtered == pack.name)
+						var filtered = this[i];
+						if (filtered == package.name)
 						{
 							index = i;
 							break;
 						}
+					
 					}
 				}
+				filePackageDict.Add(info.file, index);
 			}
 
 			if (index == -1) return false;
 			return IsActive(index);
 		}
 
-
-		public override void AddLogEntryContextMenuItems(GenericMenu menu, LogEntryInfo clickedLog)
+		private bool TryGetPackage(string path, out PackageInfo package)
 		{
-			if (allPackages == null) allPackages = PackageInfo.GetAll();
-
-			var path = clickedLog.file;
+			if (allPackages == null)
+			{
+				allPackages = PackageInfo.GetAll();
+				if (allPackages == null)
+				{
+					package = null;
+					return false;
+				}
+			}
+			
 			path = Path.GetFullPath(path);
-			// path.Replace("\\", "/");
-
 			foreach (var pack in allPackages)
 			{
 				var pp = pack.resolvedPath;
 				if (path.StartsWith(pp))
 				{
-					var str = pack.name;
-					var contains = TryGetIndex(str, out var index);
-					var isActive = contains && IsActive(str);
-					menu.AddItem(new GUIContent("Exclude Package " + str), contains && isActive, func: () =>
-					{
-						if (!contains)
-							Add(str);
-						else
-							SetActive(index, true);
-					});
-					return;
+					package = pack;
+					return true;
 				}
+			}
+
+			package = null;
+			return false;
+		}
+
+
+		public override void AddLogEntryContextMenuItems(GenericMenu menu, LogEntryInfo clickedLog)
+		{
+			if (TryGetPackage(clickedLog.file, out var pack))
+			{
+				var str = pack.name;
+				var contains = TryGetIndex(str, out var index);
+				var isActive = contains && IsActive(str);
+				menu.AddItem(new GUIContent("Exclude Package " + str), contains && isActive, func: () =>
+				{
+					if (!contains)
+						Add(str);
+					else
+						SetActive(index, true);
+				});
+				return;
 			}
 
 
