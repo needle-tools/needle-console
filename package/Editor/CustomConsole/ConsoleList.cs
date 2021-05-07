@@ -14,14 +14,14 @@ namespace Needle.Demystify
 	{
 		internal static bool DrawCustom
 		{
-			get => SessionState.GetBool("ConsoleListCustom", false);
-			set => SessionState.SetBool("ConsoleListCustom", value);
+			get => DemystifySettings.instance.CustomList;
+			set => DemystifySettings.instance.CustomList = value;
 		}
 
 
 		private static Vector2 scroll, scrollStacktrace;
 		private static readonly List<CachedConsoleInfo> currentEntries = new List<CachedConsoleInfo>();
-		private static SplitterState spl = SplitterState.FromRelative(new float[] {70, 30}, new float[] {32, 32}, null);
+		private static SplitterState spl = SplitterState.FromRelative(new float[] {70, 30}, new float[] {32, 32}, null); 
 
 		private static int selectedRow = -1, previouslySelectedRow = -2, rowDoubleClicked = -1;
 		private static string selectedText;
@@ -94,7 +94,7 @@ namespace Needle.Demystify
 			var lineCount = ConsoleWindow.Constants.LogStyleLineCount;
 			var xOffset = ConsoleWindow.Constants.LogStyleLineCount == 1 ? 2 : 14;
 			var yTop = EditorGUIUtility.singleLineHeight + 3;
-			var lineHeight = EditorGUIUtility.singleLineHeight * 1f * lineCount;
+			var lineHeight = EditorGUIUtility.singleLineHeight * 1.1f * lineCount;
 			count = currentEntries.Count;
 			var scrollAreaHeight = Screen.height - spl.realSizes[1] - 44;
 			var contentHeight = count * lineHeight;

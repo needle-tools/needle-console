@@ -2,11 +2,15 @@
 using System.Linq;
 using Unity.Profiling;
 using UnityEditor;
-using UnityEditorInternal;
 using UnityEngine;
 
 namespace Needle.Demystify
 {
+	internal interface IOwned 
+	{
+		Object Owner { get; set; }
+	}
+	
 	public interface IConsoleFilter
 	{
 		bool Enabled { get; set; }

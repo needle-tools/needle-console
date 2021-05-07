@@ -3,13 +3,15 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEditor;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 namespace Needle.Demystify
 {
 	[Serializable]
-	public abstract class BaseFilterWithActiveState<T> : IConsoleFilter
+	public abstract class FilterBase<T> : IConsoleFilter
 	{
 		private bool _isEnabled = true;
+		
 		public bool Enabled
 		{
 			get => _isEnabled;
@@ -33,7 +35,7 @@ namespace Needle.Demystify
 
 		public bool TryGetIndex(T element, out int index)
 		{
-			for (var i = 0; i < excluded.Count; i++) 
+			for (var i = 0; i < excluded.Count; i++)
 			{
 				if (excluded[i].Equals(element))
 				{
@@ -90,25 +92,61 @@ namespace Needle.Demystify
 				ConsoleFilter.MarkDirty();
 		}
 
+		public virtual void Clear()
+		{
+			if (Count > 0)
+			{
+				excluded.Clear();
+				active.Clear();
+				OnChanged();
+				if(Enabled && ConsoleFilter.Contains(this))
+					ConsoleFilter.MarkDirty();
+			}
+		}
+
 		public abstract bool Exclude(string message, int mask, int row, LogEntryInfo info);
 
 		public abstract void AddLogEntryContextMenuItems(GenericMenu menu, LogEntryInfo clickedLog);
 
-		protected virtual void OnChanged(){}
+		protected virtual void OnChanged()
+		{
+		}
+
 
 		public void OnGUI()
 		{
 			var header = ObjectNames.NicifyVariableName(GetType().Name);
 			var key = "ConsoleFilter" + header;
-			
-			header += " [" + GetActiveCount() + "/" + Count + "]";
-			var foldout = SessionState.GetBool(key, true);
-			foldout = EditorGUILayout.BeginFoldoutHeaderGroup(foldout, header);
-			// foldout = EditorGUILayout.Foldout(foldout, header);
-			SessionState.SetBool(key, foldout);
-			Enabled = foldout;
 
-			if(foldout)
+			header += " (" + GetActiveCount() + "/" + Count + ")";
+			if (!Enabled) header += " - Disabled";
+			var foldout = SessionState.GetBool(key, true);
+			foldout = EditorGUILayout.BeginFoldoutHeaderGroup(foldout, new GUIContent(header), EditorStyles.foldoutHeader, ShowOptionsContextMenu);
+
+			void ShowOptionsContextMenu(Rect r)
+			{
+				var menu = new GenericMenu();
+				if (Enabled)
+					menu.AddItem(new GUIContent("Disable"), true, () => Enabled = false);
+				else 
+					menu.AddItem(new GUIContent("Enable"), false, () => Enabled = true);
+				menu.AddSeparator(string.Empty);
+				menu.AddItem(new GUIContent("Clear"), false, Clear);
+				menu.DropDown(r);
+			}
+			if(Event.current.type == EventType.MouseDown)
+			{
+				var lr = GUILayoutUtility.GetLastRect();
+				if (Event.current.button == 1 && lr.Contains(Event.current.mousePosition))
+				{
+					var r = new Rect(Event.current.mousePosition, Vector2.zero);
+					ShowOptionsContextMenu(r);
+				}
+			}
+			
+			SessionState.SetBool(key, foldout);
+
+			if (foldout)
 			{
 				EditorGUI.indentLevel++;
 				for (var index = 0; index < Count; index++)
@@ -126,9 +164,10 @@ namespace Needle.Demystify
 						}
 					}
 				}
+
 				EditorGUI.indentLevel--;
 			}
-			
+
 			EditorGUILayout.EndFoldoutHeaderGroup();
 		}
 	}

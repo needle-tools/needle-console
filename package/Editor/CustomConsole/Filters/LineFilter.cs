@@ -13,7 +13,7 @@ namespace Needle.Demystify
 	}
 	
 	[Serializable]
-	public class LineFilter : BaseFilterWithActiveState<FileLine>
+	public class LineFilter : FilterBase<FileLine>
 	{
 		public override string GetLabel(int index)
 		{

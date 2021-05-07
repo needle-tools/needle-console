@@ -79,6 +79,8 @@ namespace Needle.Demystify
 					settings.ColorMarker = EditorGUILayout.TextField(new GUIContent("Color Marker", "Colored marker added before console log"), settings.ColorMarker);
 					if(scope.changed) DemystifyProjectSettings.RaiseColorsChangedEvent();
 				}
+				
+				settings.CustomList = EditorGUILayout.Toggle(new GUIContent("Custom List", "The custom list replaces the console log drawing with a custom implementation that allows for advanced features such like very custom log filtering via context menus"), settings.CustomList);
 
 				if(DemystifySettings.DevelopmentMode)
 				// using(new EditorGUI.DisabledScope(!settings.DevelopmentMode))

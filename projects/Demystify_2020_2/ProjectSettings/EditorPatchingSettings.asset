@@ -20,6 +20,6 @@ MonoBehaviour:
   - Needle.Demystify.Patch_EditorGUI
   - needle.EditorPatching.HarmonyInstanceRegistry
   - Needle.Demystify.Patch_AutomaticLogMessage
-  - Needle.Demystify.Patch_ConsoleWindowListView
   - Needle.Demystify.Patch_ConsoleWindowMenuItem
+  - Needle.Demystify.Patch_ConsoleWindowListView
   disabledPatchIds: []

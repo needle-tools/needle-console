@@ -5,7 +5,7 @@
       "depth": 0,
       "source": "local",
       "dependencies": {
-        "com.needle.editorpatching": "1.2.0-exp"
+        "com.needle.editorpatching": "1.2.0-exp.1"
       }
     },
     "com.needle.demystify.extras": {

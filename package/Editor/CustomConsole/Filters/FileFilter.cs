@@ -7,7 +7,7 @@ using UnityEngine;
 namespace Needle.Demystify
 {
 	[Serializable]
-	public class FileFilter : BaseFilterWithActiveState<string>
+	public class FileFilter : FilterBase<string>
 	{
 		public override string GetLabel(int index)
 		{

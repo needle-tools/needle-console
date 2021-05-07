@@ -25,7 +25,6 @@ namespace Needle.Demystify
 		{
 			protected override Task OnGetTargetMethods(List<MethodBase> targetMethods)
 			{
-				
 				targetMethods.Add(AccessTools.Method(typeof(Logger), "GetString", new[] {typeof(object)}));
 				// targetMethods.Add(AccessTools.Method(typeof(Debug), "Log", new[] {typeof(string), typeof(Object)}));
 				return Task.CompletedTask; 
@@ -36,12 +35,15 @@ namespace Needle.Demystify
 			{
 				if (__result != null && __result.Length <= 0)// || __result == "Null")
 				{
-					__result = string.Empty;
 					var stacktrace = new StackTrace();
 					var frame = stacktrace.GetFrame(4);
 					var methodName = frame.GetMethod().FullDescription();
-					SyntaxHighlighting.AddSyntaxHighlighting(ref methodName);
-					__result += methodName;
+					if (!string.IsNullOrEmpty(methodName))
+					{
+						__result = string.Empty;
+						SyntaxHighlighting.AddSyntaxHighlighting(ref methodName);
+						__result += methodName;
+					}
 					// __result += "\n" + frame.GetFileName();
 				}
 

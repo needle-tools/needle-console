@@ -11,7 +11,7 @@ using PackageInfo = UnityEditor.PackageManager.PackageInfo;
 namespace Needle.Demystify
 {
 	[Serializable]
-	public class PackageFilter : BaseFilterWithActiveState<string>
+	public class PackageFilter : FilterBase<string>
 	{
 		private static PackageInfo[] allPackages;
 		private Dictionary<string, int> filePackageDict = new Dictionary<string, int>();

@@ -72,5 +72,10 @@ namespace Needle.Demystify
 		public bool ShowFileName = true;
 		public bool AutoFilter = false;
 		public string ColorMarker = "┃";// "┃";
+		
+		public bool CustomList = true;
+		[SerializeField]
+		internal ScriptableObject ActiveConsoleFilterConfig;
 	}
+	
 }

@@ -5,7 +5,7 @@ using UnityEngine;
 namespace Needle.Demystify
 {
 	[Serializable]
-	public class MessageFilter : BaseFilterWithActiveState<string>
+	public class MessageFilter : FilterBase<string>
 	{
 		public const int MaxLenght = 100;
 		

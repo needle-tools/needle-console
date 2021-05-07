@@ -7,7 +7,7 @@ namespace Needle.Demystify
 {
 	public class TempFilterWindow : EditorWindow
 	{
-		[MenuItem("Demystify/Console Filter")]
+		[MenuItem("Tools/Demystify/Dev Console Filter Window")]
 		private static void Open()
 		{
 			var window = CreateWindow<TempFilterWindow>();
@@ -25,14 +25,12 @@ namespace Needle.Demystify
 		{
 			scroll = EditorGUILayout.BeginScrollView(scroll);
 			EditorGUI.BeginChangeCheck();
-
-			ConsoleList.DrawCustom = EditorGUILayout.Toggle("Draw Custom", ConsoleList.DrawCustom);
+			ConsoleList.DrawCustom = EditorGUILayout.Toggle("Custom List", ConsoleList.DrawCustom);
 			GUILayout.Space(10);
 
 			foreach (var filter in ConsoleFilter.RegisteredFilter)
 			{
 				filter.OnGUI();
-				GUILayout.Space(5);
 			}
 
 			if (EditorGUI.EndChangeCheck())
