@@ -43,6 +43,7 @@ namespace Needle.Demystify
 		{
 			if (!filterTextureInit)
 			{
+				filterTextureInit = true;
 				filterDisabledTex = EditorGUIUtility.FindTexture("animationvisibilitytoggleoff");
 				filterEnabledTex = EditorGUIUtility.FindTexture("animationvisibilitytoggleon");
 			}

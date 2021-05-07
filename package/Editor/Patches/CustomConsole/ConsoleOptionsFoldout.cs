@@ -9,7 +9,7 @@ namespace Needle.Demystify
 		{
 			var rect = GUILayoutUtility.GetLastRect();
 			rect.x += rect.width;
-			var label = new GUIContent("Filter");
+			var label = new GUIContent("Filter", "Console Filter Options");
 			rect.width = EditorStyles.toolbarDropDown.CalcSize(label).x;
 			if (EditorGUI.DropdownButton(rect, label, FocusType.Keyboard, EditorStyles.toolbarDropDown))
 			{
