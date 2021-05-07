@@ -15,7 +15,7 @@ namespace Needle.Demystify
 		{
 			var file = Path.GetFileName(this[index]);
 			if (string.IsNullOrEmpty(file))
-				file = "Editor Message";
+				file = "Logs without file";
 			return file;
 		}
 
@@ -38,7 +38,7 @@ namespace Needle.Demystify
 			var fileName = Path.GetFileName(clickedLog.file);
 			
 			if (string.IsNullOrWhiteSpace(fileName))
-				fileName = "No-File";
+				fileName = "All logs without file";
 			
 			menu.AddItem(new GUIContent("Exclude " + fileName), false, () =>
 			{

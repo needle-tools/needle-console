@@ -65,6 +65,12 @@ namespace Needle.Demystify
 					return false;
 				}
 			}
+
+			if (string.IsNullOrWhiteSpace(path))
+			{
+				package = null;
+				return false;
+			}
 			
 			path = Path.GetFullPath(path);
 			foreach (var pack in allPackages)
