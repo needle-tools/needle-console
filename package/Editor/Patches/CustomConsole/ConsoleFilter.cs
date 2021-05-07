@@ -131,7 +131,7 @@ namespace Needle.Demystify
 		private static bool isDirty = true;
 		private static readonly List<IConsoleFilter> registeredFilters = new List<IConsoleFilter>();
 		private static readonly Dictionary<string, bool> cachedLogResultForMask = new Dictionary<string, bool>();
-		private static readonly Dictionary<int, LogEntry> logEntries = new Dictionary<int, LogEntry>();
+		private static readonly List<LogEntry> logEntries = new List<LogEntry>();
 
 		internal static void MarkDirty()
 		{
@@ -154,8 +154,7 @@ namespace Needle.Demystify
 
 		internal static bool ShouldUpdate(int logCount)
 		{
-			if (_prevCount != logCount) isDirty = true;
-			_prevCount = logCount;
+			if (_prevCount != logCount) return true;
 			return isDirty;
 		}
 
@@ -163,21 +162,41 @@ namespace Needle.Demystify
 		{
 			using (new ProfilerMarker("ConsoleFilter.HandleUpdate").Auto())
 			{
-				isDirty = false;
-				entries.Clear();
-				LogEntry entry = new LogEntry();
-				cachedLogResultForMask.Clear();
+				var start = _prevCount;
 
-				for (var i = 0; i < count; i++)
+				var cleared = count < _prevCount;
+				if (isDirty || cleared)
 				{
-					LogEntry GetEntry()
+					start = 0;
+					entries.Clear();
+					cachedLogResultForMask.Clear();
+				}
+
+				if (cleared)
+				{
+					logEntries.Clear();
+				}
+				
+				isDirty = false;
+				
+				_prevCount = count;
+				
+
+				for (var i = start; i < count; i++)
+				{
+					LogEntry entry = null;
+					using (new ProfilerMarker("GetEntryInternal").Auto())
 					{
-						if (logEntries.TryGetValue(i, out var entry))
-							return entry;
-						var ne = new LogEntry();
-						LogEntries.GetEntryInternal(i, ne);
-						logEntries.Add(i, ne);
-						return ne;
+						if (logEntries.Count > i)
+						{
+							entry = logEntries[i];
+						}
+						else
+						{
+							entry = new LogEntry();
+							LogEntries.GetEntryInternal(i, entry);
+							logEntries.Add(entry);
+						}
 					}
 					
 					var mask = 0;
@@ -199,19 +218,11 @@ namespace Needle.Demystify
 						{
 							if (cacheRes)
 								continue;
-
-							entry = GetEntry();
 						}
 					}
 					else
 					{
-						LogEntryInfo info;
-						using (new ProfilerMarker("Filter GetEntryInternal").Auto())
-						{
-							entry = GetEntry();
-							info = new LogEntryInfo(entry);
-						}
-
+						LogEntryInfo info = new LogEntryInfo(entry);
 						var skip = false;
 						foreach (var filter in registeredFilters)
 						{
@@ -228,7 +239,9 @@ namespace Needle.Demystify
 						cachedLogResultForMask.Add(preview, skip);
 						if (skip) continue;
 					}
-					
+
+
+					preview += " #" + i;
 
 					entries.Add(new CachedConsoleInfo()
 					{

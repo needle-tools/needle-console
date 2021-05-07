@@ -104,7 +104,7 @@ namespace Needle.Demystify
 							var item = currentEntries[k];
 							var entryIsSelected = item.row == selectedRow;
 							var entry = item.entry;
-							element.row = row;
+							element.row = item.row;
 							element.position = position;
 
 							// draw background
