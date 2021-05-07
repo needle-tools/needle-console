@@ -31,10 +31,8 @@ namespace Needle.Demystify
 		private static bool wasAtBottom, logsCountChanged;
 		private static int previousLogsCount;
 
-		private static bool HasFlag(int flags)
-		{
-			return (LogEntries.consoleFlags & (int) flags) != 0;
-		}
+		private static bool HasFlag(int flags) => (LogEntries.consoleFlags & (int) flags) != 0;
+		private static bool HasMode(int mode, ConsoleWindow.Mode modeToCheck) => (uint) ((ConsoleWindow.Mode) mode & modeToCheck) > 0U;
 
 		internal static bool OnDrawList(ConsoleWindow console)
 		{
@@ -89,6 +87,8 @@ namespace Needle.Demystify
 			// scroll to bottom if logs changed and it was at the bottom previously
 			if (wasAtBottom && logsCountChanged)
 				scroll.y = Mathf.Max(0, contentHeight - scrollAreaHeight);
+			else if (contentHeight < scrollAreaHeight)
+				scroll.y = scrollAreaHeight;
 			scroll = GUI.BeginScrollView(scrollArea, scroll, contentSize);
 			
 			var position = new Rect(0, 0, width, lineHeight);
@@ -118,15 +118,37 @@ namespace Needle.Demystify
 							element.row = item.row;
 							element.position = position;
 
+							
 							// draw background
-							if (row % 2 == 0 || entryIsSelected)
+							void DrawBackground(Color col)
 							{
 								var prevCol = GUI.color;
-								GUI.color = entryIsSelected ? new Color(.15f, .4f, .5f) : new Color(0, 0, 0, .1f);
+								GUI.color = col;
 								GUI.DrawTexture(position, Texture2D.whiteTexture);
 								GUI.color = prevCol;
 							}
-
+							bool IsOdd() => row % 2 != 0;
+							if (entryIsSelected)
+							{
+								DrawBackground(new Color(.15f, .4f, .5f));
+							}
+							else if (HasMode(entry.mode, ConsoleWindow.Mode.ScriptCompileError))
+							{
+								DrawBackground(IsOdd() ? new Color(1,0,0,.2f) : new Color(1,.2f,.25f,.25f));
+							}
+							else if (HasMode(entry.mode, ConsoleWindow.Mode.ScriptingError | ConsoleWindow.Mode.Error | ConsoleWindow.Mode.StickyError | ConsoleWindow.Mode.AssetImportError))
+							{
+								DrawBackground(IsOdd() ? new Color(1,0,0,.1f) : new Color(1,.2f,.25f,.15f));
+							}
+							else if (HasMode(entry.mode, ConsoleWindow.Mode.ScriptingWarning | ConsoleWindow.Mode.AssetImportWarning | ConsoleWindow.Mode.ScriptCompileWarning))
+							{
+								DrawBackground(IsOdd() ? new Color(.5f,.5f,0, .1f) : new Color(1, 1f, .1f, .07f));
+							}
+							else if(IsOdd())
+							{
+								DrawBackground(new Color(0, 0, 0, .1f));
+							}
+							
 							// draw icon
 							GUIStyle iconStyle = ConsoleWindow.GetStyleForErrorMode(entry.mode, true, ConsoleWindow.Constants.LogStyleLineCount == 1);
 							Rect iconRect = position;
@@ -134,7 +156,7 @@ namespace Needle.Demystify
 							iconStyle.Draw(iconRect, false, false, entryIsSelected, false);
 
 							// draw text
-							var preview = item.str;
+							var preview = item.str + " - " + item.entry.mode;
 							strRect.x = xOffset;
 							ConsoleText.ModifyText(element, ref preview);
 							GUI.Label(strRect, preview, style);
@@ -206,7 +228,7 @@ namespace Needle.Demystify
 			if (Event.current.type == EventType.Repaint)
 			{
 				var diffToBottom = (contentHeight - scrollAreaHeight) - scroll.y;
-				wasAtBottom = diffToBottom < 1;
+				wasAtBottom = diffToBottom < 1 || contentHeight < scrollAreaHeight; 
 			}
 
 			// Display active text (We want word wrapped text with a vertical scrollbar)
