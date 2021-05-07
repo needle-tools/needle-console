@@ -36,7 +36,7 @@ namespace Needle.Demystify
 		private static bool HasMode(int mode, ConsoleWindow.Mode modeToCheck) => (uint) ((ConsoleWindow.Mode) mode & modeToCheck) > 0U;
 
 		private static bool filterTextureInit;
-		private static Texture2D filterDisabledTex, filterEnabledTex;
+		private static Texture2D filterIcon, filterIconDisabled;
 
 
 		internal static void OnDrawToolbar()
@@ -44,14 +44,16 @@ namespace Needle.Demystify
 			if (!filterTextureInit)
 			{
 				filterTextureInit = true;
-				filterDisabledTex = EditorGUIUtility.FindTexture("animationvisibilitytoggleoff");
-				filterEnabledTex = EditorGUIUtility.FindTexture("animationvisibilitytoggleon");
+				filterIcon = EditorGUIUtility.FindTexture("animationvisibilitytoggleoff");
+				filterIconDisabled = EditorGUIUtility.FindTexture("animationvisibilitytoggleon");
 			}
 
-			var count = " " + (ConsoleFilter.filteredCount >= 1000 ? "999+" : ConsoleFilter.filteredCount.ToString());
-			ConsoleFilter.enabled = GUILayout.Toggle(ConsoleFilter.enabled,
-				new GUIContent(count, ConsoleFilter.enabled ? filterEnabledTex : filterDisabledTex, ConsoleFilter.filteredCount + " logs hidden"),
-				ConsoleWindow.Constants.MiniButtonRight);
+			var text = ConsoleFilter.enabled 
+				? " " + (ConsoleFilter.filteredCount >= 1000 ? "999+" : ConsoleFilter.filteredCount.ToString()) 
+				: string.Empty;
+			var icon = ConsoleFilter.enabled ? filterIcon : filterIconDisabled;
+			var tooltip = ConsoleFilter.filteredCount > 1 ? ConsoleFilter.filteredCount + " logs hidden" : ConsoleFilter.filteredCount + " log hidden";
+			ConsoleFilter.enabled = !GUILayout.Toggle(!ConsoleFilter.enabled, new GUIContent(text, icon, tooltip), ConsoleWindow.Constants.MiniButtonRight);
 		}
 
 		internal static bool OnDrawList(ConsoleWindow console)
@@ -234,7 +236,13 @@ namespace Needle.Demystify
 								{
 									var item = currentEntries[k];
 									var menu = new GenericMenu();
-									ConsoleFilter.AddMenuItems(menu, item.entry);
+									if (ConsoleFilter.RegisteredFilter.Count > 0)
+									{
+										ConsoleFilter.AddMenuItems(menu, item.entry);
+									}
+									if(menu.GetItemCount() > 0)
+										menu.AddSeparator(string.Empty);
+									AddConfigMenuItems(menu);
 									menu.ShowAsContext();
 									Event.current.Use();
 									break;
@@ -250,6 +258,13 @@ namespace Needle.Demystify
 			finally
 			{
 				LogEntries.EndGettingEntries();
+			}
+
+			if (Event.current.type == EventType.MouseUp && Event.current.button == 1)
+			{
+				var menu = new GenericMenu();
+				AddConfigMenuItems(menu);
+				menu.ShowAsContext();
 			}
 
 			if (rowDoubleClicked >= 0)
@@ -281,6 +296,28 @@ namespace Needle.Demystify
 			SplitterGUILayout.EndVerticalSplit();
 
 			return false;
+		}
+
+		private static void AddConfigMenuItems(GenericMenu menu)
+		{
+			var content = ConsoleFilter.enabled ? new GUIContent("Disable Console Filter") : new GUIContent("Enable Console Filter");
+			menu.AddItem(content, ConsoleFilter.enabled, () => ConsoleFilter.enabled = !ConsoleFilter.enabled);
+			menu.AddSeparator(string.Empty);
+			
+			foreach (var config in ConsoleFilterConfig.AllConfigs)
+			{
+				menu.AddItem(new GUIContent("Configs/" + config.name), config.IsActive, () =>
+				{
+					if(config.IsActive) config.Deactivate();
+					else config.Activate();
+				});
+			}
+			menu.AddSeparator("Configs/");
+			menu.AddItem(new GUIContent("Configs/New"), false, () =>
+			{
+				var config = ConsoleFilterConfig.CreateAsset();
+				if(config) config.Activate();
+			});
 		}
 	}
 }

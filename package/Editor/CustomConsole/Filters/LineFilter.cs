@@ -10,6 +10,11 @@ namespace Needle.Demystify
 	{
 		public string file;
 		public int line;
+
+		public override string ToString()
+		{
+			return file + ":" + line;
+		}
 	}
 	
 	[Serializable]
@@ -18,7 +23,7 @@ namespace Needle.Demystify
 		public override string GetLabel(int index)
 		{
 			var e = this[index];
-			return e.file + ":" + e.line;
+			return Path.GetFileName(e.file) + ":" + e.line;
 		}
 
 		public override bool Exclude(string message, int mask, int row, LogEntryInfo info)

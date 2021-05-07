@@ -32,7 +32,7 @@ namespace Needle.Demystify
 		{
 			var msg = clickedLog.message;
 			msg = msg.Substring(0, Mathf.Min(msg.Length, MaxLenght));
-			menu.AddItem(new GUIContent("Exclude Message \"" + msg.Replace('/', '_') + "\""), false, func: () =>
+			menu.AddItem(new GUIContent("Exclude Exact Message: \"" + msg.Replace('/', '_') + "\""), false, func: () =>
 			{
 				Add(msg);
 			});

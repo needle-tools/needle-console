@@ -30,7 +30,19 @@ namespace Needle.Demystify
 		public T this[int index] => excluded[index];
 		public bool IsActive(int index) => active[index];
 
+		public bool IsActive(T element)
+		{
+			for (var i = 0; i < excluded.Count; i++)
+			{
+				if (excluded[i].Equals(element))
+					return active[i];
+			}
+
+			return false;
+		}
+
 		public int GetActiveCount() => active.Count(e => e);
+
 		public abstract string GetLabel(int index);
 
 		public bool TryGetIndex(T element, out int index)
@@ -50,24 +62,17 @@ namespace Needle.Demystify
 
 		public bool Contains(T element) => excluded.Contains(element);
 
-		public bool IsActive(T element)
-		{
-			for (var i = 0; i < excluded.Count; i++)
-			{
-				if (excluded[i].Equals(element))
-					return active[i];
-			}
-
-			return false;
-		}
-
 		public void SetActive(int index, bool active)
 		{
 			if (this.active[index] != active)
 			{
 				this.active[index] = active;
 				if (Enabled && ConsoleFilter.Contains(this))
+				{
 					ConsoleFilter.MarkDirty();
+					if (active && !ConsoleFilter.enabled)
+						ConsoleFilter.enabled = true;
+				}
 			}
 		}
 
@@ -79,7 +84,11 @@ namespace Needle.Demystify
 				active.Add(isActive);
 				OnChanged();
 				if (Enabled && ConsoleFilter.Contains(this))
+				{
 					ConsoleFilter.MarkDirty();
+					if (!ConsoleFilter.enabled)
+						ConsoleFilter.enabled = true;
+				}
 			}
 		}
 

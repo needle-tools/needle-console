@@ -57,6 +57,7 @@ namespace Needle.Demystify
 		public MessageFilter messageFilter = new MessageFilter();
 		public LineFilter lineFilter = new LineFilter();
 		public FileFilter fileFilter = new FileFilter();
+		public ObjectIdFilter idFilter = new ObjectIdFilter();
 		public PackageFilter packageFilter = new PackageFilter();
 
 		public IEnumerable<IConsoleFilter> EnumerateFilter()
@@ -64,6 +65,7 @@ namespace Needle.Demystify
 			yield return messageFilter;
 			yield return lineFilter;
 			yield return fileFilter;
+			yield return idFilter;
 			yield return packageFilter;
 		}
 
