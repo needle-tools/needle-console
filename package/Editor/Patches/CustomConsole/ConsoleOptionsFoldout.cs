@@ -21,12 +21,26 @@ namespace Needle.Demystify
 		{
 			public override Vector2 GetWindowSize()
 			{
-				return new Vector2(200, 150);
+				return new Vector2(350, 400);
 			}
+
+			private Vector2 scroll;
 
 			public override void OnGUI(Rect rect)
 			{
-				GUILayout.Label("Popup Options Example", EditorStyles.boldLabel);
+				scroll = EditorGUILayout.BeginScrollView(scroll);
+				EditorGUI.BeginChangeCheck();
+				foreach (var filter in ConsoleFilter.RegisteredFilter)
+				{
+					filter.OnGUI();
+				}
+
+				if (EditorGUI.EndChangeCheck())
+				{
+					ConsoleFilter.MarkDirty();
+				}
+
+				EditorGUILayout.EndScrollView();
 			}
 		}
 	}

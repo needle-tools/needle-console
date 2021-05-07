@@ -11,7 +11,7 @@ namespace Needle.Demystify
 		
 		public override string GetLabel(int index)
 		{
-			var msg = this[index];
+			var msg = (string)this[index];
 			var lbi = msg.IndexOf("\n", StringComparison.Ordinal);
 			if (lbi < 0) lbi = 50;
 			return msg.Substring(0, Mathf.Min(msg.Length, lbi));
@@ -21,7 +21,7 @@ namespace Needle.Demystify
 		{
 			for (var i = 0; i < Count; i++)
 			{
-				if (IsActive(i) && info.message.StartsWith(this[i]))
+				if (IsActive(i) && info.message.StartsWith((string)this[i]))
 					return true;
 			}
 

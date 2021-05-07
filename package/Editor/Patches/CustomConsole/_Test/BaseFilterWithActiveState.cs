@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using UnityEditor;
+using UnityEngine;
 
 namespace Needle.Demystify
 {
@@ -11,7 +12,7 @@ namespace Needle.Demystify
 		private bool _isEnabled = true;
 		public bool Enabled
 		{
-			get { return _isEnabled; }
+			get => _isEnabled;
 			set
 			{
 				if (value == _isEnabled) return;
@@ -32,7 +33,7 @@ namespace Needle.Demystify
 
 		public bool TryGetIndex(T element, out int index)
 		{
-			for (var i = 0; i < excluded.Count; i++)
+			for (var i = 0; i < excluded.Count; i++) 
 			{
 				if (excluded[i].Equals(element))
 				{
@@ -94,5 +95,41 @@ namespace Needle.Demystify
 		public abstract void AddLogEntryContextMenuItems(GenericMenu menu, LogEntryInfo clickedLog);
 
 		protected virtual void OnChanged(){}
+
+		public void OnGUI()
+		{
+			var header = ObjectNames.NicifyVariableName(GetType().Name);
+			var key = "ConsoleFilter" + header;
+			
+			header += " [" + GetActiveCount() + "/" + Count + "]";
+			var foldout = SessionState.GetBool(key, true);
+			foldout = EditorGUILayout.BeginFoldoutHeaderGroup(foldout, header);
+			// foldout = EditorGUILayout.Foldout(foldout, header);
+			SessionState.SetBool(key, foldout);
+			Enabled = foldout;
+
+			if(foldout)
+			{
+				EditorGUI.indentLevel++;
+				for (var index = 0; index < Count; index++)
+				{
+					var file = this[index];
+					var label = GetLabel(index);
+					using (new GUILayout.HorizontalScope())
+					{
+						var ex = EditorGUILayout.ToggleLeft(new GUIContent(label, file.ToString()), IsActive(index));
+						SetActive(index, ex);
+						if (GUILayout.Button("x", GUILayout.Width(20)))
+						{
+							Remove(index);
+							index -= 1;
+						}
+					}
+				}
+				EditorGUI.indentLevel--;
+			}
+			
+			EditorGUILayout.EndFoldoutHeaderGroup();
+		}
 	}
 }

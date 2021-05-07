@@ -9,8 +9,6 @@ namespace Needle.Demystify
 	[Serializable]
 	public class FileFilter : BaseFilterWithActiveState<string>
 	{
-		public EditorWindow window;
-
 		public override string GetLabel(int index)
 		{
 			var file = Path.GetFileName(this[index]);
@@ -43,7 +41,6 @@ namespace Needle.Demystify
 			menu.AddItem(new GUIContent("Exclude File " + fileName), false, () =>
 			{
 				Add(clickedLog.file);
-				if (window) window.Repaint();
 			});
 		}
 	}

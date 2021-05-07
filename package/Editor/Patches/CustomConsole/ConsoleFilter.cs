@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using Unity.Profiling;
 using UnityEditor;
 using UnityEditorInternal;
@@ -11,6 +12,8 @@ namespace Needle.Demystify
 		bool Enabled { get; set; }
 		bool Exclude(string message, int mask, int row, LogEntryInfo info);
 		void AddLogEntryContextMenuItems(GenericMenu menu, LogEntryInfo clickedLog);
+		void OnGUI();
+		int Count { get; }
 	}
 
 	internal struct CachedConsoleInfo
@@ -57,16 +60,12 @@ namespace Needle.Demystify
 		
 		internal static int filteredCount { get; private set; }
 
-		public static void MarkDirty()
-		{
-			isDirty = true;
-		}
+		public static IReadOnlyList<IConsoleFilter> RegisteredFilter => registeredFilters;
 
-		public static bool Contains(IConsoleFilter filter)
-		{
-			return registeredFilters.Contains(filter);
-		}
-		
+		public static void MarkDirty() => isDirty = true;
+
+		public static bool Contains(IConsoleFilter filter) => registeredFilters.Contains(filter);
+
 		public static void AddFilter(IConsoleFilter filter)
 		{
 			if (!registeredFilters.Contains(filter))
@@ -76,13 +75,23 @@ namespace Needle.Demystify
 			}
 		}
 
-		public static void RemoveFilter(IConsoleFilter filter)
+		public static void RemoveAllFilter()
+		{
+			if (registeredFilters.Count <= 0) return;
+			var anyActive = registeredFilters.Any(r => r.Enabled);
+			registeredFilters.Clear();
+			if(anyActive) MarkDirty();
+		}
+
+		public static bool RemoveFilter(IConsoleFilter filter)
 		{
 			if (registeredFilters.Contains(filter))
 			{
 				registeredFilters.Remove(filter);
 				MarkDirty();
+				return true;
 			}
+			return false;
 		}
 
 		internal static void AddMenuItems(GenericMenu menu, LogEntryInfo clickedLog)

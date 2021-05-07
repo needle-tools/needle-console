@@ -1,16 +1,24 @@
-﻿using System.Collections.Generic;
+﻿using System;
 using System.IO;
 using UnityEditor;
 using UnityEngine;
 
 namespace Needle.Demystify
 {
-	[SerializeField]
-	public class LineFilter : BaseFilterWithActiveState<(string file, int line)>
+	[Serializable]
+	public struct FileLine
+	{
+		public string file;
+		public int line;
+	}
+	
+	[Serializable]
+	public class LineFilter : BaseFilterWithActiveState<FileLine>
 	{
 		public override string GetLabel(int index)
 		{
-			return this[index].file + ":" + this[index].line;
+			var e = this[index];
+			return e.file + ":" + e.line;
 		}
 
 		public override bool Exclude(string message, int mask, int row, LogEntryInfo info)
@@ -35,7 +43,7 @@ namespace Needle.Demystify
 			
 			menu.AddItem(new GUIContent("Exclude Line " + fileName + ":" + clickedLog.line), false, () =>
 			{
-				Add((clickedLog.file, clickedLog.line));
+				Add(new FileLine {file = clickedLog.file, line = clickedLog.line});
 			});
 		}
 	}

@@ -30,7 +30,7 @@ namespace Needle.Demystify
 		public override bool Exclude(string message, int mask, int row, LogEntryInfo info)
 		{
 			if (Count <= 0) return false;
-			
+
 			if (!filePackageDict.TryGetValue(info.file, out var index))
 			{
 				index = -1;
@@ -44,9 +44,9 @@ namespace Needle.Demystify
 							index = i;
 							break;
 						}
-					
 					}
 				}
+
 				filePackageDict.Add(info.file, index);
 			}
 
@@ -71,7 +71,7 @@ namespace Needle.Demystify
 				package = null;
 				return false;
 			}
-			
+
 			path = Path.GetFullPath(path);
 			foreach (var pack in allPackages)
 			{
