@@ -14,23 +14,25 @@ namespace Needle.Demystify
 			str = "<color=#" + hex + ">" + str + "</color>";
 		}
 		
-		public static Color GetColor(string str, out float t)
+		public static Color GetColor(string str, out float hue)
 		{
-			t = CalculateHash(str) % .7f + .05f;
-			var distToGreen = t - .4f;
-			t += distToGreen;// * 2f;// .3f;
-			t = Mathf.Abs(t);
-			t %= 1f;
-			var col = Color.HSVToRGB(t, .8f, 2f);
+			hue = CalculateHash(str, 333) % 1f;// + .05f;
+			var b = CalculateHash(str, 100) % 3;
+			b = 0.5f + Mathf.Max(.7f, b);
+			// var distToGreen = hue - .4f;
+			// hue += distToGreen;// * 2f;// .3f;
+			// hue = Mathf.Abs(hue);
+			// hue %= 1f;
+			var col = Color.HSVToRGB(hue, .8f, b);
 			return col;
 		}
 
-		private static float CalculateHash(string read)
+		private static float CalculateHash(string read, float factor)
 		{
 			var hashedValue = 0f;
 			foreach (var t in read)
 			{
-				hashedValue += 333 * t * t / (float)char.MaxValue;
+				hashedValue += factor * t * t / (float)char.MaxValue;
 			}
 			return (hashedValue * read.Length);
 		}
