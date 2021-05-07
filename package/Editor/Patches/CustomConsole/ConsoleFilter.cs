@@ -85,7 +85,6 @@ namespace Needle.Demystify
 			if (_prevCount != logCount) return true;
 			if (LogEntries.consoleFlags != _lastFlags)
 			{
-				Debug.Log("Flags changed");
 				return true;
 			}
 			return isDirty;

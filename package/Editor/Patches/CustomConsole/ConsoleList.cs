@@ -28,6 +28,9 @@ namespace Needle.Demystify
 
 		private static int collapsedFlag = 1 << 0;
 
+		private static bool wasAtBottom, logsCountChanged;
+		private static int previousLogsCount;
+
 		private static bool HasFlag(int flags)
 		{
 			return (LogEntries.consoleFlags & (int) flags) != 0;
@@ -47,6 +50,8 @@ namespace Needle.Demystify
 				{
 					LogEntries.StartGettingEntries();
 					count = LogEntries.GetCount();
+					logsCountChanged = count != previousLogsCount;
+					previousLogsCount = count;
 					if (ConsoleFilter.ShouldUpdate(count))
 					{
 						ConsoleFilter.HandleUpdate(count, currentEntries);
@@ -81,7 +86,11 @@ namespace Needle.Demystify
 				width -= 13;
 			var contentSize = new Rect(0, 0, width, contentHeight);
 
+			// scroll to bottom if logs changed and it was at the bottom previously
+			if (wasAtBottom && logsCountChanged)
+				scroll.y = Mathf.Max(0, contentHeight - scrollAreaHeight);
 			scroll = GUI.BeginScrollView(scrollArea, scroll, contentSize);
+			
 			var position = new Rect(0, 0, width, lineHeight);
 			var element = new ListViewElement();
 			var style = new GUIStyle(ConsoleWindow.Constants.LogSmallStyle);
@@ -193,6 +202,12 @@ namespace Needle.Demystify
 			}
 
 			GUI.EndScrollView();
+
+			if (Event.current.type == EventType.Repaint)
+			{
+				var diffToBottom = (contentHeight - scrollAreaHeight) - scroll.y;
+				wasAtBottom = diffToBottom < 1;
+			}
 
 			// Display active text (We want word wrapped text with a vertical scrollbar)
 			GUILayout.Space(scrollAreaHeight + 2);
