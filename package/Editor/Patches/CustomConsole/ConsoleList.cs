@@ -30,6 +30,7 @@ namespace Needle.Demystify
 
 		private static bool wasAtBottom, logsCountChanged;
 		private static int previousLogsCount;
+		private static DateTime lastClickTime;
 
 		private static bool HasFlag(int flags) => (LogEntries.consoleFlags & (int) flags) != 0;
 		private static bool HasMode(int mode, ConsoleWindow.Mode modeToCheck) => (uint) ((ConsoleWindow.Mode) mode & modeToCheck) > 0U;
@@ -130,7 +131,7 @@ namespace Needle.Demystify
 							bool IsOdd() => row % 2 != 0;
 							if (entryIsSelected)
 							{
-								DrawBackground(new Color(.15f, .4f, .5f));
+								DrawBackground(new Color(.2f, .5f, .8f, .5f));
 							}
 							else if (HasMode(entry.mode, ConsoleWindow.Mode.ScriptCompileError))
 							{
@@ -142,7 +143,7 @@ namespace Needle.Demystify
 							}
 							else if (HasMode(entry.mode, ConsoleWindow.Mode.ScriptingWarning | ConsoleWindow.Mode.AssetImportWarning | ConsoleWindow.Mode.ScriptCompileWarning))
 							{
-								DrawBackground(IsOdd() ? new Color(.5f,.5f,0, .1f) : new Color(1, 1f, .1f, .07f));
+								DrawBackground(IsOdd() ? new Color(.5f,.5f,0, .08f) : new Color(1, 1f, .1f, .04f));
 							}
 							else if(IsOdd())
 							{
@@ -156,7 +157,7 @@ namespace Needle.Demystify
 							iconStyle.Draw(iconRect, false, false, entryIsSelected, false);
 
 							// draw text
-							var preview = item.str + " - " + item.entry.mode;
+							var preview = item.str;// + " - " + item.entry.mode;
 							strRect.x = xOffset;
 							ConsoleText.ModifyText(element, ref preview);
 							GUI.Label(strRect, preview, style);
@@ -186,7 +187,12 @@ namespace Needle.Demystify
 									selectedRow = currentEntries[k].row;
 									selectedText = currentEntries[k].entry.message;
 									if (previouslySelectedRow == selectedRow)
-										rowDoubleClicked = selectedRow;
+									{
+										var td = (DateTime.Now - lastClickTime).Seconds;
+										if(td < 1)
+											rowDoubleClicked = selectedRow;
+									}
+									lastClickTime = DateTime.Now;
 									Event.current.Use();
 									console.Repaint();
 									break;
