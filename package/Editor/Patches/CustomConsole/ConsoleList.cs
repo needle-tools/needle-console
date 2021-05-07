@@ -64,6 +64,7 @@ namespace Needle.Demystify
 				previouslySelectedRow = selectedRow;
 				selectedRow = int.MaxValue;
 			}
+			
 
 			SplitterGUILayout.BeginVerticalSplit(spl);
 
@@ -90,6 +91,7 @@ namespace Needle.Demystify
 			strRect.height -= position.height * .15f;
 			var tempContent = new GUIContent();
 			var collapsed = HasFlag(collapsedFlag);
+			
 
 			try
 			{

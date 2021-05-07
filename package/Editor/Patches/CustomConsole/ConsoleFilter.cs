@@ -1,100 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Runtime.Serialization;
+﻿using System.Collections.Generic;
 using Unity.Profiling;
 using UnityEditor;
-using UnityEditorInternal;
 using UnityEngine;
 
 namespace Needle.Demystify
 {
-	public class TempFilterWindow : EditorWindow
-	{
-		[MenuItem("Console/FilterWindow")]
-		private static void Open()
-		{
-			var window = CreateWindow<TempFilterWindow>();
-			window.Show();
-		}
-
-		[SerializeField] private FileFilter filter = new FileFilter();
-
-		private void OnEnable()
-		{
-			filter.window = this;
-			ConsoleFilter.RegisterFilter(filter);
-		}
-
-
-		[Serializable]
-		public class FileFilter : IConsoleFilter
-		{
-			internal List<string> excludedFiles = new List<string>();
-			internal List<bool> active = new List<bool>();
-			public EditorWindow window;
-
-
-			public bool Exclude(string message, int mask, int row, LogEntryInfo info)
-			{
-				for (var index = 0; index < excludedFiles.Count; index++)
-				{
-					var ex = excludedFiles[index];
-					if (active[index] && ex == info.file)
-					{
-						return true;
-					}
-				}
-
-				return false;
-			}
-
-			public void AddLogEntryContextMenuItems(GenericMenu menu, LogEntryInfo clickedLog)
-			{
-				var fileName = Path.GetFileName(clickedLog.file);
-				menu.AddItem(new GUIContent("Exclude " + fileName), false, () =>
-				{
-					excludedFiles.Add(clickedLog.file);
-					active.Add(true);
-					ConsoleFilter.MarkDirty();
-					if (window)
-						window.Repaint();
-				});
-			}
-		}
-
-		private void OnGUI()
-		{
-			EditorGUI.BeginChangeCheck();
-
-			ConsoleList.DrawCustom = EditorGUILayout.Toggle("Draw Custom", ConsoleList.DrawCustom);
-			for (var index = 0; index < filter.excludedFiles.Count; index++)
-			{
-				var file = filter.excludedFiles[index];
-				var fileName = Path.GetFileName(file);
-				if (index >= filter.active.Count) filter.active.Add(true);
-				using (new GUILayout.HorizontalScope())
-				{
-					var ex = EditorGUILayout.ToggleLeft(new GUIContent(fileName, file), filter.active[index]);
-					filter.active[index] = ex;
-					if (GUILayout.Button("x", GUILayout.Width(30)))
-					{
-						filter.excludedFiles.RemoveAt(index);
-						filter.active.RemoveAt(index);
-						index -= 1;
-					}
-				}
-			}
-
-			if (EditorGUI.EndChangeCheck())
-			{
-				ConsoleFilter.MarkDirty();
-				InternalEditorUtility.RepaintAllViews();
-			}
-		}
-	}
-
 	public interface IConsoleFilter
 	{
 		bool Exclude(string message, int mask, int row, LogEntryInfo info);
@@ -133,15 +43,32 @@ namespace Needle.Demystify
 		private static readonly Dictionary<string, bool> cachedLogResultForMask = new Dictionary<string, bool>();
 		private static readonly List<LogEntry> logEntries = new List<LogEntry>();
 
-		internal static void MarkDirty()
+		public static void MarkDirty()
 		{
 			isDirty = true;
 		}
+
+		public static bool Contains(IConsoleFilter filter)
+		{
+			return registeredFilters.Contains(filter);
+		}
 		
-		internal static void RegisterFilter(IConsoleFilter filter)
+		public static void AddFilter(IConsoleFilter filter)
 		{
 			if (!registeredFilters.Contains(filter))
+			{
 				registeredFilters.Add(filter);
+				MarkDirty();
+			}
+		}
+
+		public static void RemoveFilter(IConsoleFilter filter)
+		{
+			if (registeredFilters.Contains(filter))
+			{
+				registeredFilters.Remove(filter);
+				MarkDirty();
+			}
 		}
 
 		internal static void AddMenuItems(GenericMenu menu, LogEntryInfo clickedLog)
@@ -150,11 +77,16 @@ namespace Needle.Demystify
 				fil.AddLogEntryContextMenuItems(menu, clickedLog);
 		}
 
-		private static int _prevCount;
+		private static int _prevCount, _lastFlags;
 
 		internal static bool ShouldUpdate(int logCount)
 		{
 			if (_prevCount != logCount) return true;
+			if (LogEntries.consoleFlags != _lastFlags)
+			{
+				Debug.Log("Flags changed");
+				return true;
+			}
 			return isDirty;
 		}
 
@@ -165,21 +97,18 @@ namespace Needle.Demystify
 				var start = _prevCount;
 
 				var cleared = count < _prevCount;
-				if (isDirty || cleared)
+				var flagsChanged = LogEntries.consoleFlags != _lastFlags;
+				if (isDirty || cleared || flagsChanged)
 				{
 					start = 0;
 					entries.Clear();
 					cachedLogResultForMask.Clear();
-				}
-
-				if (cleared)
-				{
 					logEntries.Clear();
 				}
 				
 				isDirty = false;
-				
 				_prevCount = count;
+				_lastFlags = LogEntries.consoleFlags;
 				
 
 				for (var i = start; i < count; i++)
@@ -241,7 +170,7 @@ namespace Needle.Demystify
 					}
 
 
-					preview += " #" + i;
+					// preview += " #" + i;
 
 					entries.Add(new CachedConsoleInfo()
 					{
