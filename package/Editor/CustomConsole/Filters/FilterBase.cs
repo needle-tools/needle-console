@@ -145,7 +145,23 @@ namespace Needle.Demystify
 			return entries.Any(s => s.Solo);
 		}
 
-		public abstract FilterResult Filter(string message, int mask, int row, LogEntryInfo info);
+		public virtual FilterResult Filter(string message, int mask, int row, LogEntryInfo info)
+		{
+			for (var index = 0; index < Count; index++)
+			{
+				var ex = this[index];
+				if ((IsActiveAtIndex(index) || IsSoloAtIndex(index)) && MatchFilter(ex, index, message, mask, row, info))// ex.Equals(info.file))
+				{
+					var res = IsSoloAtIndex(index) ? FilterResult.Solo : FilterResult.Exclude;
+					// Debug.Log((res == FilterResult.Solo) + ", " + Path.GetFileName(info.file));
+					return res;
+				}
+			}
+
+			return FilterResult.Keep;
+		}
+
+		protected abstract bool MatchFilter(T entry, int index, string message, int mask, int row, LogEntryInfo info);
 
 		public abstract void AddLogEntryContextMenuItems(GenericMenu menu, LogEntryInfo clickedLog);
 
@@ -153,8 +169,7 @@ namespace Needle.Demystify
 		{
 		}
 
-
-		
+	
 		public void OnGUI()
 		{
 			var header = ObjectNames.NicifyVariableName(GetType().Name);
@@ -258,6 +273,24 @@ namespace Needle.Demystify
 				if (activateFilteringIfDisabled && !ConsoleFilter.enabled)
 					ConsoleFilter.enabled = true;
 			}
+		}
+
+		protected void AddContextMenuItem(GenericMenu menu, string text, T element)
+		{
+			var active = TryGetIndex(element, out var index);
+			if (active) active = IsActiveAtIndex(index);
+			
+			menu.AddItem(new GUIContent(text), active, () =>
+			{
+				if (!active)
+				{
+					Add(element);
+				}
+				else
+				{
+					SetActiveAtIndex(index, ConsoleFilter.enabled);
+				}
+			});
 		}
 	}
 }

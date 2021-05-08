@@ -17,15 +17,12 @@ namespace Needle.Demystify
 		public override FilterResult Filter(string message, int mask, int row, LogEntryInfo info)
 		{
 			if (info.instanceID == 0) return FilterResult.Keep;
-			for (var index = 0; index < Count; index++)
-			{
-				if (IsActiveAtIndex(index) || IsSoloAtIndex(index))
-				{
-					if(this[index] == info.instanceID) 
-						return IsSoloAtIndex(index) ? FilterResult.Solo : FilterResult.Exclude;
-				}
-			}
-			return FilterResult.Keep;
+			return base.Filter(message, mask, row, info);
+		}
+
+		protected override bool MatchFilter(int entry, int index, string message, int mask, int row, LogEntryInfo info)
+		{
+			return entry == info.instanceID;
 		}
 
 		public override void AddLogEntryContextMenuItems(GenericMenu menu, LogEntryInfo clickedLog)
@@ -33,10 +30,7 @@ namespace Needle.Demystify
 			if (clickedLog.instanceID == 0) return;
 			var obj = EditorUtility.InstanceIDToObject(clickedLog.instanceID);
 			if (!obj) return;
-			menu.AddItem(new GUIContent("Exclude Instance " + obj.GetType().Name + " on " + obj.name), false, () =>
-			{
-				Add(clickedLog.instanceID);
-			});
+			AddContextMenuItem(menu, "Exclude Instance " + obj.GetType().Name + " on " + obj.name, clickedLog.instanceID);
 		}
 	}
 }

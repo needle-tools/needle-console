@@ -16,29 +16,18 @@ namespace Needle.Demystify
 			if (lbi < 0) lbi = 50;
 			return msg.Substring(0, Mathf.Min(msg.Length, lbi));
 		}
-
-		public override FilterResult Filter(string message, int mask, int row, LogEntryInfo info)
+		
+		protected override bool MatchFilter(string entry, int index, string message, int mask, int row, LogEntryInfo info)
 		{
-			for (var index = 0; index < Count; index++)
-			{
-				if (IsActiveAtIndex(index) || IsSoloAtIndex(index))
-				{
-					if (info.message.StartsWith(this[index]))
-						return IsSoloAtIndex(index) ? FilterResult.Solo : FilterResult.Exclude;
-				}
-			}
-
-			return FilterResult.Keep;
+			return info.message.StartsWith(entry);
 		}
 
 		public override void AddLogEntryContextMenuItems(GenericMenu menu, LogEntryInfo clickedLog)
 		{
-			var msg = clickedLog.message;
-			msg = msg.Substring(0, Mathf.Min(msg.Length, MaxLenght));
-			menu.AddItem(new GUIContent("Exclude Exact Message: \"" + msg.Replace('/', '_') + "\""), false, func: () =>
-			{
-				Add(msg);
-			});
+			var message = clickedLog.message;
+			message = message.Substring(0, Mathf.Min(message.Length, MaxLenght));
+			var text = "Exclude Exact Message: \"" + message.Replace('/', '_') + "\"";
+			AddContextMenuItem(menu, text, message);
 		}
 	}
 }

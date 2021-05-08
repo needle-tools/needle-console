@@ -20,42 +20,24 @@ namespace Needle.Demystify
 	[Serializable]
 	public class LineFilter : FilterBase<FileLine>
 	{
-		public override string GetLabel(int index)
+		public override string GetLabel(int index) 
 		{
 			var e = this[index];
 			return Path.GetFileName(e.file) + ":" + e.line;
 		}
 
-		public override FilterResult Filter(string message, int mask, int row, LogEntryInfo info)
+		protected override bool MatchFilter(FileLine entry, int index, string message, int mask, int row, LogEntryInfo info)
 		{
-			for (var index = 0; index < Count; index++)
-			{
-				if (IsActiveAtIndex(index) || IsSoloAtIndex(index))
-				{
-					var entry = this[index];
-					if (entry.line == info.line && info.file == entry.file)
-						return IsSoloAtIndex(index) ? FilterResult.Solo : FilterResult.Exclude;
-				}
-			}
-
-			return FilterResult.Keep;
+			return entry.line == info.line && entry.file == info.file;
 		}
 
 		public override void AddLogEntryContextMenuItems(GenericMenu menu, LogEntryInfo clickedLog)
 		{
 			if (string.IsNullOrEmpty(clickedLog.file)) return;
 			if (clickedLog.line <= 0) return;
-			
 			var fileName = Path.GetFileName(clickedLog.file);
 			var fl = new FileLine {file = clickedLog.file, line = clickedLog.line};
-			var active = IsActive(fl);
-			menu.AddItem(new GUIContent("Exclude Line " + fileName + ":" + clickedLog.line), active, () =>
-			{
-				if(!active)
-					Add(fl);
-				else 
-					SetActive(fl, false);;
-			});
+			AddContextMenuItem(menu, "Exclude Line " + fileName + ":" + clickedLog.line, fl);
 		}
 	}
 }

@@ -17,22 +17,11 @@ namespace Needle.Demystify
 			return file;
 		}
 
-		public override FilterResult Filter(string message, int mask, int row, LogEntryInfo info)
+		protected override bool MatchFilter(string entry, int index, string message, int mask, int row, LogEntryInfo info)
 		{
-			for (var index = 0; index < Count; index++)
-			{
-				var ex = this[index];
-				if ((IsActiveAtIndex(index) || IsSoloAtIndex(index)) && ex == info.file)
-				{
-					var res = IsSoloAtIndex(index) ? FilterResult.Solo : FilterResult.Exclude;
-					// Debug.Log((res == FilterResult.Solo) + ", " + Path.GetFileName(info.file));
-					return res;
-				}
-			}
-
-			return FilterResult.Keep;
+			return entry == info.file;
 		}
-		
+
 		public override void AddLogEntryContextMenuItems(GenericMenu menu, LogEntryInfo clickedLog)
 		{
 			var fileName = default(string);
@@ -48,16 +37,7 @@ namespace Needle.Demystify
 
 			if (fileName != null)
 			{
-				var active = IsActive(clickedLog.file);
-				menu.AddItem(new GUIContent("Exclude File " + fileName), active, () =>
-				{
-					if (!active)
-					{
-						Add(clickedLog.file);
-					}
-					else
-						SetActive(clickedLog.file, false);
-				});
+				AddContextMenuItem(menu, "Exclude File " + fileName, clickedLog.file);
 			}
 		}
 	}

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using NUnit.Framework.Internal.Filters;
 using UnityEditor;
 using UnityEditor.PackageManager;
 using UnityEditor.SearchService;
@@ -29,6 +30,8 @@ namespace Needle.Demystify
 
 		public override FilterResult Filter(string message, int mask, int row, LogEntryInfo info)
 		{
+			if (Count <= 0) return FilterResult.Keep;
+			
 			var index = -1;
 			if (Count > 0 && !filePackageDict.TryGetValue(info.file, out index))
 			{
@@ -53,6 +56,12 @@ namespace Needle.Demystify
 			if (IsSoloAtIndex(index)) return FilterResult.Solo;
 			if (IsActiveAtIndex(index)) return FilterResult.Exclude;
 			return FilterResult.Keep;
+		}
+
+		protected override bool MatchFilter(string entry, int index, string message, int mask, int row, LogEntryInfo info)
+		{
+			// custom implementation of Filter, should never be called
+			return false;
 		}
 
 		private bool TryGetPackage(string path, out PackageInfo package)
@@ -103,15 +112,7 @@ namespace Needle.Demystify
 			if (TryGetPackage(clickedLog.file, out var pack))
 			{
 				var str = pack.name;
-				var contains = TryGetIndex(str, out var index);
-				var isActive = contains && IsActive(str);
-				menu.AddItem(new GUIContent("Exclude Package " + str), contains && isActive, func: () =>
-				{
-					if (!contains)
-						Add(str);
-					else
-						SetActiveAtIndex(index, true);
-				});
+				AddContextMenuItem(menu, "Exclude Package " + str, str);
 			}
 		}
 	}
