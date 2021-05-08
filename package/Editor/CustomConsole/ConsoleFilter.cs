@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Unity.Profiling;
 using UnityEditor;
@@ -21,6 +22,8 @@ namespace Needle.Demystify
 		void AddLogEntryContextMenuItems(GenericMenu menu, LogEntryInfo clickedLog);
 		void OnGUI();
 		int Count { get; }
+
+		event Action HasChanged;
 	}
 
 	internal struct CachedConsoleInfo

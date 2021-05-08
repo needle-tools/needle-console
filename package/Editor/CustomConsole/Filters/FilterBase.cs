@@ -32,7 +32,9 @@ namespace Needle.Demystify
 			public bool Solo;
 		}
 
+		[SerializeField]
 		private List<Entry> entries = new List<Entry>();
+		
 		public int Count => entries.Count;
 		public T this[int index] => entries[index].Element;
 		public bool IsActiveAtIndex(int index) => entries[index].Active;
@@ -265,8 +267,12 @@ namespace Needle.Demystify
 			EditorGUILayout.EndFoldoutHeaderGroup();
 		}
 
+		public event Action HasChanged;
+
 		private void NotifyConsole(bool activateFilteringIfDisabled)
 		{
+			HasChanged?.Invoke();
+			
 			if (Enabled && ConsoleFilter.Contains(this))
 			{
 				ConsoleFilter.MarkDirty();

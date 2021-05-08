@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
 using UnityEditor;
+using UnityEditor.Hardware;
 using UnityEngine;
 
 namespace Needle.Demystify
@@ -54,11 +55,16 @@ namespace Needle.Demystify
 		}
 
 		public bool IsActive => DemystifySettings.instance.ActiveConsoleFilterConfig == this;
-
+		
+		[SerializeField]
 		public MessageFilter messageFilter = new MessageFilter();
+		[SerializeField]
 		public LineFilter lineFilter = new LineFilter();
+		[SerializeField]
 		public FileFilter fileFilter = new FileFilter();
+		[SerializeField]
 		public ObjectIdFilter idFilter = new ObjectIdFilter();
+		[SerializeField]
 		public PackageFilter packageFilter = new PackageFilter();
 
 		public IEnumerable<IConsoleFilter> EnumerateFilter()
@@ -75,13 +81,31 @@ namespace Needle.Demystify
 			if (!_allConfigs.Contains(this))
 				_allConfigs.Add(this);
 
+			foreach (var f in EnumerateFilter())
+			{
+				f.HasChanged += OnFilterChanged;
+			}
+
 			if (DemystifySettings.instance.ActiveConsoleFilterConfig == this)
 				Activate();
+		}
+
+		private void OnDisable()
+		{
+			foreach (var f in EnumerateFilter())
+			{
+				f.HasChanged -= OnFilterChanged;
+			}
 		}
 
 		private void OnDestroy()
 		{
 			_allConfigs.Remove(this);
+		}
+
+		private void OnFilterChanged()
+		{
+			EditorUtility.SetDirty(this);
 		}
 
 		[ContextMenu(nameof(Activate))]
