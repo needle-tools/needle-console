@@ -1,12 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using NUnit.Framework.Internal.Filters;
 using UnityEditor;
-using UnityEditor.PackageManager;
-using UnityEditor.SearchService;
-using UnityEngine;
 using PackageInfo = UnityEditor.PackageManager.PackageInfo;
 
 namespace Needle.Demystify

@@ -24,7 +24,7 @@ namespace Needle.Demystify
 
 		public override void AddLogEntryContextMenuItems(GenericMenu menu, LogEntryInfo clickedLog)
 		{
-			var fileName = default(string);
+			string fileName;
 			try
 			{
 				fileName = Path.GetFileName(clickedLog.file);
@@ -33,12 +33,13 @@ namespace Needle.Demystify
 			}
 			catch (ArgumentException)
 			{
+				// some logs have file paths with invalid characters and ids
+				// these come from engine calls I think. they look like <56545453423>
+				// we just catch the exception here and ignore those
+				return;
 			}
 
-			if (fileName != null)
-			{
-				AddContextMenuItem(menu, "Exclude File " + fileName, clickedLog.file);
-			}
+			AddContextMenuItem(menu, "Exclude File " + fileName, clickedLog.file);
 		}
 	}
 }
