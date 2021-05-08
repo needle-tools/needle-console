@@ -28,10 +28,7 @@ namespace Needle.Demystify
 			ConsoleList.DrawCustom = EditorGUILayout.Toggle("Custom List", ConsoleList.DrawCustom);
 			GUILayout.Space(10);
 
-			foreach (var filter in ConsoleFilter.RegisteredFilter)
-			{
-				filter.OnGUI();
-			}
+			Draw.FilterList(ConsoleFilter.RegisteredFilter);
 
 			if (EditorGUI.EndChangeCheck())
 			{

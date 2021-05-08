@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Security.Cryptography;
 using UnityEditor;
 using UnityEngine;
@@ -124,22 +125,8 @@ namespace Needle.Demystify
 				}
 
 				GUILayout.Space(10);
-				var any = false;
-				foreach (var f in t.EnumerateFilter())
-				{
-					if (f.Count <= 0) continue;
-					if (!any)
-					{
-						any = true;
-						EditorGUILayout.LabelField("Selected Filters", EditorStyles.boldLabel);
-					}
-					f.OnGUI();
-				}
-
-				if (!any)
-				{
-					DrawHowToFilterHelpBox();
-				}
+				var list = t.EnumerateFilter().ToList();
+				Draw.FilterList(list);
 			}
 		}
 

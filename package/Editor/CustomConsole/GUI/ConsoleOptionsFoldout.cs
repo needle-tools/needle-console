@@ -63,7 +63,7 @@ namespace Needle.Demystify
 
 				scroll = EditorGUILayout.BeginScrollView(scroll);
 
-				configsFoldout = EditorGUILayout.BeginFoldoutHeaderGroup(configsFoldout, "Configs", null, r =>
+				configsFoldout = EditorGUILayout.BeginFoldoutHeaderGroup(configsFoldout, "Filter Configs In Project", null, r =>
 				{
 					var menu = new GenericMenu();
 					menu.AddItem(new GUIContent("New"), false, () => ConsoleFilterConfig.CreateAsset());
@@ -101,30 +101,7 @@ namespace Needle.Demystify
 
 				EditorGUILayout.EndFoldoutHeaderGroup();
 
-				var any = false;
-				if (ConsoleFilter.RegisteredFilter.Count > 0)
-				{
-					EditorGUI.BeginChangeCheck();
-					var anySolo = ConsoleFilter.RegisteredFilter.Any(f => f.HasAnySolo());
-					foreach (var filter in ConsoleFilter.RegisteredFilter)
-					{
-						if (filter.Count <= 0) continue;
-						any = true;
-						var prevColor = filter.BeforeOnGUI(anySolo);
-						filter.OnGUI();
-						filter.AfterOnGUI(prevColor);
-					}
-
-					if (EditorGUI.EndChangeCheck())
-					{
-						ConsoleFilter.MarkDirty();
-					}
-				}
-
-				if (!any)
-				{
-					ConsoleFilterConfig.DrawHowToFilterHelpBox();
-				}
+				Draw.FilterList(ConsoleFilter.RegisteredFilter);
 
 				EditorGUILayout.EndScrollView();
 			}

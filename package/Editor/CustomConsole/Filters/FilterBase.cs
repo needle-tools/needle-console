@@ -232,7 +232,7 @@ namespace Needle.Demystify
 						}
 
 						GUILayout.Space(-15);
-						EditorGUILayout.LabelField(new GUIContent(label, file.ToString()));
+						EditorGUILayout.LabelField(new GUIContent(label, file.ToString()), GUILayout.ExpandWidth(true));
 
 						if (GUILayout.Button(new GUIContent(Textures.Remove), Styles.FilterToggleButton(), iconWidth))
 						{
