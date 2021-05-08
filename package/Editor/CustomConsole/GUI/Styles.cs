@@ -7,17 +7,18 @@ namespace Needle.Demystify
 	{
 		private static GUIStyle toggleButton;
 
-		public static GUIStyle ToggleButton
+		public static GUIStyle FilterToggleButton(float height = -1)
 		{
-			get
+			if (toggleButton == null)
 			{
-				if (toggleButton == null)
-				{
-					toggleButton = new GUIStyle(EditorStyles.miniButton);
-				}
-
-				return toggleButton;
+				toggleButton = new GUIStyle(); //(EditorStyles.miniButton);
+				toggleButton.alignment = TextAnchor.MiddleCenter;
+				toggleButton.imagePosition = ImagePosition.ImageLeft;
+				toggleButton.stretchHeight = toggleButton.stretchWidth = false;
 			}
+
+			toggleButton.fixedHeight = height < 0 ? EditorGUIUtility.singleLineHeight + 2 : height;
+			return toggleButton;
 		}
 	}
 }

@@ -193,6 +193,7 @@ namespace Needle.Demystify
 				var anySolo = HasAnySolo();
 				
 				EditorGUI.indentLevel++;
+				var iconWidth = GUILayout.Width(15);
 				for (var index = 0; index < Count; index++)
 				{
 					var prevColor = GUI.color;
@@ -207,33 +208,38 @@ namespace Needle.Demystify
 					var label = GetLabel(index);
 					using (new GUILayout.HorizontalScope())
 					{
+						GUILayout.Space(5);
 						// var ex = EditorGUILayout.ToggleLeft(new GUIContent(label, file.ToString()), isActive);
 						// SetActiveAtIndex(index, ex);
 
 						// using (new GUIColorScope(isActive ? ConsoleFilterExtensions.DisabledColor : GUI.color))
 						{
-							var newActive = GUILayout.Toggle(isActive, new GUIContent(isActive ? Textures.EyeClosed : Textures.EyeOpen), Styles.ToggleButton, GUILayout.Width(30));
-							if (newActive != isActive)
+							var res = GUILayout.Toggle(isActive, new GUIContent(isActive ? Textures.EyeClosed : Textures.EyeOpen), Styles.FilterToggleButton(), iconWidth);
+							if (res != isActive)
 							{
-								SetActiveAtIndex(index, newActive);
+								SetActiveAtIndex(index, res);
 							}
 						}
+						GUILayout.Space(3);
 
 						using (new GUIColorScope(isSolo ? new Color(1, .5f, .5f) : GUI.color))
 						{
-							if (GUILayout.Button("s", GUILayout.Width(20)))
+							var res = GUILayout.Toggle(isSolo, new GUIContent(Textures.Solo), Styles.FilterToggleButton(), iconWidth);
+							if (res != isSolo)
 							{
-								SetSoloAtIndex(index, !entries[index].Solo);
+								SetSoloAtIndex(index, res);
 							}
 						}
-						
+
+						GUILayout.Space(-15);
 						EditorGUILayout.LabelField(new GUIContent(label, file.ToString()));
 
-						if (GUILayout.Button("x", GUILayout.Width(20)))
+						if (GUILayout.Button(new GUIContent(Textures.Remove), Styles.FilterToggleButton(), iconWidth))
 						{
 							Remove(index);
 							index -= 1;
 						}
+						GUILayout.Space(7f);
 					}
 					GUI.color = prevColor;
 				}
