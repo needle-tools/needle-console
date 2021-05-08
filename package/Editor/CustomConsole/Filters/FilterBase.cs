@@ -58,7 +58,7 @@ namespace Needle.Demystify
 		{
 			for (var i = 0; i < entries.Count; i++)
 			{
-				if (entries[i].Equals(element))
+				if (entries[i].Element.Equals(element))
 				{
 					index = i;
 					return true;
