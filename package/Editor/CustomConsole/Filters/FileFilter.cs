@@ -25,7 +25,7 @@ namespace Needle.Demystify
 				if ((IsActiveAtIndex(index) || IsSoloAtIndex(index)) && ex == info.file)
 				{
 					var res = IsSoloAtIndex(index) ? FilterResult.Solo : FilterResult.Exclude;
-					Debug.Log((res == FilterResult.Solo) + ", " + Path.GetFileName(info.file));
+					// Debug.Log((res == FilterResult.Solo) + ", " + Path.GetFileName(info.file));
 					return res;
 				}
 			}

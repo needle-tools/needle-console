@@ -23,7 +23,7 @@ namespace Needle.Demystify
 		private static readonly List<CachedConsoleInfo> currentEntries = new List<CachedConsoleInfo>();
 		private static SplitterState spl = SplitterState.FromRelative(new float[] {70, 30}, new float[] {32, 32}, null); 
 
-		private static int selectedRow = -1, previouslySelectedRow = -2, rowDoubleClicked = -1;
+		private static int selectedRowIndex = -1, previouslySelectedRow = -2, rowDoubleClicked = -1;
 		private static string selectedText;
 
 		private static int collapsedFlag = 1 << 0;
@@ -86,8 +86,8 @@ namespace Needle.Demystify
 			if (Event.current.type == EventType.MouseDown)
 			{
 				rowDoubleClicked = -1;
-				previouslySelectedRow = selectedRow;
-				selectedRow = int.MaxValue;
+				previouslySelectedRow = selectedRowIndex;
+				selectedRowIndex = -1;
 			}
 
 
@@ -124,9 +124,9 @@ namespace Needle.Demystify
 			var collapsed = HasFlag(collapsedFlag);
 
 
-			void SelectRow(int index, int row)
+			void SelectRow(int index)
 			{
-				selectedRow = row;
+				selectedRowIndex = index;
 				selectedText = currentEntries[index].entry.message;
 			}
 
@@ -141,7 +141,7 @@ namespace Needle.Demystify
 						{
 							var row = k;
 							var item = currentEntries[k];
-							var entryIsSelected = item.row == selectedRow;
+							var entryIsSelected = k == selectedRowIndex;
 							var entry = item.entry;
 							element.row = item.row;
 							element.position = position;
@@ -217,13 +217,13 @@ namespace Needle.Demystify
 								if (position.Contains(Event.current.mousePosition))
 								{
 									var entry = currentEntries[k].entry;
-									SelectRow(k, currentEntries[k].row);
+									SelectRow(k);
 									
-									if (previouslySelectedRow == selectedRow)
+									if (previouslySelectedRow == selectedRowIndex)
 									{
 										var td = (DateTime.Now - lastClickTime).Seconds;
 										if (td < 1)
-											rowDoubleClicked = selectedRow;
+											rowDoubleClicked = selectedRowIndex;
 									}
 									else
 									{
@@ -269,16 +269,16 @@ namespace Needle.Demystify
 			
 			
 			
-			if (selectedRow >= 0 && Event.current.type == EventType.KeyDown)
+			if (selectedRowIndex >= 0 && Event.current.type == EventType.KeyDown)
 			{
 				switch (Event.current.keyCode)
 				{
 					case KeyCode.S:
 					case KeyCode.DownArrow:
-						if (selectedRow >= 0 && selectedRow + 1 < currentEntries.Count)
+						if (selectedRowIndex >= 0 && (selectedRowIndex + 1) < currentEntries.Count)
 						{
 							scroll.y += lineHeight;
-							SelectRow(selectedRow + 1, currentEntries[selectedRow + 1].row);
+							SelectRow(selectedRowIndex + 1);
 							// if(selectedRow * lineHeight > scroll.y + (contentHeight - scrollAreaHeight))
 							// 	scrollArea
 							console.Repaint();
@@ -286,31 +286,32 @@ namespace Needle.Demystify
 						break;
 					case KeyCode.W:
 					case KeyCode.UpArrow:
-						if (selectedRow > 0)
+						if (currentEntries.Count > 0 && selectedRowIndex > 0 && selectedRowIndex < currentEntries.Count)
 						{
-							SelectRow(selectedRow -1, currentEntries[selectedRow -1].row);
+							SelectRow(selectedRowIndex - 1);
 							scroll.y -= lineHeight;
+							if (scroll.y < 0) scroll.y = 0;
 							console.Repaint();
 						}
 						break;
 					case KeyCode.Space:
-						if (selectedRow >= 0)
+						if (selectedRowIndex >= 0 && currentEntries.Count > 0)
 						{
 							var menu = new GenericMenu();
 							if (ConsoleFilter.RegisteredFilter.Count > 0)
 							{
-								ConsoleFilter.AddMenuItems(menu, currentEntries[selectedRow].entry);
+								ConsoleFilter.AddMenuItems(menu, currentEntries[selectedRowIndex].entry);
 							}
 							AddConfigMenuItems(menu);
 							var rect = position;
-							rect.y = selectedRow * lineHeight;
+							rect.y = selectedRowIndex * lineHeight;
 							menu.DropDown(rect);
 						}
 						break;
 					case KeyCode.Return:
-						if (selectedRow > 0)
+						if (selectedRowIndex > 0)
 						{
-							rowDoubleClicked = selectedRow;
+							rowDoubleClicked = selectedRowIndex;
 						}
 						break;
 				}
@@ -368,7 +369,8 @@ namespace Needle.Demystify
 					else config.Activate();
 				});
 			}
-			menu.AddSeparator("Configs/");
+			if(menu.GetItemCount() > 0 && ConsoleFilterConfig.AllConfigs.Count > 0)
+				menu.AddSeparator("Configs/");
 			menu.AddItem(new GUIContent("Configs/New"), false, () =>
 			{
 				var config = ConsoleFilterConfig.CreateAsset();

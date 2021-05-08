@@ -36,7 +36,7 @@ namespace Needle.Demystify
 		public static ConsoleFilterConfig CreateAsset()
 		{
 			var dir = LastSelectedPath;
-			if (!Directory.Exists(dir)) dir = Application.dataPath;
+			if (!Directory.Exists(dir) || !dir.StartsWith(Application.dataPath.Replace("\\", "/"))) dir = Application.dataPath;
 			var path = EditorUtility.SaveFilePanel("Create Console Filter", dir, "Console Filter Config", "asset");
 			path = path.Replace("\\", "/");
 			var validPath = Path.GetFullPath(Application.dataPath + "/../").Replace("\\", "/");
