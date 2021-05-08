@@ -22,7 +22,7 @@ namespace Needle.Demystify
 			for (var index = 0; index < Count; index++)
 			{
 				var ex = this[index];
-				if (IsActive(index) && ex == info.file)
+				if (IsActiveAtIndex(index) && ex == info.file)
 				{
 					return true;
 				}
@@ -38,9 +38,15 @@ namespace Needle.Demystify
 			if (string.IsNullOrWhiteSpace(fileName))
 				fileName = "All logs without file";
 			
-			menu.AddItem(new GUIContent("Exclude File " + fileName), false, () =>
+			var active = IsActive(clickedLog.file);
+			menu.AddItem(new GUIContent("Exclude File " + fileName), active, () =>
 			{
-				Add(clickedLog.file);
+				if (!active)
+				{
+					Add(clickedLog.file);
+				}
+				else
+					SetActive(clickedLog.file, false);
 			});
 		}
 	}

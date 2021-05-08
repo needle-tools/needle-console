@@ -21,7 +21,7 @@ namespace Needle.Demystify
 		{
 			for (var i = 0; i < Count; i++)
 			{
-				if (IsActive(i) && info.message.StartsWith((string)this[i]))
+				if (IsActiveAtIndex(i) && info.message.StartsWith((string)this[i]))
 					return true;
 			}
 

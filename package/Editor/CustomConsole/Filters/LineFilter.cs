@@ -30,7 +30,7 @@ namespace Needle.Demystify
 		{
 			for (var i = 0; i < Count; i++)
 			{
-				if (!IsActive(i)) continue;
+				if (!IsActiveAtIndex(i)) continue;
 				var entry = this[i];
 				if (entry.line == info.line && info.file == entry.file)
 					return true;

@@ -19,7 +19,8 @@ namespace Needle.Demystify
 			{
 				if (value == _isEnabled) return;
 				_isEnabled = value;
-				ConsoleFilter.MarkDirty();
+				if(ConsoleFilter.Contains(this))
+					ConsoleFilter.MarkDirty();
 			}
 		}
 
@@ -28,7 +29,7 @@ namespace Needle.Demystify
 
 		public int Count => excluded.Count;
 		public T this[int index] => excluded[index];
-		public bool IsActive(int index) => active[index];
+		public bool IsActiveAtIndex(int index) => active[index];
 
 		public bool IsActive(T element)
 		{
@@ -62,17 +63,21 @@ namespace Needle.Demystify
 
 		public bool Contains(T element) => excluded.Contains(element);
 
-		public void SetActive(int index, bool active)
+		public void SetActiveAtIndex(int index, bool active)
 		{
 			if (this.active[index] != active)
 			{
 				this.active[index] = active;
-				if (Enabled && ConsoleFilter.Contains(this))
-				{
-					ConsoleFilter.MarkDirty();
-					if (active && !ConsoleFilter.enabled)
-						ConsoleFilter.enabled = true;
-				}
+				NotifyConsole(active);
+			}
+		}
+
+		public void SetActive(T element, bool active)
+		{
+			if (TryGetIndex(element, out var i))
+			{
+				this.active[i] = active;
+				NotifyConsole(active);
 			}
 		}
 
@@ -83,12 +88,12 @@ namespace Needle.Demystify
 				excluded.Add(entry);
 				active.Add(isActive);
 				OnChanged();
-				if (Enabled && ConsoleFilter.Contains(this))
-				{
-					ConsoleFilter.MarkDirty();
-					if (!ConsoleFilter.enabled)
-						ConsoleFilter.enabled = true;
-				}
+				NotifyConsole(isActive);
+			}
+			else if (isActive && TryGetIndex(entry, out var index))
+			{
+				active[index] = true;
+				NotifyConsole(true);
 			}
 		}
 
@@ -97,8 +102,7 @@ namespace Needle.Demystify
 			excluded.RemoveAt(index);
 			active.RemoveAt(index);
 			OnChanged();
-			if (Enabled && ConsoleFilter.Contains(this))
-				ConsoleFilter.MarkDirty();
+			NotifyConsole(false);
 		}
 
 		public virtual void Clear()
@@ -108,8 +112,7 @@ namespace Needle.Demystify
 				excluded.Clear();
 				active.Clear();
 				OnChanged();
-				if(Enabled && ConsoleFilter.Contains(this))
-					ConsoleFilter.MarkDirty();
+				NotifyConsole(false);
 			}
 		}
 
@@ -164,8 +167,8 @@ namespace Needle.Demystify
 					var label = GetLabel(index);
 					using (new GUILayout.HorizontalScope())
 					{
-						var ex = EditorGUILayout.ToggleLeft(new GUIContent(label, file.ToString()), IsActive(index));
-						SetActive(index, ex);
+						var ex = EditorGUILayout.ToggleLeft(new GUIContent(label, file.ToString()), IsActiveAtIndex(index));
+						SetActiveAtIndex(index, ex);
 						if (GUILayout.Button("x", GUILayout.Width(20)))
 						{
 							Remove(index);
@@ -178,6 +181,16 @@ namespace Needle.Demystify
 			}
 
 			EditorGUILayout.EndFoldoutHeaderGroup();
+		}
+
+		private void NotifyConsole(bool activateFilteringIfDisabled)
+		{
+			if (Enabled && ConsoleFilter.Contains(this))
+			{
+				ConsoleFilter.MarkDirty();
+				if (activateFilteringIfDisabled && !ConsoleFilter.enabled)
+					ConsoleFilter.enabled = true;
+			}
 		}
 	}
 }

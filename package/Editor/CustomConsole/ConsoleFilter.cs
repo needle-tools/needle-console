@@ -59,7 +59,7 @@ namespace Needle.Demystify
 		}
 		private static bool isDirty = true;
 		private static readonly List<IConsoleFilter> registeredFilters = new List<IConsoleFilter>();
-		private static readonly Dictionary<string, bool> cachedLogResultForMask = new Dictionary<string, bool>();
+		private static readonly Dictionary<(string preview, int instanceId), bool> cachedLogResultForMask = new Dictionary<(string preview, int instanceId), bool>();
 		private static readonly List<LogEntry> logEntries = new List<LogEntry>();
 		
 		internal static int filteredCount { get; private set; }
@@ -165,7 +165,7 @@ namespace Needle.Demystify
 					bool isCached = false, cacheRes = false;
 					using (new ProfilerMarker("Filter.GetCachedValue").Auto())
 					{
-						isCached = cachedLogResultForMask.TryGetValue(preview, out cacheRes);
+						isCached = cachedLogResultForMask.TryGetValue((preview, entry.instanceID), out cacheRes);
 					}
 
 					if (isCached)
@@ -194,7 +194,7 @@ namespace Needle.Demystify
 							}
 						}
 
-						cachedLogResultForMask.Add(preview, skip);
+						cachedLogResultForMask.Add((preview, entry.instanceID), skip);
 						if (skip) continue;
 					}
 

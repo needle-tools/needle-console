@@ -185,6 +185,7 @@ namespace Needle.Demystify
 							var preview = item.str; // + " - " + item.entry.mode;
 							strRect.x = xOffset;
 							ConsoleText.ModifyText(element, ref preview);
+							preview += item.entry.instanceID;
 							GUI.Label(strRect, preview, style);
 
 							// draw badge

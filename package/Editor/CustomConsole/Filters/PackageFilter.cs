@@ -51,7 +51,7 @@ namespace Needle.Demystify
 			}
 
 			if (index == -1) return false;
-			return IsActive(index);
+			return IsActiveAtIndex(index);
 		}
 
 		private bool TryGetPackage(string path, out PackageInfo package)
@@ -100,7 +100,7 @@ namespace Needle.Demystify
 					if (!contains)
 						Add(str);
 					else
-						SetActive(index, true);
+						SetActiveAtIndex(index, true);
 				});
 			}
 		}

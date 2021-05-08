@@ -19,7 +19,7 @@ namespace Needle.Demystify
 			if (info.instanceID == 0) return false;
 			for (var i = 0; i < Count; i++)
 			{
-				if(this.IsActive(i) && this[i] == info.instanceID) 
+				if(IsActiveAtIndex(i) && this[i] == info.instanceID) 
 					return true;
 			}
 			return false;
