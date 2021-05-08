@@ -141,7 +141,6 @@ namespace Needle.Demystify
 				_lastFlags = LogEntries.consoleFlags;
 
 				var anySolo = registeredFilters.Any(f => f.HasAnySolo());
-				Debug.Log(anySolo);
 
 				for (var i = start; i < count; i++)
 				{

@@ -124,6 +124,12 @@ namespace Needle.Demystify
 			var collapsed = HasFlag(collapsedFlag);
 
 
+			void SelectRow(int index, int row)
+			{
+				selectedRow = row;
+				selectedText = currentEntries[index].entry.message;
+			}
+
 			try
 			{
 				LogEntries.StartGettingEntries();
@@ -185,7 +191,7 @@ namespace Needle.Demystify
 							var preview = item.str; // + " - " + item.entry.mode;
 							strRect.x = xOffset;
 							ConsoleText.ModifyText(element, ref preview);
-							preview += item.entry.instanceID;
+							// preview += item.entry.instanceID;
 							GUI.Label(strRect, preview, style);
 
 							// draw badge
@@ -211,8 +217,8 @@ namespace Needle.Demystify
 								if (position.Contains(Event.current.mousePosition))
 								{
 									var entry = currentEntries[k].entry;
-									selectedRow = currentEntries[k].row;
-									selectedText = entry.message;
+									SelectRow(k, currentEntries[k].row);
+									
 									if (previouslySelectedRow == selectedRow)
 									{
 										var td = (DateTime.Now - lastClickTime).Seconds;
@@ -259,6 +265,55 @@ namespace Needle.Demystify
 			finally
 			{
 				LogEntries.EndGettingEntries();
+			}
+			
+			
+			
+			if (selectedRow >= 0 && Event.current.type == EventType.KeyDown)
+			{
+				switch (Event.current.keyCode)
+				{
+					case KeyCode.S:
+					case KeyCode.DownArrow:
+						if (selectedRow >= 0 && selectedRow + 1 < currentEntries.Count)
+						{
+							scroll.y += lineHeight;
+							SelectRow(selectedRow + 1, currentEntries[selectedRow + 1].row);
+							// if(selectedRow * lineHeight > scroll.y + (contentHeight - scrollAreaHeight))
+							// 	scrollArea
+							console.Repaint();
+						}
+						break;
+					case KeyCode.W:
+					case KeyCode.UpArrow:
+						if (selectedRow > 0)
+						{
+							SelectRow(selectedRow -1, currentEntries[selectedRow -1].row);
+							scroll.y -= lineHeight;
+							console.Repaint();
+						}
+						break;
+					case KeyCode.Space:
+						if (selectedRow >= 0)
+						{
+							var menu = new GenericMenu();
+							if (ConsoleFilter.RegisteredFilter.Count > 0)
+							{
+								ConsoleFilter.AddMenuItems(menu, currentEntries[selectedRow].entry);
+							}
+							AddConfigMenuItems(menu);
+							var rect = position;
+							rect.y = selectedRow * lineHeight;
+							menu.DropDown(rect);
+						}
+						break;
+					case KeyCode.Return:
+						if (selectedRow > 0)
+						{
+							rowDoubleClicked = selectedRow;
+						}
+						break;
+				}
 			}
 
 			if (Event.current.type == EventType.MouseUp && Event.current.button == 1)

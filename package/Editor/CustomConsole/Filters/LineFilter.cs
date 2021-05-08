@@ -47,10 +47,14 @@ namespace Needle.Demystify
 			if (clickedLog.line <= 0) return;
 			
 			var fileName = Path.GetFileName(clickedLog.file);
-			
-			menu.AddItem(new GUIContent("Exclude Line " + fileName + ":" + clickedLog.line), false, () =>
+			var fl = new FileLine {file = clickedLog.file, line = clickedLog.line};
+			var active = IsActive(fl);
+			menu.AddItem(new GUIContent("Exclude Line " + fileName + ":" + clickedLog.line), active, () =>
 			{
-				Add(new FileLine {file = clickedLog.file, line = clickedLog.line});
+				if(!active)
+					Add(fl);
+				else 
+					SetActive(fl, false);;
 			});
 		}
 	}
