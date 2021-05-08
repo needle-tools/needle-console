@@ -7,7 +7,7 @@ namespace Needle.Demystify
 	[Serializable]
 	public class MessageFilter : FilterBase<string>
 	{
-		public const int MaxLenght = 100;
+		public const int MaxLenght = 50;
 		
 		public override string GetLabel(int index)
 		{
@@ -26,7 +26,7 @@ namespace Needle.Demystify
 		{
 			var message = clickedLog.message;
 			message = message.Substring(0, Mathf.Min(message.Length, MaxLenght));
-			var text = "Exclude Exact Message: \"" + message.Replace('/', '_') + "\"";
+			var text = "Exclude Message \"" + message.Replace('/', '_') + "\"";
 			AddContextMenuItem(menu, text, message);
 		}
 	}
