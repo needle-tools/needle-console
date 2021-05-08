@@ -26,17 +26,19 @@ namespace Needle.Demystify
 			return Path.GetFileName(e.file) + ":" + e.line;
 		}
 
-		public override bool Exclude(string message, int mask, int row, LogEntryInfo info)
+		public override FilterResult Filter(string message, int mask, int row, LogEntryInfo info)
 		{
-			for (var i = 0; i < Count; i++)
+			for (var index = 0; index < Count; index++)
 			{
-				if (!IsActiveAtIndex(i)) continue;
-				var entry = this[i];
-				if (entry.line == info.line && info.file == entry.file)
-					return true;
+				if (IsActiveAtIndex(index) || IsSoloAtIndex(index))
+				{
+					var entry = this[index];
+					if (entry.line == info.line && info.file == entry.file)
+						return IsSoloAtIndex(index) ? FilterResult.Solo : FilterResult.Exclude;
+				}
 			}
 
-			return false;
+			return FilterResult.Keep;
 		}
 
 		public override void AddLogEntryContextMenuItems(GenericMenu menu, LogEntryInfo clickedLog)

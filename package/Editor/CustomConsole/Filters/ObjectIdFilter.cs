@@ -14,15 +14,18 @@ namespace Needle.Demystify
 			return obj ? (obj.GetType().Name + " on " + obj.name) : "Missing Object? InstanceId=" + id;
 		} 
 
-		public override bool Exclude(string message, int mask, int row, LogEntryInfo info)
+		public override FilterResult Filter(string message, int mask, int row, LogEntryInfo info)
 		{
-			if (info.instanceID == 0) return false;
-			for (var i = 0; i < Count; i++)
+			if (info.instanceID == 0) return FilterResult.Keep;
+			for (var index = 0; index < Count; index++)
 			{
-				if(IsActiveAtIndex(i) && this[i] == info.instanceID) 
-					return true;
+				if (IsActiveAtIndex(index) || IsSoloAtIndex(index))
+				{
+					if(this[index] == info.instanceID) 
+						return IsSoloAtIndex(index) ? FilterResult.Solo : FilterResult.Exclude;
+				}
 			}
-			return false;
+			return FilterResult.Keep;
 		}
 
 		public override void AddLogEntryContextMenuItems(GenericMenu menu, LogEntryInfo clickedLog)

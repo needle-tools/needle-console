@@ -6,15 +6,18 @@ using UnityEngine;
 
 namespace Needle.Demystify
 {
-	internal interface IOwned 
+	public enum FilterResult
 	{
-		Object Owner { get; set; }
+		Keep = 0,
+		Exclude = 1,
+		Solo = 2,
 	}
 	
 	public interface IConsoleFilter
 	{
 		bool Enabled { get; set; }
-		bool Exclude(string message, int mask, int row, LogEntryInfo info);
+		bool HasAnySolo();
+		FilterResult Filter(string message, int mask, int row, LogEntryInfo info);
 		void AddLogEntryContextMenuItems(GenericMenu menu, LogEntryInfo clickedLog);
 		void OnGUI();
 		int Count { get; }
@@ -136,7 +139,9 @@ namespace Needle.Demystify
 				isDirty = false;
 				_prevCount = count;
 				_lastFlags = LogEntries.consoleFlags;
-				
+
+				var anySolo = registeredFilters.Any(f => f.HasAnySolo());
+				Debug.Log(anySolo);
 
 				for (var i = start; i < count; i++)
 				{
@@ -185,11 +190,24 @@ namespace Needle.Demystify
 							if (!filter.Enabled) continue;
 							using (new ProfilerMarker("Filter Exclude").Auto())
 							{
-								if (filter.Exclude(preview, mask, i, info))
+								var res = filter.Filter(preview, mask, i, info);
+								if (anySolo)
 								{
-									filteredCount += 1;
 									skip = true;
-									break;
+									if (res == FilterResult.Solo)
+									{
+										skip = false;
+										break;
+									}
+								}
+								else
+								{
+									if (res == FilterResult.Exclude)
+									{
+										filteredCount += 1;
+										skip = true;
+										break;
+									}
 								}
 							}
 						}

@@ -17,15 +17,18 @@ namespace Needle.Demystify
 			return msg.Substring(0, Mathf.Min(msg.Length, lbi));
 		}
 
-		public override bool Exclude(string message, int mask, int row, LogEntryInfo info)
+		public override FilterResult Filter(string message, int mask, int row, LogEntryInfo info)
 		{
-			for (var i = 0; i < Count; i++)
+			for (var index = 0; index < Count; index++)
 			{
-				if (IsActiveAtIndex(i) && info.message.StartsWith((string)this[i]))
-					return true;
+				if (IsActiveAtIndex(index) || IsSoloAtIndex(index))
+				{
+					if (info.message.StartsWith(this[index]))
+						return IsSoloAtIndex(index) ? FilterResult.Solo : FilterResult.Exclude;
+				}
 			}
 
-			return false;
+			return FilterResult.Keep;
 		}
 
 		public override void AddLogEntryContextMenuItems(GenericMenu menu, LogEntryInfo clickedLog)

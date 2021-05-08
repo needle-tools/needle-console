@@ -27,11 +27,10 @@ namespace Needle.Demystify
 			return this[index];
 		}
 
-		public override bool Exclude(string message, int mask, int row, LogEntryInfo info)
+		public override FilterResult Filter(string message, int mask, int row, LogEntryInfo info)
 		{
-			if (Count <= 0) return false;
-
-			if (!filePackageDict.TryGetValue(info.file, out var index))
+			var index = -1;
+			if (Count > 0 && !filePackageDict.TryGetValue(info.file, out index))
 			{
 				index = -1;
 				if (TryGetPackage(info.file, out var package))
@@ -50,8 +49,10 @@ namespace Needle.Demystify
 				filePackageDict.Add(info.file, index);
 			}
 
-			if (index == -1) return false;
-			return IsActiveAtIndex(index);
+			if (index == -1) return FilterResult.Keep;
+			if (IsSoloAtIndex(index)) return FilterResult.Solo;
+			if (IsActiveAtIndex(index)) return FilterResult.Exclude;
+			return FilterResult.Keep;
 		}
 
 		private bool TryGetPackage(string path, out PackageInfo package)
@@ -72,7 +73,16 @@ namespace Needle.Demystify
 				return false;
 			}
 
-			path = Path.GetFullPath(path);
+			try
+			{
+				path = Path.GetFullPath(path);
+			}
+			catch (ArgumentException)
+			{
+				package = null;
+				return false;
+			}
+
 			foreach (var pack in allPackages)
 			{
 				var pp = pack.resolvedPath;

@@ -24,33 +24,41 @@ namespace Needle.Demystify
 			}
 		}
 
-		private List<T> excluded = new List<T>();
-		private List<bool> active = new List<bool>();
+		[Serializable]
+		private struct Entry
+		{
+			public T Element;
+			public bool Active;
+			public bool Solo;
+		}
 
-		public int Count => excluded.Count;
-		public T this[int index] => excluded[index];
-		public bool IsActiveAtIndex(int index) => active[index];
+		private List<Entry> entries = new List<Entry>();
+		public int Count => entries.Count;
+		public T this[int index] => entries[index].Element;
+		public bool IsActiveAtIndex(int index) => entries[index].Active;
+		public bool IsSoloAtIndex(int index) => entries[index].Solo;
+		
 
 		public bool IsActive(T element)
 		{
-			for (var i = 0; i < excluded.Count; i++)
+			for (var i = 0; i < entries.Count; i++)
 			{
-				if (excluded[i].Equals(element))
-					return active[i];
+				if (entries[i].Equals(element))
+					return entries[i].Active;
 			}
 
 			return false;
 		}
 
-		public int GetActiveCount() => active.Count(e => e);
+		public int GetActiveCount() => entries.Count(e => e.Active);
 
 		public abstract string GetLabel(int index);
 
 		public bool TryGetIndex(T element, out int index)
 		{
-			for (var i = 0; i < excluded.Count; i++)
+			for (var i = 0; i < entries.Count; i++)
 			{
-				if (excluded[i].Equals(element))
+				if (entries[i].Equals(element))
 				{
 					index = i;
 					return true;
@@ -61,13 +69,15 @@ namespace Needle.Demystify
 			return false;
 		}
 
-		public bool Contains(T element) => excluded.Contains(element);
+		public bool Contains(T element) => entries.Any(e => e.Element.Equals(element));
 
 		public void SetActiveAtIndex(int index, bool active)
 		{
-			if (this.active[index] != active)
+			if (this.entries[index].Active != active)
 			{
-				this.active[index] = active;
+				var ex = this.entries[index];
+				ex.Active = active;
+				entries[index] = ex;
 				NotifyConsole(active);
 			}
 		}
@@ -76,31 +86,46 @@ namespace Needle.Demystify
 		{
 			if (TryGetIndex(element, out var i))
 			{
-				this.active[i] = active;
-				NotifyConsole(active);
+				SetActiveAtIndex(i, active);
 			}
 		}
 
-		public virtual void Add(T entry, bool isActive = true)
+		public void SetSoloAtIndex(int index, bool solo)
 		{
-			if (!excluded.Contains(entry))
+			var cur = this.entries[index].Solo;
+			if (cur == solo) return;
+			var e = entries[index];
+			e.Solo = solo;
+			// if (solo) e.Active = true;
+			entries[index] = e;
+			NotifyConsole(solo);
+		}
+
+		public void SetSolo(T element, bool solo)
+		{
+			if (TryGetIndex(element, out var index))
 			{
-				excluded.Add(entry);
-				active.Add(isActive);
+				SetSoloAtIndex(index, solo);
+			}
+		}
+
+		public virtual void Add(T entry, bool isActive = true, bool isSolo = false)
+		{
+			if (!entries.Any(e => e.Element.Equals(entry)))
+			{
+				entries.Add(new Entry(){Element = entry, Active = isActive, Solo = isSolo});
 				OnChanged();
 				NotifyConsole(isActive);
 			}
 			else if (isActive && TryGetIndex(entry, out var index))
 			{
-				active[index] = true;
-				NotifyConsole(true);
+				SetActiveAtIndex(index, true);
 			}
 		}
 
 		public virtual void Remove(int index)
 		{
-			excluded.RemoveAt(index);
-			active.RemoveAt(index);
+			entries.RemoveAt(index);
 			OnChanged();
 			NotifyConsole(false);
 		}
@@ -109,14 +134,18 @@ namespace Needle.Demystify
 		{
 			if (Count > 0)
 			{
-				excluded.Clear();
-				active.Clear();
+				entries.Clear();
 				OnChanged();
 				NotifyConsole(false);
 			}
 		}
 
-		public abstract bool Exclude(string message, int mask, int row, LogEntryInfo info);
+		public bool HasAnySolo()
+		{
+			return entries.Any(s => s.Solo);
+		}
+
+		public abstract FilterResult Filter(string message, int mask, int row, LogEntryInfo info);
 
 		public abstract void AddLogEntryContextMenuItems(GenericMenu menu, LogEntryInfo clickedLog);
 
@@ -125,6 +154,7 @@ namespace Needle.Demystify
 		}
 
 
+		
 		public void OnGUI()
 		{
 			var header = ObjectNames.NicifyVariableName(GetType().Name);
@@ -160,21 +190,52 @@ namespace Needle.Demystify
 
 			if (foldout)
 			{
+				var anySolo = HasAnySolo();
+				
 				EditorGUI.indentLevel++;
 				for (var index = 0; index < Count; index++)
 				{
+					var prevColor = GUI.color;
+					var isSolo = IsSoloAtIndex(index);
+					var isActive = IsActiveAtIndex(index);
+					if (anySolo && !isSolo)
+					{
+						GUI.color = ConsoleFilterExtensions.DisabledColor;
+					}
+					
 					var file = this[index];
 					var label = GetLabel(index);
 					using (new GUILayout.HorizontalScope())
 					{
-						var ex = EditorGUILayout.ToggleLeft(new GUIContent(label, file.ToString()), IsActiveAtIndex(index));
-						SetActiveAtIndex(index, ex);
+						// var ex = EditorGUILayout.ToggleLeft(new GUIContent(label, file.ToString()), isActive);
+						// SetActiveAtIndex(index, ex);
+
+						// using (new GUIColorScope(isActive ? ConsoleFilterExtensions.DisabledColor : GUI.color))
+						{
+							var newActive = GUILayout.Toggle(isActive, new GUIContent(isActive ? Textures.EyeClosed : Textures.EyeOpen), Styles.ToggleButton, GUILayout.Width(30));
+							if (newActive != isActive)
+							{
+								SetActiveAtIndex(index, newActive);
+							}
+						}
+
+						using (new GUIColorScope(isSolo ? new Color(1, .5f, .5f) : GUI.color))
+						{
+							if (GUILayout.Button("s", GUILayout.Width(20)))
+							{
+								SetSoloAtIndex(index, !entries[index].Solo);
+							}
+						}
+						
+						EditorGUILayout.LabelField(new GUIContent(label, file.ToString()));
+
 						if (GUILayout.Button("x", GUILayout.Width(20)))
 						{
 							Remove(index);
 							index -= 1;
 						}
 					}
+					GUI.color = prevColor;
 				}
 
 				EditorGUI.indentLevel--;
