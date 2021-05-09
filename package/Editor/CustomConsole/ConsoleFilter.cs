@@ -4,6 +4,7 @@ using System.Linq;
 using Unity.Profiling;
 using UnityEditor;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 namespace Needle.Demystify
 {
@@ -23,7 +24,7 @@ namespace Needle.Demystify
 		void OnGUI();
 		int Count { get; }
 
-		event Action HasChanged;
+		event Action<IConsoleFilter> WillChange, HasChanged;
 	}
 
 	internal struct CachedConsoleInfo
@@ -53,6 +54,28 @@ namespace Needle.Demystify
 
 	public static class ConsoleFilter
 	{
+		[InitializeOnLoadMethod]
+		private static void Init()
+		{
+			var name = Undo.GetCurrentGroupName();
+			EditorApplication.update += () =>
+			{
+				name = Undo.GetCurrentGroupName();
+			};
+			Undo.undoRedoPerformed += () =>
+			{
+				if(name.EndsWith(UndoPostfix))
+					MarkDirty();
+			};
+		}
+
+		public const string UndoPostfix = "(Console Filter)";
+		
+		public static void RegisterUndo(Object obj, string name)
+		{
+			Undo.RegisterCompleteObjectUndo(obj, $"{name} {UndoPostfix}");
+		}
+
 		internal static bool enabled {
 			set
 			{
@@ -63,6 +86,7 @@ namespace Needle.Demystify
 			}
 			get => EditorPrefs.GetBool("ConsoleFilter_Enabled", true);
 		}
+		
 		private static bool isDirty = true;
 		private static readonly List<IConsoleFilter> registeredFilters = new List<IConsoleFilter>();
 		private static readonly Dictionary<(string preview, int instanceId), bool> cachedLogResultForMask = new Dictionary<(string preview, int instanceId), bool>();

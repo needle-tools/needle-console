@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 
@@ -7,6 +8,8 @@ namespace Needle.Demystify
 	[Serializable]
 	public class MessageFilter : FilterBase<string>
 	{
+		public MessageFilter(List<FilterEntry> list = null) : base(list){}
+		
 		public const int MaxLenght = 50;
 		
 		public override string GetLabel(int index)

@@ -11,7 +11,7 @@ namespace Needle.Demystify
 	public abstract class FilterBase<T> : IConsoleFilter
 	{
 		private bool _isEnabled = true;
-		
+
 		public bool Enabled
 		{
 			get => _isEnabled;
@@ -19,27 +19,39 @@ namespace Needle.Demystify
 			{
 				if (value == _isEnabled) return;
 				_isEnabled = value;
-				if(ConsoleFilter.Contains(this))
+				if (ConsoleFilter.Contains(this))
 					ConsoleFilter.MarkDirty();
 			}
 		}
 
 		[Serializable]
-		private struct Entry
+		public struct FilterEntry
 		{
 			public T Element;
 			public bool Active;
 			public bool Solo;
 		}
 
-		[SerializeField]
-		private List<Entry> entries = new List<Entry>();
-		
+		[SerializeField] private List<FilterEntry> entries;
+
+		protected FilterBase()
+		{
+			this.entries = new List<FilterEntry>();
+		}
+
+		protected FilterBase(List<FilterEntry> list)
+		{
+			if (list != null)
+				entries = list;
+			else 
+				entries = new List<FilterEntry>();
+		}
+
 		public int Count => entries.Count;
 		public T this[int index] => entries[index].Element;
 		public bool IsActiveAtIndex(int index) => entries[index].Active;
 		public bool IsSoloAtIndex(int index) => entries[index].Solo;
-		
+
 
 		public bool IsActive(T element)
 		{
@@ -77,6 +89,7 @@ namespace Needle.Demystify
 		{
 			if (this.entries[index].Active != active)
 			{
+				WillChange?.Invoke(this);
 				var ex = this.entries[index];
 				ex.Active = active;
 				entries[index] = ex;
@@ -96,6 +109,7 @@ namespace Needle.Demystify
 		{
 			var cur = this.entries[index].Solo;
 			if (cur == solo) return;
+			WillChange?.Invoke(this);
 			var e = entries[index];
 			e.Solo = solo;
 			// if (solo) e.Active = true;
@@ -115,7 +129,8 @@ namespace Needle.Demystify
 		{
 			if (!entries.Any(e => e.Element.Equals(entry)))
 			{
-				entries.Add(new Entry(){Element = entry, Active = isActive, Solo = isSolo});
+				WillChange?.Invoke(this);
+				entries.Add(new FilterEntry() {Element = entry, Active = isActive, Solo = isSolo});
 				OnChanged();
 				NotifyConsole(isActive);
 			}
@@ -127,6 +142,7 @@ namespace Needle.Demystify
 
 		public virtual void Remove(int index)
 		{
+			WillChange?.Invoke(this);
 			entries.RemoveAt(index);
 			OnChanged();
 			NotifyConsole(false);
@@ -136,6 +152,7 @@ namespace Needle.Demystify
 		{
 			if (Count > 0)
 			{
+				WillChange?.Invoke(this);
 				entries.Clear();
 				OnChanged();
 				NotifyConsole(false);
@@ -152,7 +169,7 @@ namespace Needle.Demystify
 			for (var index = 0; index < Count; index++)
 			{
 				var ex = this[index];
-				if ((IsActiveAtIndex(index) || IsSoloAtIndex(index)) && MatchFilter(ex, index, message, mask, row, info))// ex.Equals(info.file))
+				if ((IsActiveAtIndex(index) || IsSoloAtIndex(index)) && MatchFilter(ex, index, message, mask, row, info)) // ex.Equals(info.file))
 				{
 					var res = IsSoloAtIndex(index) ? FilterResult.Solo : FilterResult.Exclude;
 					// Debug.Log((res == FilterResult.Solo) + ", " + Path.GetFileName(info.file));
@@ -171,7 +188,7 @@ namespace Needle.Demystify
 		{
 		}
 
-	
+
 		public void OnGUI()
 		{
 			var header = ObjectNames.NicifyVariableName(GetType().Name);
@@ -187,13 +204,14 @@ namespace Needle.Demystify
 				var menu = new GenericMenu();
 				if (Enabled)
 					menu.AddItem(new GUIContent("Disable"), true, () => Enabled = false);
-				else 
+				else
 					menu.AddItem(new GUIContent("Enable"), false, () => Enabled = true);
 				menu.AddSeparator(string.Empty);
 				menu.AddItem(new GUIContent("Clear"), false, Clear);
 				menu.DropDown(r);
 			}
-			if(Event.current.type == EventType.MouseDown)
+
+			if (Event.current.type == EventType.MouseDown)
 			{
 				var lr = GUILayoutUtility.GetLastRect();
 				if (Event.current.button == 1 && lr.Contains(Event.current.mousePosition))
@@ -202,13 +220,13 @@ namespace Needle.Demystify
 					ShowOptionsContextMenu(r);
 				}
 			}
-			
+
 			SessionState.SetBool(key, foldout);
 
 			if (foldout)
 			{
 				var anySolo = HasAnySolo();
-				
+
 				EditorGUI.indentLevel++;
 				var iconWidth = GUILayout.Width(15);
 				for (var index = 0; index < Count; index++)
@@ -220,7 +238,7 @@ namespace Needle.Demystify
 					{
 						GUI.color = ConsoleFilterExtensions.DisabledColor;
 					}
-					
+
 					var file = this[index];
 					var label = GetLabel(index);
 					using (new GUILayout.HorizontalScope())
@@ -231,7 +249,8 @@ namespace Needle.Demystify
 
 						// using (new GUIColorScope(isActive ? ConsoleFilterExtensions.DisabledColor : GUI.color))
 						{
-							var res = GUILayout.Toggle(isActive, new GUIContent(isActive ? Textures.EyeClosed : Textures.EyeOpen), Styles.FilterToggleButton(), iconWidth);
+							var res = GUILayout.Toggle(isActive, new GUIContent(isActive ? Textures.EyeClosed : Textures.EyeOpen), Styles.FilterToggleButton(),
+								iconWidth);
 							if (res != isActive)
 							{
 								SetActiveAtIndex(index, res);
@@ -256,8 +275,10 @@ namespace Needle.Demystify
 							Remove(index);
 							index -= 1;
 						}
+
 						GUILayout.Space(7f);
 					}
+
 					GUI.color = prevColor;
 				}
 
@@ -267,12 +288,12 @@ namespace Needle.Demystify
 			EditorGUILayout.EndFoldoutHeaderGroup();
 		}
 
-		public event Action HasChanged;
+		public event Action<IConsoleFilter> WillChange, HasChanged;
 
 		private void NotifyConsole(bool activateFilteringIfDisabled)
 		{
-			HasChanged?.Invoke();
-			
+			HasChanged?.Invoke(this);
+
 			if (Enabled && ConsoleFilter.Contains(this))
 			{
 				ConsoleFilter.MarkDirty();
@@ -285,7 +306,7 @@ namespace Needle.Demystify
 		{
 			var active = TryGetIndex(element, out var index);
 			if (active) active = IsActiveAtIndex(index);
-			
+
 			menu.AddItem(new GUIContent(text), active, () =>
 			{
 				if (!active)

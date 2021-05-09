@@ -55,17 +55,19 @@ namespace Needle.Demystify
 		}
 
 		public bool IsActive => DemystifySettings.instance.ActiveConsoleFilterConfig == this;
+
+		[SerializeField]
+		private List<FilterBase<string>.FilterEntry> messages, files, packages;
+		[SerializeField]
+		private List<FilterBase<int>.FilterEntry> ids;
+		[SerializeField]
+		private List<FilterBase<FileLine>.FilterEntry> lines;
 		
-		[SerializeField]
-		public MessageFilter messageFilter = new MessageFilter();
-		[SerializeField]
-		public LineFilter lineFilter = new LineFilter();
-		[SerializeField]
-		public FileFilter fileFilter = new FileFilter();
-		[SerializeField]
-		public ObjectIdFilter idFilter = new ObjectIdFilter();
-		[SerializeField]
-		public PackageFilter packageFilter = new PackageFilter();
+		private MessageFilter messageFilter;
+		private LineFilter lineFilter;
+		private FileFilter fileFilter;
+		private ObjectIdFilter idFilter;
+		private PackageFilter packageFilter;
 
 		public IEnumerable<IConsoleFilter> EnumerateFilter()
 		{
@@ -78,11 +80,18 @@ namespace Needle.Demystify
 
 		private void OnEnable()
 		{
+			messageFilter = new MessageFilter(messages);
+			lineFilter = new LineFilter(lines);
+			fileFilter = new FileFilter(files);
+			idFilter = new ObjectIdFilter(ids);
+			packageFilter = new PackageFilter(packages);
+			
 			if (!_allConfigs.Contains(this))
 				_allConfigs.Add(this);
 
 			foreach (var f in EnumerateFilter())
 			{
+				f.WillChange += OnFilterWillChange;
 				f.HasChanged += OnFilterChanged;
 			}
 
@@ -94,6 +103,7 @@ namespace Needle.Demystify
 		{
 			foreach (var f in EnumerateFilter())
 			{
+				f.WillChange -= OnFilterWillChange;
 				f.HasChanged -= OnFilterChanged;
 			}
 		}
@@ -102,8 +112,13 @@ namespace Needle.Demystify
 		{
 			_allConfigs.Remove(this);
 		}
+		
+		private void OnFilterWillChange(IConsoleFilter filter)
+		{
+			ConsoleFilter.RegisterUndo(this, filter.GetType().Name + " changed");
+		}
 
-		private void OnFilterChanged()
+		private void OnFilterChanged(IConsoleFilter filter)
 		{
 			EditorUtility.SetDirty(this);
 		}

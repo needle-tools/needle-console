@@ -9,6 +9,8 @@ namespace Needle.Demystify
 	[Serializable]
 	public class FileFilter : FilterBase<string>
 	{
+		public FileFilter(List<FilterEntry> list = null) : base(list){}
+
 		public override string GetLabel(int index)
 		{
 			var file = Path.GetFileName(this[index]);

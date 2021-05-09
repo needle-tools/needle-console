@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using UnityEditor;
 using UnityEngine;
@@ -20,6 +21,8 @@ namespace Needle.Demystify
 	[Serializable]
 	public class LineFilter : FilterBase<FileLine>
 	{
+		public LineFilter(List<FilterEntry> list = null) : base(list){}
+		
 		public override string GetLabel(int index) 
 		{
 			var e = this[index];

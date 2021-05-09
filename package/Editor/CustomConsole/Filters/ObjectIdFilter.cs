@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 
@@ -7,6 +8,10 @@ namespace Needle.Demystify
 	[Serializable]
 	public class ObjectIdFilter : FilterBase<int>
 	{
+		public ObjectIdFilter(List<FilterEntry> ids) : base(ids)
+		{
+		}
+
 		public override string GetLabel(int index)
 		{
 			var id = this[index];
