@@ -31,6 +31,7 @@ namespace Needle.Demystify
 		private static bool wasAtBottom, logsCountChanged;
 		private static int previousLogsCount;
 		private static DateTime lastClickTime;
+		private static GUIStyle logStyle;
 
 		private static bool HasFlag(int flags) => (LogEntries.consoleFlags & (int) flags) != 0;
 		private static bool HasMode(int mode, ConsoleWindow.Mode modeToCheck) => (uint) ((ConsoleWindow.Mode) mode & modeToCheck) > 0U;
@@ -95,10 +96,14 @@ namespace Needle.Demystify
 
 			var position = new Rect(0, 0, width, lineHeight);
 			var element = new ListViewElement();
-			var style = new GUIStyle(ConsoleWindow.Constants.LogSmallStyle);
-			style.alignment = TextAnchor.MiddleLeft;
+			if (logStyle == null)
+			{
+				logStyle = new GUIStyle(ConsoleWindow.Constants.LogSmallStyle);
+				logStyle.alignment = TextAnchor.UpperLeft;
+			}
 			var strRect = position;
 			strRect.x += xOffset;
+			strRect.y -= 1;
 			strRect.height -= position.height * .15f;
 			var tempContent = new GUIContent();
 			var collapsed = HasFlag(collapsedFlag);
@@ -172,7 +177,7 @@ namespace Needle.Demystify
 							strRect.x = xOffset;
 							ConsoleText.ModifyText(element, ref preview);
 							// preview += item.entry.instanceID;
-							GUI.Label(strRect, preview, style);
+							GUI.Label(strRect, preview, logStyle);
 
 							// draw badge
 							if (collapsed)
