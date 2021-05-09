@@ -258,6 +258,35 @@ namespace Needle.Demystify
 			{
 				switch (Event.current.keyCode)
 				{
+					case KeyCode.D:
+					case KeyCode.RightArrow:
+						if (selectedRowIndex >= 0)
+						{
+							var newIndex = selectedRowIndex + (int) (scrollAreaHeight / lineHeight);
+							newIndex = Mathf.Clamp(newIndex, 0, currentEntries.Count);
+							if (newIndex >= 0 && (newIndex) < currentEntries.Count)
+							{
+								scroll.y += (newIndex - selectedRowIndex) * lineHeight;
+								SelectRow(newIndex);
+								console.Repaint();
+							}
+						}
+						break;
+					case KeyCode.A:
+					case KeyCode.LeftArrow:
+						if (selectedRowIndex >= 0)
+						{
+							var newIndex = selectedRowIndex - (int) (scrollAreaHeight / lineHeight);
+							newIndex = Mathf.Clamp(newIndex, 0, currentEntries.Count);
+							if (newIndex >= 0 && (newIndex) < currentEntries.Count)
+							{
+								scroll.y += (newIndex - selectedRowIndex) * lineHeight;
+								SelectRow(newIndex);
+								console.Repaint();
+							}
+						}
+						break;
+					
 					case KeyCode.S:
 					case KeyCode.DownArrow:
 						if (selectedRowIndex >= 0 && (selectedRowIndex + 1) < currentEntries.Count)
