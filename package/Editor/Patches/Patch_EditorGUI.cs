@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Reflection;
 using System.Text.RegularExpressions;
 using HarmonyLib;
 using UnityEditor;
@@ -9,25 +11,27 @@ namespace Needle.Demystify
 	/// <summary>
 	/// patch that adds code preview support to console
 	/// </summary>
-	[HarmonyPatch]
-	public class Patch_EditorGUI
+	public class Patch_EditorGUI : PatchBase
 	{
+		protected override IEnumerable<MethodBase> GetPatches()
+		{
+			yield return AccessTools.Method(typeof(EditorGUI), "DoTextField");
+		}
+		
 		private static CodePreview.Window window;
 		private static double lastTimeFoundKey;
 
 		private static void ClearPopupWindow()
 		{
-			if (!window) return;
+			if (!window) return; 
 			if (window.Text == null) return;
 			window.Text = null;
 			EditorUtility.SetDirty(window);
 			window.Repaint();
 		}
 		
-		[HarmonyPrefix]
-		[HarmonyPatch(typeof(EditorGUI), "DoTextField")]
 		// https://github.com/Unity-Technologies/UnityCsReference/blob/61f92bd79ae862c4465d35270f9d1d57befd1761/Editor/Mono/EditorGUI.cs#L790
-		private static void DoTextField(TextEditor editor, Rect position, GUIStyle style)
+		private static void Prefix(TextEditor editor, Rect position, GUIStyle style)
 		{
 			var settings = DemystifySettings.instance;
 			if (!settings || !settings.AllowCodePreview) return;

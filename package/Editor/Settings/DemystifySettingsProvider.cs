@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Runtime.InteropServices;
-using needle.EditorPatching;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -72,7 +69,6 @@ namespace Needle.Demystify
 				settings.ShowFileName = EditorGUILayout.Toggle(new GUIContent("Show Filename", "When enabled demystify will prefix console log entries with the file name of the log source"), settings.ShowFileName); 
 				
 				EditorGUILayout.LabelField("Experimental", EditorStyles.boldLabel);
-				settings.AutoFilter = EditorGUILayout.Toggle(new GUIContent("Auto Filter", "When enabled demystify will set the search filter for project asset selection and hierarchy selection (first component it finds)"), settings.AutoFilter);
 
 				using (var scope = new EditorGUI.ChangeCheckScope())
 				{
@@ -168,19 +164,15 @@ namespace Needle.Demystify
 
 		private static void DrawActivateGUI(DemystifySettings settings)
 		{
-			if (!UnityDemystify.Patches().All(PatchManager.IsActive))
+			if (!settings.Enabled)// !UnityDemystify.Patches().All(PatchManager.IsActive))
 			{
-				if (GUILayout.Button(new GUIContent("Enable Demystify", 
-					"Enables patches:\n" + string.Join("\n", UnityDemystify.Patches())
-				)))
-					UnityDemystify.Enable(true);
+				if (GUILayout.Button(new GUIContent("Enable Demystify")))
+					UnityDemystify.Enable();
 				EditorGUILayout.HelpBox("Demystify is disabled, click the Button above to enable it", MessageType.Info);
 			}
 			else
 			{
-				if (GUILayout.Button(new GUIContent("Disable Demystify", 
-					"Disables patches:\n" + string.Join("\n", UnityDemystify.Patches())
-					)))
+				if (GUILayout.Button(new GUIContent("Disable Demystify")))
 					UnityDemystify.Disable();
 			}
 		}

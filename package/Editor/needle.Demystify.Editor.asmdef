@@ -2,8 +2,7 @@
     "name": "Needle.Demystify.Editor",
     "rootNamespace": "Needle.Demystify",
     "references": [
-        "GUID:190fcbce4bc335a4789824a5a58281a8",
-        "GUID:336404f647c61ce4db3b999a77d5db23"
+        "GUID:190fcbce4bc335a4789824a5a58281a8"
     ],
     "includePlatforms": [
         "Editor"

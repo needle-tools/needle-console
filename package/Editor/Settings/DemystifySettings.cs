@@ -8,6 +8,8 @@ namespace Needle.Demystify
 	[FilePath("Preferences/DemystifySettings.asset", FilePathAttribute.Location.PreferencesFolder)]
 	internal class DemystifySettings : ScriptableSingleton<DemystifySettings>
 	{
+		internal bool Enabled = true;
+		
 		public static event Action Changed;
 
 		internal static void RaiseChangedEvent() => Changed?.Invoke();
@@ -70,7 +72,6 @@ namespace Needle.Demystify
 
 		public bool ShortenFilePaths = true;
 		public bool ShowFileName = true;
-		public bool AutoFilter = false;
 		public string ColorMarker = "┃";// "┃";
 		
 		public bool CustomList = true;

@@ -2,20 +2,24 @@
 // #undef UNITY_DEMYSTIFY_DEV
 
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.Reflection;
 using HarmonyLib;
 
 namespace Needle.Demystify
 {
-	[HarmonyPatch(typeof(Exception))]
 	// ReSharper disable once UnusedType.Global
-	public class Patch_Exception
+	public class Patch_Exception : PatchBase
 	{
+		protected override IEnumerable<MethodBase> GetPatches()
+		{
+			yield return AccessTools.Method(typeof(Exception), "GetStackTrace");
+		}
+		
 		// capture exception stacktrace.
 		// unity is internally looping stackFrames instead of using GetStackTrace
 		// but we capture all other cases in other patches
-		[HarmonyPostfix]
-		[HarmonyPatch("GetStackTrace")]
 		private static void Postfix(object __instance, ref string __result)
 		{
 			if (__instance is Exception ex)
@@ -27,6 +31,5 @@ namespace Needle.Demystify
 			
 			
 		}
-		
 	}
 }

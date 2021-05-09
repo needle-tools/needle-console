@@ -2,38 +2,20 @@
 using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
-using System.Threading.Tasks;
 using HarmonyLib;
-using needle.EditorPatching;
 using UnityEditor;
-using UnityEngine;
 
 // ReSharper disable UnusedType.Global
 // ReSharper disable UnusedMember.Local
 
 namespace Needle.Demystify
 {
-	public class Patch_ConsoleWindowListView : EditorPatchProvider
-	{
-		public override string Description => "Custom Console List View";
-
-		protected override void OnGetPatches(List<EditorPatch> patches)
+		internal class Patch_ConsoleWindowListView : PatchBase
 		{
-			patches.Add(new ListViewPatch());
-			// patches.Add(new EnumeratorPatch());
-			// patches.Add(new ListViewStatePatch());
-		}
-
-		// https://github.com/Unity-Technologies/UnityCsReference/blob/61f92bd79ae862c4465d35270f9d1d57befd1761/Editor/Mono/GUI/ListViewGUILayout.cs#L183
-
-
-		private class ListViewPatch : EditorPatch
-		{
-			protected override Task OnGetTargetMethods(List<MethodBase> targetMethods)
+			protected override IEnumerable<MethodBase> GetPatches()
 			{
 				var method = Patch_Console.ConsoleWindowType.GetMethod("OnGUI", BindingFlags.NonPublic | BindingFlags.Instance);
-				targetMethods.Add(method);
-				return Task.CompletedTask;
+				yield return method;
 			}
 
 			private static IEnumerable<CodeInstruction> Transpiler(MethodBase method, ILGenerator il, IEnumerable<CodeInstruction> instructions)
@@ -100,5 +82,4 @@ namespace Needle.Demystify
 				}
 			}
 		}
-	}
 }

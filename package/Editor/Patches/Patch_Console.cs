@@ -2,25 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Threading.Tasks;
-using needle.EditorPatching;
 using UnityEditor;
 using UnityEngine;
 
 namespace Needle.Demystify
 {
-	public class Patch_Console : EditorPatchProvider
+	public class Patch_Console
 	{
-		public override string DisplayName { get; }
-		public override string Description => "Applies syntax highlighting to demystified stacktraces";
-
-		protected override void OnGetPatches(List<EditorPatch> patches)
-		{
-			patches.Add(new StacktracePatch());
-			patches.Add(new ConsoleDrawingEvent());
-		}
-
-
 		internal static bool IsDrawingConsole { get; private set; }
 		private static Type _consoleWindowType;
 
@@ -47,7 +35,7 @@ namespace Needle.Demystify
 						_consoleWindow = EditorWindow.GetWindow(ConsoleWindowType);
 				}
 
-				return _consoleWindow;
+				return _consoleWindow; 
 			}
 			private set => _consoleWindow = value;
 		}
@@ -82,14 +70,11 @@ namespace Needle.Demystify
 			return (Vector2) TextScroll.GetValue(ConsoleWindow);
 		}
 
-		private class ConsoleDrawingEvent : EditorPatch
+		private class ConsoleDrawingEvent : PatchBase
 		{
-			protected override Task OnGetTargetMethods(List<MethodBase> targetMethods)
+			protected override IEnumerable<MethodBase> GetPatches()
 			{
-				var method = ConsoleWindowType?.GetMethod("OnGUI", (BindingFlags) ~0);
-				Debug.Assert(method != null, "Could not find console OnGUI method. Console?: " + ConsoleWindowType);
-				targetMethods.Add(method);
-				return Task.CompletedTask;
+				yield return ConsoleWindowType?.GetMethod("OnGUI", (BindingFlags) ~0);;
 			}
 
 			private static void Prefix()
@@ -103,14 +88,11 @@ namespace Needle.Demystify
 			}
 		}
 
-		private class StacktracePatch : EditorPatch
+		private class StacktracePatch : PatchBase
 		{
-			protected override Task OnGetTargetMethods(List<MethodBase> targetMethods)
+			protected override IEnumerable<MethodBase> GetPatches()
 			{
-				var method = ConsoleWindowType?.GetMethod("StacktraceWithHyperlinks", (BindingFlags) ~0, null, new[] {typeof(string)}, null);
-				Debug.Assert(method != null, "Could not find console stacktrace method. Console?: " + ConsoleWindowType);
-				targetMethods.Add(method);
-				return Task.CompletedTask;
+				yield return ConsoleWindowType?.GetMethod("StacktraceWithHyperlinks", (BindingFlags) ~0, null, new[] {typeof(string)}, null);
 			}
 
 			private static string lastText;
