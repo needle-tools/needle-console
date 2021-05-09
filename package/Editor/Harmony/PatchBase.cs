@@ -19,7 +19,7 @@ namespace Needle.Demystify
 		{
 			if (applied) return;
 			applied = true;
-			Debug.Log("Patch " + this); 
+			// Debug.Log("Patch " + this); 
 			if (patches == null)
 				patches = new List<(MethodBase original, MethodInfo patch)>();
 			var t = GetType(); 
