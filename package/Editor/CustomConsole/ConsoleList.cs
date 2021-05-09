@@ -35,26 +35,6 @@ namespace Needle.Demystify
 		private static bool HasFlag(int flags) => (LogEntries.consoleFlags & (int) flags) != 0;
 		private static bool HasMode(int mode, ConsoleWindow.Mode modeToCheck) => (uint) ((ConsoleWindow.Mode) mode & modeToCheck) > 0U;
 
-		private static bool filterTextureInit;
-		private static Texture2D filterIcon, filterIconDisabled;
-
-
-		internal static void OnDrawToolbar()
-		{
-			if (!filterTextureInit)
-			{
-				filterTextureInit = true;
-				filterIcon = EditorGUIUtility.FindTexture("animationvisibilitytoggleoff");
-				filterIconDisabled = EditorGUIUtility.FindTexture("animationvisibilitytoggleon");
-			}
-
-			var text = ConsoleFilter.enabled 
-				? " " + (ConsoleFilter.filteredCount >= 1000 ? "999+" : ConsoleFilter.filteredCount.ToString()) 
-				: string.Empty;
-			var icon = ConsoleFilter.enabled ? filterIcon : filterIconDisabled;
-			var tooltip = ConsoleFilter.filteredCount > 1 ? ConsoleFilter.filteredCount + " logs hidden" : ConsoleFilter.filteredCount + " log hidden";
-			ConsoleFilter.enabled = !GUILayout.Toggle(!ConsoleFilter.enabled, new GUIContent(text, icon, tooltip), ConsoleWindow.Constants.MiniButtonRight);
-		}
 
 		internal static bool OnDrawList(ConsoleWindow console)
 		{

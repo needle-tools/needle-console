@@ -69,7 +69,7 @@ namespace Needle.Demystify
 					// this is before "EndHorizontal"
 					else if (index == 317)
 					{
-						yield return CodeInstruction.Call(typeof(ConsoleList), nameof(ConsoleList.OnDrawToolbar));
+						yield return CodeInstruction.Call(typeof(ConsoleToolbarIcon), nameof(ConsoleToolbarIcon.OnDrawToolbar));
 					}
 					// this is before "GUILayout.FlexibleSpace"
 					// https://github.com/Unity-Technologies/UnityCsReference/blob/61f92bd79ae862c4465d35270f9d1d57befd1761/Editor/Mono/ConsoleWindow.cs#L539
