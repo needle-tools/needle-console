@@ -35,10 +35,11 @@ namespace Needle.Demystify
 			"System.Runtime.CompilerServices"
 		};
 
-		private static bool TryGetMethodName(string message, out string methodName)
+		private static bool TryGetMethodName(string message, out string typeName, out string methodName)
 		{
 			using (new ProfilerMarker("ConsoleList.ParseMethodName").Auto())
 			{
+				typeName = null;
 				using (var rd = new StringReader(message))
 				{
 					var linesRead = 0;
@@ -50,10 +51,16 @@ namespace Needle.Demystify
 						if (!line.Contains(".cs")) continue;
 						Match match;
 						using (new ProfilerMarker("Regex").Auto())
-							match = Regex.Match(line, @".*?(\..*?){0,}[\.\:](?<method_name>.*?)\(.*\.cs(:\d{1,})?", RegexOptions.Compiled | RegexOptions.ExplicitCapture); 
+							match = Regex.Match(line, @".*?(\.(?<type_name>.*?)){0,}[\.\:](?<method_name>.*?)\(.*\.cs(:\d{1,})?", RegexOptions.Compiled | RegexOptions.ExplicitCapture); 
 						using (new ProfilerMarker("Handle Match").Auto())
 						{
 							// var match = matches[i];
+							var type = match.Groups["type_name"];
+							if (type.Success)
+							{
+								typeName = type.Value.Trim();
+							}
+							
 							var group = match.Groups["method_name"];
 							if (group.Success)
 							{
@@ -94,65 +101,65 @@ namespace Needle.Demystify
 				if (LogEntries.GetEntryInternal(element.row, tempEntry))
 				{
 					var filePath = tempEntry.file;
-					if (!string.IsNullOrWhiteSpace(filePath)) // && File.Exists(filePath))
+					try
 					{
-						try
+						var fileName = Path.GetFileNameWithoutExtension(filePath);
+						const string colorPrefix = "<color=#999999>";
+						const string colorPostfix = "</color>";
+
+						var colorKey = fileName;
+						var colorMarker = DemystifySettings.instance.ColorMarker; // " ▍";
+						if (!string.IsNullOrWhiteSpace(colorMarker))
+							LogColor.AddColor(colorKey, ref colorMarker);
+
+						string GetPrefix()
 						{
-							var fileName = Path.GetFileNameWithoutExtension(filePath);
-							const string colorPrefix = "<color=#999999>";
-							const string colorPostfix = "</color>";
-
-							var colorKey = fileName;
-							var colorMarker = DemystifySettings.instance.ColorMarker;// " ▍";
-							if(!string.IsNullOrWhiteSpace(colorMarker))
-								LogColor.AddColor(colorKey, ref colorMarker);
-							
-							string GetText()
+							var str = default(string);
+							if (TryGetMethodName(tempEntry.message, out var typeName, out var methodName))
 							{
-								var str = fileName;
-								if (TryGetMethodName(tempEntry.message, out var methodName))
-								{
-									// colorKey += methodName;
-									str += "." + methodName; 
-								}
-
-								// str = colorPrefix + "[" + str + "]" + colorPostfix;
-								// str = "<b>" + str + "</b>";
-								// str = "\t" + str;
-								str = colorPrefix + str + colorPostfix;// + " |";
-								return str;
+								if (string.IsNullOrWhiteSpace(typeName))
+									str = fileName;
+								else str = typeName;
+								str += "." + methodName;
 							}
 
-							var endTimeIndex = text.IndexOf("] ", StringComparison.InvariantCulture);
+							if (str == null) return string.Empty;
+							// str = colorPrefix + "[" + str + "]" + colorPostfix;
+							// str = "<b>" + str + "</b>";
+							// str = "\t" + str;
+							str = $"{colorPrefix} {str} {colorPostfix}"; // + " |";
+							return str;
+						}
 
-							// text = element.row.ToString();
-							
-							// no time:
-							if (endTimeIndex == -1)
-							{
-								// LogColor.AddColor(colorKey, ref text);
-								text = $"{colorMarker} {GetText()} {text}";
-							}
-							// contains time:
-							else
-							{
-								var message = text.Substring(endTimeIndex + 1);
-								// LogColor.AddColor(colorKey, ref message);
-								text = $"{colorPrefix}{text.Substring(1, endTimeIndex-1)}{colorPostfix} {colorMarker} {GetText()} {message}";
-							}
+						var endTimeIndex = text.IndexOf("] ", StringComparison.InvariantCulture);
 
-							cachedInfo.Add(key, text);
-						}
-						catch (ArgumentException)
+						// text = element.row.ToString();
+
+						// no time:
+						if (endTimeIndex == -1)
 						{
-							// sometimes filepath contains illegal characters and is not actually a path
-							cachedInfo.Add(key, text);
+							// LogColor.AddColor(colorKey, ref text);
+							text = $"{colorMarker}{GetPrefix()}{text}";
 						}
-						catch (Exception e)
+						// contains time:
+						else
 						{
-							Debug.LogException(e);
-							cachedInfo.Add(key, text);
+							var message = text.Substring(endTimeIndex + 1);
+							// LogColor.AddColor(colorKey, ref message);
+							text = $"{colorPrefix}{text.Substring(1, endTimeIndex - 1)}{colorPostfix} {colorMarker}{GetPrefix()}{message}";
 						}
+
+						cachedInfo.Add(key, text);
+					}
+					catch (ArgumentException)
+					{
+						// sometimes filepath contains illegal characters and is not actually a path
+						cachedInfo.Add(key, text);
+					}
+					catch (Exception e)
+					{
+						Debug.LogException(e);
+						cachedInfo.Add(key, text);
 					}
 				}
 			}
