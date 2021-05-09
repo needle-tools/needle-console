@@ -75,6 +75,8 @@ namespace Needle.Demystify
 		public string ColorMarker = "┃";// "┃";
 		
 		public bool CustomList = true;
+		public bool RowColors = true;
+		
 		[SerializeField]
 		internal ScriptableObject ActiveConsoleFilterConfig;
 	}

@@ -142,21 +142,22 @@ namespace Needle.Demystify
 							}
 
 							bool IsOdd() => row % 2 != 0;
+							var allowColors = DemystifySettings.instance.RowColors;
 							if (entryIsSelected)
 							{
 								DrawBackground(new Color(.2f, .5f, .8f, .5f));
 							}
-							else if (HasMode(entry.mode, ConsoleWindow.Mode.ScriptCompileError))
+							else if (allowColors && HasMode(entry.mode, ConsoleWindow.Mode.ScriptCompileError))
 							{
 								DrawBackground(IsOdd() ? new Color(1, 0, 0, .2f) : new Color(1, .2f, .25f, .25f));
 							}
-							else if (HasMode(entry.mode,
+							else if (allowColors && HasMode(entry.mode,
 								ConsoleWindow.Mode.ScriptingError | ConsoleWindow.Mode.Error | ConsoleWindow.Mode.StickyError |
 								ConsoleWindow.Mode.AssetImportError))
 							{
 								DrawBackground(IsOdd() ? new Color(1, 0, 0, .1f) : new Color(1, .2f, .25f, .15f));
 							}
-							else if (HasMode(entry.mode,
+							else if (allowColors && HasMode(entry.mode,
 								ConsoleWindow.Mode.ScriptingWarning | ConsoleWindow.Mode.AssetImportWarning | ConsoleWindow.Mode.ScriptCompileWarning))
 							{
 								DrawBackground(IsOdd() ? new Color(.5f, .5f, 0, .08f) : new Color(1, 1f, .1f, .04f));
