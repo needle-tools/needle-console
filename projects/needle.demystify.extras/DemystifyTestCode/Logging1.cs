@@ -40,11 +40,15 @@ namespace Demystify._Tests
 		[MenuItem("Test/Log Many")]
 		private static void LogMany()
 		{
-			for (var i = 0; i < 100; i++)
+			var words = new[] {"Unity", "Console", "Log", "this", "is", "hello", "Ok", "does", "like", "repeat", "random"};
+			for (var i = 0; i < 50; i++)
 			{
-				var fn = Path.GetRandomFileName();
-				for (var k = 0; k < 1 + (int) (Random.value * 5); k++)
-					Debug.Log(fn);
+				var str = string.Empty;
+				for (var k = 0; k < 2 + (int) Random.value; k++)
+				{
+					str += words[Mathf.FloorToInt(Random.value * words.Length)] + " ";
+				}
+				Debug.Log(str);
 			}
 		}
 	}
