@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Needle.Demystify
 {
-	internal static class ConsoleOptionsFoldout
+	internal static class ConsoleToolbarFoldout
 	{
 		internal static void OnDrawFoldouts()
 		{
@@ -16,6 +16,8 @@ namespace Needle.Demystify
 			{
 				PopupWindow.Show(rect, new FilterFoldout(), new[] {PopupLocation.Below});
 			}
+
+			GUILayout.Space(rect.width);
 		}
 
 		private class FilterFoldout : PopupWindowContent

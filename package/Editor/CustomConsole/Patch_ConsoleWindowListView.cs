@@ -75,7 +75,7 @@ namespace Needle.Demystify
 					// https://github.com/Unity-Technologies/UnityCsReference/blob/61f92bd79ae862c4465d35270f9d1d57befd1761/Editor/Mono/ConsoleWindow.cs#L539
 					else if (index == 209)
 					{
-						yield return CodeInstruction.Call(typeof(ConsoleOptionsFoldout), nameof(ConsoleOptionsFoldout.OnDrawFoldouts));
+						yield return CodeInstruction.Call(typeof(ConsoleToolbarFoldout), nameof(ConsoleToolbarFoldout.OnDrawFoldouts));
 					}
 					
 					yield return inst;
