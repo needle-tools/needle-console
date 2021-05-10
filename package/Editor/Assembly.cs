@@ -1,4 +1,4 @@
 ﻿using System.Runtime.CompilerServices;
 
 
-[assembly:InternalsVisibleTo("Unity.InternalAPIEngineBridge.020")]
+[assembly:InternalsVisibleTo("Unity.InternalAPIEngineBridgeDev.001")]

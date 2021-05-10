@@ -1,16 +1,18 @@
 {
-    "name": "Unity.InternalAPIEngineBridge.020",
+    "name": "Unity.InternalAPIEngineBridgeDev.001",
+    "rootNamespace": "",
     "references": [
-        "GUID:c3a49cff5f11deb4785c3ec837d72af2",
-        "GUID:336404f647c61ce4db3b999a77d5db23"
+        "GUID:c3a49cff5f11deb4785c3ec837d72af2"
     ],
     "includePlatforms": [
         "Editor"
     ],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
-    "overrideReferences": false,
-    "precompiledReferences": [],
+    "overrideReferences": true,
+    "precompiledReferences": [
+        "0Harmony.dll"
+    ],
     "autoReferenced": false,
     "defineConstraints": [],
     "versionDefines": [],

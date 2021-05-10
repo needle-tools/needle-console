@@ -1,7 +1,7 @@
 {
 	"displayName": "Demystify",
 	"name": "com.needle.demystify",
-	"version": "1.4.0-exp",
+	"version": "1.4.0-exp.1",
 	"unity": "2019.4",
 	"description": "Demystifying stacktraces using https://github.com/needle-tools/Ben.Demystifier",
 	"keywords": [
