@@ -49,7 +49,7 @@ namespace Needle.Demystify
 							var ldStr = arr[index - 1];
 							yield return new CodeInstruction(OpCodes.Ldloc, loadListViewElementIndex);
 							yield return ldStr;
-							yield return CodeInstruction.Call(typeof(ConsoleText), nameof(ConsoleText.ModifyText));
+							yield return CodeInstruction.Call(typeof(ConsolePreviewText), nameof(ConsolePreviewText.ModifyText));
 							continue;
 						}
 					}

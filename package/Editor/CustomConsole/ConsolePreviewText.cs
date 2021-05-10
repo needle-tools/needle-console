@@ -9,7 +9,7 @@ using UnityEngine;
 
 namespace Needle.Demystify
 {
-	internal static class ConsoleText
+	internal static class ConsolePreviewText
 	{
 		[InitializeOnLoadMethod]
 		private static void Init()
@@ -123,7 +123,11 @@ namespace Needle.Demystify
 								str += "." + methodName;
 							}
 
-							if (str == null) return string.Empty;
+							if (string.IsNullOrWhiteSpace(str))
+							{
+								if (string.IsNullOrEmpty(fileName)) return string.Empty;
+								str = fileName;
+							}
 							// str = colorPrefix + "[" + str + "]" + colorPostfix;
 							// str = "<b>" + str + "</b>";
 							// str = "\t" + str;

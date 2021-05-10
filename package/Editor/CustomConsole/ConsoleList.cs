@@ -176,7 +176,7 @@ namespace Needle.Demystify
 							// draw text
 							var preview = item.str; // + " - " + item.entry.mode;
 							strRect.x = xOffset;
-							ConsoleText.ModifyText(element, ref preview);
+							ConsolePreviewText.ModifyText(element, ref preview);
 							// preview += item.entry.instanceID;
 							GUI.Label(strRect, preview, logStyle);
 
@@ -209,7 +209,7 @@ namespace Needle.Demystify
 									{
 										var td = (DateTime.Now - lastClickTime).Seconds;
 										if (td < 1)
-											rowDoubleClicked = selectedRowIndex;
+											rowDoubleClicked = currentEntries[selectedRowIndex].row;
 									}
 									else
 									{
@@ -326,7 +326,7 @@ namespace Needle.Demystify
 					case KeyCode.Return:
 						if (selectedRowIndex > 0)
 						{
-							rowDoubleClicked = selectedRowIndex;
+							rowDoubleClicked = currentEntries[selectedRowIndex].row;
 						}
 						break;
 				}
