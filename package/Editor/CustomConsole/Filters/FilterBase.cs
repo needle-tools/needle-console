@@ -229,6 +229,9 @@ namespace Needle.Demystify
 
 				EditorGUI.indentLevel++;
 				var iconWidth = GUILayout.Width(15);
+				var statsStyle = new GUIStyle(EditorStyles.label);
+				statsStyle.alignment = TextAnchor.MiddleRight;
+				
 				for (var index = 0; index < Count; index++)
 				{
 					var prevColor = GUI.color;
@@ -268,7 +271,15 @@ namespace Needle.Demystify
 						}
 
 						GUILayout.Space(-15);
+						
 						EditorGUILayout.LabelField(new GUIContent(label, file.ToString()), GUILayout.ExpandWidth(true));
+
+						// var stats = ConsoleFilter.GetStats(this);
+						// if (stats.Excluded > 0)
+						// {
+						// 	using(new GUIColorScope(new Color(1,1,1,.7f)))
+						// 		GUILayout.Label("hides " + stats.Excluded, statsStyle);
+						// }
 
 						if (GUILayout.Button(new GUIContent(Textures.Remove), Styles.FilterToggleButton(), iconWidth))
 						{

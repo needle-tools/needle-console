@@ -86,9 +86,34 @@ namespace Needle.Demystify
 			}
 			get => EditorPrefs.GetBool("ConsoleFilter_Enabled", true);
 		}
+
+		public struct Stats
+		{
+			public int Excluded { get; private set; }
+			
+			internal void Add(FilterResult res, LogEntry log)
+			{
+				switch (res)
+				{
+					case FilterResult.Keep:
+						break;
+					case FilterResult.Exclude:
+						Excluded += 1;
+						break;
+					case FilterResult.Solo:
+						break;
+				}
+			}
+			
+			internal void Clear()
+			{
+				Excluded = 0;
+			}
+		}
 		
 		private static bool isDirty = true;
 		private static readonly List<IConsoleFilter> registeredFilters = new List<IConsoleFilter>();
+		private static readonly List<Stats> registeredFiltersStats = new List<Stats>();
 		private static readonly Dictionary<(string preview, int instanceId), bool> cachedLogResultForMask = new Dictionary<(string preview, int instanceId), bool>();
 		private static readonly List<LogEntry> logEntries = new List<LogEntry>();
 		
@@ -105,6 +130,7 @@ namespace Needle.Demystify
 			if (!registeredFilters.Contains(filter))
 			{
 				registeredFilters.Add(filter);
+				registeredFiltersStats.Add(new Stats());
 				MarkDirty();
 			}
 		}
@@ -114,19 +140,30 @@ namespace Needle.Demystify
 			if (registeredFilters.Count <= 0) return;
 			var anyActive = registeredFilters.Any(r => r.Enabled);
 			registeredFilters.Clear();
+			registeredFiltersStats.Clear();
 			if(anyActive) MarkDirty();
 		}
 
 		public static bool RemoveFilter(IConsoleFilter filter)
 		{
-			if (registeredFilters.Contains(filter))
+			if (registeredFilters.TryFindIndex(filter, out var index))
 			{
-				registeredFilters.Remove(filter);
+				registeredFilters.RemoveAt(index);
+				registeredFiltersStats.RemoveAt(index);
 				MarkDirty();
 				return true;
 			}
 			return false;
 		}
+
+		public static Stats GetStats(IConsoleFilter filter)
+		{
+			if (registeredFilters.TryFindIndex(filter, out var i))
+				return registeredFiltersStats[i];
+			return new Stats();
+		}
+		
+		public static Stats Global { get; private set; }
 
 		internal static void AddMenuItems(GenericMenu menu, LogEntryInfo clickedLog)
 		{
@@ -168,6 +205,14 @@ namespace Needle.Demystify
 				_lastFlags = LogEntries.consoleFlags;
 
 				var anySolo = registeredFilters.Any(f => f.HasAnySolo());
+
+				for (var index = 0; index < registeredFiltersStats.Count; index++)
+				{
+					var stat = registeredFiltersStats[index];
+					stat.Clear();
+					registeredFiltersStats[index] = stat;
+				}
+				Global = new Stats();
 
 				for (var i = start; i < count; i++)
 				{
@@ -211,18 +256,32 @@ namespace Needle.Demystify
 					{
 						LogEntryInfo info = new LogEntryInfo(entry);
 						var skip = false;
-						foreach (var filter in registeredFilters)
+						for (var index = 0; index < registeredFilters.Count; index++)
 						{
+							var filter = registeredFilters[index];
 							if (!filter.Enabled) continue;
 							using (new ProfilerMarker("Filter Exclude").Auto())
 							{
 								var res = filter.Filter(preview, mask, i, info);
+
+								void RegisterStat()
+								{
+									var stats = registeredFiltersStats[index];
+									stats.Add(res, entry);
+									registeredFiltersStats[index] = stats;
+									
+									var glob = Global;
+										glob.Add(res, entry);
+										Global = glob;
+								}
+								
 								if (anySolo)
 								{
 									skip = true;
 									if (res == FilterResult.Solo)
 									{
 										skip = false;
+										RegisterStat();
 										break;
 									}
 								}
@@ -232,6 +291,7 @@ namespace Needle.Demystify
 									{
 										filteredCount += 1;
 										skip = true;
+										RegisterStat();
 										break;
 									}
 								}
