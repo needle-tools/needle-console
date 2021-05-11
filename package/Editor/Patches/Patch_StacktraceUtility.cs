@@ -46,12 +46,14 @@ namespace Needle.Demystify
 				for (var i = 0; i < rawStacktrace.FrameCount; i++)
 				{
 					var frame = rawStacktrace.GetFrame(i);
-					var method = frame.GetMethod();
+					var method = frame.GetMethod(); 
 					if (method == null) break;
 					if (method.DeclaringType == typeof(Patch_StacktraceUtility)
 					    || method.DeclaringType == typeof(StackTraceUtility)
 					    || method.DeclaringType == typeof(Debug)
-					    || method.DeclaringType?.Name == "DebugLogHandler")
+					    || method.DeclaringType?.Name == "DebugLogHandler"
+					    || method.Name == nameof(Prefix)
+					    )
 					{
 						skipCalls += 1;
 						continue;
