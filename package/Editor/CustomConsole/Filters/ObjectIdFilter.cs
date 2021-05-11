@@ -19,10 +19,10 @@ namespace Needle.Demystify
 			return obj ? (obj.GetType().Name + " on " + obj.name) : "Missing Object? InstanceId=" + id;
 		} 
 
-		public override FilterResult Filter(string message, int mask, int row, LogEntryInfo info)
+		protected override (FilterResult result, int index) OnFilter(string message, int mask, int row, LogEntryInfo info)
 		{
-			if (info.instanceID == 0) return FilterResult.Keep;
-			return base.Filter(message, mask, row, info);
+			if (info.instanceID == 0) return (FilterResult.Keep, -1);
+			return base.OnFilter(message, mask, row, info);
 		}
 
 		protected override bool MatchFilter(int entry, int index, string message, int mask, int row, LogEntryInfo info)

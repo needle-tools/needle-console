@@ -33,18 +33,32 @@ namespace Needle.Demystify
 		}
 
 		[SerializeField] private List<FilterEntry> entries;
+		private List<int> excludedCountPerFilter;
+
+		public int GetExcluded(int index)
+		{
+			if (index >= 0 && index < excludedCountPerFilter.Count) return excludedCountPerFilter[index];
+			return 0;
+		}
 
 		protected FilterBase()
 		{
 			this.entries = new List<FilterEntry>();
+			excludedCountPerFilter = new List<int>();
 		}
 
 		protected FilterBase(List<FilterEntry> list)
 		{
 			if (list != null)
+			{
 				entries = list;
-			else 
-				entries = new List<FilterEntry>();
+				excludedCountPerFilter = new List<int>(new int[list.Count]);
+			}
+			else
+			{
+				list = new List<FilterEntry>();
+				excludedCountPerFilter = new List<int>();
+			}
 		}
 
 		public int Count => entries.Count;
@@ -131,6 +145,7 @@ namespace Needle.Demystify
 			{
 				WillChange?.Invoke(this);
 				entries.Add(new FilterEntry() {Element = entry, Active = isActive, Solo = isSolo});
+				excludedCountPerFilter.Add(0);
 				OnChanged();
 				NotifyConsole(isActive);
 			}
@@ -144,6 +159,7 @@ namespace Needle.Demystify
 		{
 			WillChange?.Invoke(this);
 			entries.RemoveAt(index);
+			excludedCountPerFilter.RemoveAt(index);
 			OnChanged();
 			NotifyConsole(false);
 		}
@@ -154,6 +170,7 @@ namespace Needle.Demystify
 			{
 				WillChange?.Invoke(this);
 				entries.Clear();
+				excludedCountPerFilter.Clear();
 				OnChanged();
 				NotifyConsole(false);
 			}
@@ -164,7 +181,25 @@ namespace Needle.Demystify
 			return entries.Any(s => s.Solo);
 		}
 
-		public virtual FilterResult Filter(string message, int mask, int row, LogEntryInfo info)
+		public void BeforeFilter()
+		{
+			for (var index = 0; index < excludedCountPerFilter.Count; index++)
+			{
+				excludedCountPerFilter[index] = 0;
+			}
+		}
+
+		public FilterResult Filter(string message, int mask, int row, LogEntryInfo info)
+		{
+			var res = OnFilter(message, mask, row, info);
+			if (res.result == FilterResult.Exclude && res.index >= 0)
+			{
+				excludedCountPerFilter[res.index] += 1;
+			}
+			return res.result;
+		}
+
+		protected virtual (FilterResult result, int index) OnFilter(string message, int mask, int row, LogEntryInfo info)
 		{
 			for (var index = 0; index < Count; index++)
 			{
@@ -173,17 +208,18 @@ namespace Needle.Demystify
 				{
 					var res = IsSoloAtIndex(index) ? FilterResult.Solo : FilterResult.Exclude;
 					// Debug.Log((res == FilterResult.Solo) + ", " + Path.GetFileName(info.file));
-					return res;
+					return (res, index);
 				}
 			}
 
-			return FilterResult.Keep;
+			return (FilterResult.Keep, -1);
 		}
 
 		protected abstract bool MatchFilter(T entry, int index, string message, int mask, int row, LogEntryInfo info);
 
 		public abstract void AddLogEntryContextMenuItems(GenericMenu menu, LogEntryInfo clickedLog);
 
+		
 		protected virtual void OnChanged()
 		{
 		}
@@ -274,12 +310,12 @@ namespace Needle.Demystify
 						
 						EditorGUILayout.LabelField(new GUIContent(label, file.ToString()), GUILayout.ExpandWidth(true));
 
-						// var stats = ConsoleFilter.GetStats(this);
-						// if (stats.Excluded > 0)
-						// {
-						// 	using(new GUIColorScope(new Color(1,1,1,.7f)))
-						// 		GUILayout.Label("hides " + stats.Excluded, statsStyle);
-						// }
+						var excluded = GetExcluded(index);// ConsoleFilter.GetStats(this);
+						if (excluded > 0)
+						{
+							using(new GUIColorScope(new Color(1,1,1,.7f)))
+								GUILayout.Label("hides " + excluded, statsStyle);
+						}
 
 						if (GUILayout.Button(new GUIContent(Textures.Remove), Styles.FilterToggleButton(), iconWidth))
 						{

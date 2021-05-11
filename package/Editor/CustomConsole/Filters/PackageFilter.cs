@@ -27,9 +27,9 @@ namespace Needle.Demystify
 			return this[index];
 		}
 
-		public override FilterResult Filter(string message, int mask, int row, LogEntryInfo info)
+		protected override (FilterResult result, int index) OnFilter(string message, int mask, int row, LogEntryInfo info)
 		{
-			if (Count <= 0) return FilterResult.Keep;
+			if (Count <= 0) return (FilterResult.Keep, -1);
 			
 			var index = -1;
 			if (Count > 0 && !filePackageDict.TryGetValue(info.file, out index))
@@ -51,10 +51,10 @@ namespace Needle.Demystify
 				filePackageDict.Add(info.file, index);
 			}
 
-			if (index == -1) return FilterResult.Keep;
-			if (IsSoloAtIndex(index)) return FilterResult.Solo;
-			if (IsActiveAtIndex(index)) return FilterResult.Exclude;
-			return FilterResult.Keep;
+			if (index == -1) return (FilterResult.Keep, -1);
+			if (IsSoloAtIndex(index)) return (FilterResult.Solo, index);
+			if (IsActiveAtIndex(index)) return (FilterResult.Exclude, index);
+			return (FilterResult.Keep, -1);
 		}
 
 		protected override bool MatchFilter(string entry, int index, string message, int mask, int row, LogEntryInfo info)

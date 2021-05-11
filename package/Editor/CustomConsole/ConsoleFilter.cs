@@ -14,17 +14,42 @@ namespace Needle.Demystify
 		Exclude = 1,
 		Solo = 2,
 	}
+
+	public struct Stats
+	{
+		public int Excluded { get; private set; }
+			
+		internal void Add(FilterResult res)
+		{
+			switch (res)
+			{
+				case FilterResult.Keep:
+					break;
+				case FilterResult.Exclude:
+					Excluded += 1;
+					break;
+				case FilterResult.Solo:
+					break;
+			}
+		}
+			
+		internal void Clear()
+		{
+			Excluded = 0;
+		}
+	}
 	
 	public interface IConsoleFilter
 	{
 		bool Enabled { get; set; }
 		bool HasAnySolo();
+		void BeforeFilter();
 		FilterResult Filter(string message, int mask, int row, LogEntryInfo info);
 		void AddLogEntryContextMenuItems(GenericMenu menu, LogEntryInfo clickedLog);
 		void OnGUI();
 		int Count { get; }
-
 		event Action<IConsoleFilter> WillChange, HasChanged;
+		int GetExcluded(int index);
 	}
 
 	internal struct CachedConsoleInfo
@@ -85,30 +110,6 @@ namespace Needle.Demystify
 				MarkDirty();
 			}
 			get => EditorPrefs.GetBool("ConsoleFilter_Enabled", true);
-		}
-
-		public struct Stats
-		{
-			public int Excluded { get; private set; }
-			
-			internal void Add(FilterResult res, LogEntry log)
-			{
-				switch (res)
-				{
-					case FilterResult.Keep:
-						break;
-					case FilterResult.Exclude:
-						Excluded += 1;
-						break;
-					case FilterResult.Solo:
-						break;
-				}
-			}
-			
-			internal void Clear()
-			{
-				Excluded = 0;
-			}
 		}
 		
 		private static bool isDirty = true;
@@ -206,11 +207,13 @@ namespace Needle.Demystify
 
 				var anySolo = registeredFilters.Any(f => f.HasAnySolo());
 
+				// reset stats
 				for (var index = 0; index < registeredFiltersStats.Count; index++)
 				{
 					var stat = registeredFiltersStats[index];
 					stat.Clear();
 					registeredFiltersStats[index] = stat;
+					registeredFilters[index].BeforeFilter();
 				}
 				Global = new Stats();
 
@@ -267,11 +270,11 @@ namespace Needle.Demystify
 								void RegisterStat()
 								{
 									var stats = registeredFiltersStats[index];
-									stats.Add(res, entry);
+									stats.Add(res);
 									registeredFiltersStats[index] = stats;
 									
 									var glob = Global;
-										glob.Add(res, entry);
+										glob.Add(res);
 										Global = glob;
 								}
 								
