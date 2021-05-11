@@ -41,8 +41,9 @@ namespace Needle.Demystify
 				return;
 			}
 
-			AddContextMenuItem_Hide(menu, ExcludeMenuItemPrefix + "File " + fileName, clickedLog.file);
-			AddContextMenuItem_Solo(menu, SoloMenuItemPrefix + "File " + fileName, clickedLog.file);
+			var text = "File " + fileName;
+			AddContextMenuItem_Hide(menu, ExcludeMenuItemPrefix + text, clickedLog.file);
+			AddContextMenuItem_Solo(menu, SoloMenuItemPrefix + text, clickedLog.file);
 		}
 	}
 }

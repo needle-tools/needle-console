@@ -61,6 +61,12 @@ namespace Needle.Demystify
 					count = LogEntries.GetCount();
 					logsCountChanged = count != previousLogsCount;
 					previousLogsCount = count;
+					if (count <= 0)
+					{
+						selectedText = null;
+						selectedRowIndex = -1;
+						previouslySelectedRow = -1;
+					}
 					if (ConsoleFilter.ShouldUpdate(count))
 					{
 						ConsoleFilter.HandleUpdate(count, currentEntries);

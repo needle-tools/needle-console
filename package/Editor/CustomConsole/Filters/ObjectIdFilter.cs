@@ -35,7 +35,9 @@ namespace Needle.Demystify
 			if (clickedLog.instanceID == 0) return;
 			var obj = EditorUtility.InstanceIDToObject(clickedLog.instanceID);
 			if (!obj) return;
-			AddContextMenuItem_Hide(menu, ExcludeMenuItemPrefix + "Instance " + obj.GetType().Name + " on " + obj.name, clickedLog.instanceID);
+			var text = "Instance " + obj.GetType().Name + " on " + obj.name;
+			AddContextMenuItem_Hide(menu, ExcludeMenuItemPrefix + text, clickedLog.instanceID);
+			AddContextMenuItem_Solo(menu, SoloMenuItemPrefix + text, clickedLog.instanceID);
 		}
 	}
 }
