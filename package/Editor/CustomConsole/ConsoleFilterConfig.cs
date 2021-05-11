@@ -121,7 +121,6 @@ namespace Needle.Demystify
 		private void OnFilterChanged(IConsoleFilter filter)
 		{
 			EditorUtility.SetDirty(this);
-			AssetDatabase.SaveAssets();
 		}
 
 		[ContextMenu(nameof(Activate))]
