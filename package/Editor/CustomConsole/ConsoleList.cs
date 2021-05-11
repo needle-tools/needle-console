@@ -271,6 +271,7 @@ namespace Needle.Demystify
 			{
 				switch (Event.current.keyCode)
 				{
+					case KeyCode.PageDown:
 					case KeyCode.D:
 					case KeyCode.RightArrow:
 						if (selectedRowIndex >= 0)
@@ -285,6 +286,8 @@ namespace Needle.Demystify
 							}
 						}
 						break;
+					
+					case KeyCode.PageUp:
 					case KeyCode.A:
 					case KeyCode.LeftArrow:
 						if (selectedRowIndex >= 0)
