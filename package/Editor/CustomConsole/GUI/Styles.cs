@@ -15,8 +15,9 @@ namespace Needle.Demystify
 				toggleButton.alignment = TextAnchor.MiddleCenter;
 				toggleButton.imagePosition = ImagePosition.ImageLeft;
 				toggleButton.stretchHeight = toggleButton.stretchWidth = false;
+				toggleButton.normal.textColor = Color.white;
 			}
-
+			
 			toggleButton.fixedHeight = height < 0 ? EditorGUIUtility.singleLineHeight + 2 : height;
 			return toggleButton;
 		}

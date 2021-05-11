@@ -286,10 +286,12 @@ namespace Needle.Demystify
 						// var ex = EditorGUILayout.ToggleLeft(new GUIContent(label, file.ToString()), isActive);
 						// SetActiveAtIndex(index, ex);
 
-						// using (new GUIColorScope(isActive ? ConsoleFilterExtensions.DisabledColor : GUI.color))
+						var eye = new GUIContent(isActive ? Textures.EyeClosed : Textures.EyeOpen);
+						// eye.text = " 0";
+						using (new GUIColorScope(Color.white))
 						{
-							var res = GUILayout.Toggle(isActive, new GUIContent(isActive ? Textures.EyeClosed : Textures.EyeOpen), Styles.FilterToggleButton(),
-								iconWidth);
+							var width = iconWidth;// GUILayout.Width(30);
+							var res = GUILayout.Toggle(isActive, eye, Styles.FilterToggleButton(), width);
 							if (res != isActive)
 							{
 								SetActiveAtIndex(index, res);
@@ -305,6 +307,7 @@ namespace Needle.Demystify
 								SetSoloAtIndex(index, res);
 							}
 						}
+						
 
 						GUILayout.Space(-15);
 						
