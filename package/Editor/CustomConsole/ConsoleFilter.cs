@@ -306,7 +306,9 @@ namespace Needle.Demystify
 							}
 						}
 
-						cachedLogResultForMask.Add((preview, entry.instanceID), skip);
+						var key = (preview, entry.instanceID);
+						if(!cachedLogResultForMask.ContainsKey(key))
+							cachedLogResultForMask.Add(key, skip);
 						if (enabled && skip) continue;
 					}
 
