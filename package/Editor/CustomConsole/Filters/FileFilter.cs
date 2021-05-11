@@ -41,7 +41,8 @@ namespace Needle.Demystify
 				return;
 			}
 
-			AddContextMenuItem(menu, "Exclude File " + fileName, clickedLog.file);
+			AddContextMenuItem_Hide(menu, ExcludeMenuItemPrefix + "File " + fileName, clickedLog.file);
+			AddContextMenuItem_Solo(menu, SoloMenuItemPrefix + "File " + fileName, clickedLog.file);
 		}
 	}
 }

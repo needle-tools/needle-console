@@ -10,6 +10,9 @@ namespace Needle.Demystify
 	[Serializable]
 	public abstract class FilterBase<T> : IConsoleFilter
 	{
+		public const string ExcludeMenuItemPrefix = "Hide/";
+		public const string SoloMenuItemPrefix = "Solo/";
+		
 		private bool _isEnabled = true;
 
 		public bool Enabled
@@ -147,11 +150,12 @@ namespace Needle.Demystify
 				entries.Add(new FilterEntry() {Element = entry, Active = isActive, Solo = isSolo});
 				excludedCountPerFilter.Add(0);
 				OnChanged();
-				NotifyConsole(isActive);
+				NotifyConsole(isActive || isSolo);
 			}
-			else if (isActive && TryGetIndex(entry, out var index))
+			else if (TryGetIndex(entry, out var index))
 			{
-				SetActiveAtIndex(index, true);
+				SetActiveAtIndex(index, isActive);
+				SetSoloAtIndex(index, isSolo);
 			}
 		}
 
@@ -288,7 +292,7 @@ namespace Needle.Demystify
 
 						var eye = new GUIContent(isActive ? Textures.EyeClosed : Textures.EyeOpen);
 						// eye.text = " 0";
-						using (new GUIColorScope(Color.white))
+						using (new GUIColorScope(!ConsoleFilter.HasAnyFilterSolo ? Color.white : ConsoleFilterExtensions.DisabledColor))
 						{
 							var width = iconWidth;// GUILayout.Width(30);
 							var res = GUILayout.Toggle(isActive, eye, Styles.FilterToggleButton(), width);
@@ -354,7 +358,7 @@ namespace Needle.Demystify
 			}
 		}
 
-		protected void AddContextMenuItem(GenericMenu menu, string text, T element)
+		protected void AddContextMenuItem_Hide(GenericMenu menu, string text, T element)
 		{
 			var active = TryGetIndex(element, out var index);
 			if (active) active = IsActiveAtIndex(index);
@@ -368,6 +372,30 @@ namespace Needle.Demystify
 				else
 				{
 					SetActiveAtIndex(index, ConsoleFilter.enabled);
+					SetSoloAtIndex(index, false);
+				}
+			});
+		}
+
+		protected void AddContextMenuItem_Solo(GenericMenu menu, string text, T element)
+		{
+			var found = TryGetIndex(element, out var index);
+
+			var solo = false;
+			if (found)
+			{
+				solo = IsSoloAtIndex(index);
+			}
+
+			menu.AddItem(new GUIContent(text), solo, () =>
+			{
+				if (!solo)
+				{
+					Add(element, false, true);
+				}
+				else
+				{
+					SetSoloAtIndex(index, !solo);
 				}
 			});
 		}

@@ -36,9 +36,17 @@ namespace Needle.Demystify
 		private static bool HasFlag(int flags) => (LogEntries.consoleFlags & (int) flags) != 0;
 		private static bool HasMode(int mode, ConsoleWindow.Mode modeToCheck) => (uint) ((ConsoleWindow.Mode) mode & modeToCheck) > 0U;
 
+		private static ConsoleWindow _consoleWindow;
+
+		internal static void RequestRepaint()
+		{
+			if(_consoleWindow) _consoleWindow.Repaint();
+		}
 
 		internal static bool OnDrawList(ConsoleWindow console)
 		{
+			_consoleWindow = console;
+			
 			if (!DrawCustom)
 				return true;
 
@@ -233,8 +241,6 @@ namespace Needle.Demystify
 									{
 										ConsoleFilter.AddMenuItems(menu, item.entry);
 									}
-									if(menu.GetItemCount() > 0)
-										menu.AddSeparator(string.Empty);
 									AddConfigMenuItems(menu);
 									menu.ShowAsContext();
 									Event.current.Use();
@@ -372,25 +378,38 @@ namespace Needle.Demystify
 
 		private static void AddConfigMenuItems(GenericMenu menu)
 		{
-			var content = ConsoleFilter.enabled ? new GUIContent("Disable Console Filter") : new GUIContent("Enable Console Filter");
-			menu.AddItem(content, ConsoleFilter.enabled, () => ConsoleFilter.enabled = !ConsoleFilter.enabled);
-			menu.AddSeparator(string.Empty);
-			
-			foreach (var config in ConsoleFilterConfig.AllConfigs)
+			// var content = new GUIContent("Console Filter");
+			// menu.AddItem(content, ConsoleFilter.enabled, () => ConsoleFilter.enabled = !ConsoleFilter.enabled);
+			// menu.AddSeparator(string.Empty);
+
+			// if (ConsoleFilter.RegisteredFilter.Count <= 0)
 			{
-				menu.AddItem(new GUIContent("Configs/" + config.name), config.IsActive, () =>
+				if (menu.GetItemCount() > 0)
+					menu.AddSeparator(string.Empty);
+				
+				foreach (var config in ConsoleFilterConfig.AllConfigs)
 				{
-					if(config.IsActive) config.Deactivate();
-					else config.Activate();
-				});
+					menu.AddItem(new GUIContent("Configs/" + config.name), config.IsActive, () =>
+					{
+						if (config.IsActive)
+						{
+							config.Deactivate();
+						}
+						else
+						{
+							ConsoleFilter.enabled = true;
+							config.Activate();
+						}
+					});
+				}
 			}
-			if(menu.GetItemCount() > 0 && ConsoleFilterConfig.AllConfigs.Count > 0)
-				menu.AddSeparator("Configs/");
-			menu.AddItem(new GUIContent("Configs/New"), false, () =>
-			{
-				var config = ConsoleFilterConfig.CreateAsset();
-				if(config) config.Activate();
-			});
+			// if(menu.GetItemCount() > 0 && ConsoleFilterConfig.AllConfigs.Count > 0)
+			// 	menu.AddSeparator("Configs/");
+			// menu.AddItem(new GUIContent("Configs/New"), false, () =>
+			// {
+			// 	var config = ConsoleFilterConfig.CreateAsset();
+			// 	if(config) config.Activate();
+			// });
 		}
 	}
 }

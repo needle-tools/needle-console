@@ -111,7 +111,7 @@ namespace Needle.Demystify
 			if (TryGetPackage(clickedLog.file, out var pack))
 			{
 				var str = pack.name;
-				AddContextMenuItem(menu, "Exclude Package " + str, str);
+				AddContextMenuItem_Hide(menu, ExcludeMenuItemPrefix + "Package " + str, str);
 			}
 		}
 	}

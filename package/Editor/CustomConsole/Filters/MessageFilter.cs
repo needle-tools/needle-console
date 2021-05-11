@@ -29,8 +29,8 @@ namespace Needle.Demystify
 		{
 			var message = clickedLog.message;
 			message = message.Substring(0, Mathf.Min(message.Length, MaxLenght));
-			var text = "Exclude Message \"" + message.Replace('/', '_') + "\"";
-			AddContextMenuItem(menu, text, message);
+			var text = ExcludeMenuItemPrefix + "Message \"" + message.Replace('/', '_') + "\"";
+			AddContextMenuItem_Hide(menu, text, message);
 		}
 	}
 }

@@ -40,7 +40,8 @@ namespace Needle.Demystify
 			if (clickedLog.line <= 0) return;
 			var fileName = Path.GetFileName(clickedLog.file);
 			var fl = new FileLine {file = clickedLog.file, line = clickedLog.line};
-			AddContextMenuItem(menu, "Exclude Line " + fileName + ":" + clickedLog.line, fl);
+			AddContextMenuItem_Hide(menu, ExcludeMenuItemPrefix + "Line " + fileName + ":" + clickedLog.line, fl);
+			AddContextMenuItem_Solo(menu, SoloMenuItemPrefix + "Line " + fileName + ":" + clickedLog.line, fl);
 		}
 	}
 }

@@ -122,7 +122,11 @@ namespace Needle.Demystify
 
 		public static IReadOnlyList<IConsoleFilter> RegisteredFilter => registeredFilters;
 
-		public static void MarkDirty() => isDirty = true;
+		public static void MarkDirty()
+		{
+			isDirty = true;
+			ConsoleList.RequestRepaint();
+		}
 
 		public static bool Contains(IConsoleFilter filter) => registeredFilters.Contains(filter);
 
@@ -173,6 +177,7 @@ namespace Needle.Demystify
 		}
 
 		private static int _prevCount, _lastFlags;
+		internal static bool HasAnyFilterSolo { get; private set; }
 
 		internal static bool ShouldUpdate(int logCount)
 		{
@@ -205,7 +210,7 @@ namespace Needle.Demystify
 				_prevCount = count;
 				_lastFlags = LogEntries.consoleFlags;
 
-				var anySolo = registeredFilters.Any(f => f.HasAnySolo());
+				HasAnyFilterSolo = registeredFilters.Any(f => f.HasAnySolo());
 
 				// reset stats
 				for (var index = 0; index < registeredFiltersStats.Count; index++)
@@ -255,7 +260,7 @@ namespace Needle.Demystify
 								continue;
 						}
 					}
-					else if(enabled)
+					// else if(enabled)
 					{
 						LogEntryInfo info = new LogEntryInfo(entry);
 						var skip = false;
@@ -278,7 +283,7 @@ namespace Needle.Demystify
 										Global = glob;
 								}
 								
-								if (anySolo)
+								if (HasAnyFilterSolo)
 								{
 									skip = true;
 									if (res == FilterResult.Solo)
@@ -302,7 +307,7 @@ namespace Needle.Demystify
 						}
 
 						cachedLogResultForMask.Add((preview, entry.instanceID), skip);
-						if (skip) continue;
+						if (enabled && skip) continue;
 					}
 
 
