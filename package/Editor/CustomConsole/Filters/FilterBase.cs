@@ -316,8 +316,10 @@ namespace Needle.Demystify
 						var excluded = GetExcluded(index);// ConsoleFilter.GetStats(this);
 						if (excluded > 0)
 						{
-							using(new GUIColorScope(new Color(1,1,1,.7f)))
-								GUILayout.Label("hides " + excluded, statsStyle);
+							using (new GUIColorScope(new Color(1, 1, 1, .7f)))
+							{
+								GUILayout.Label("hides " + excluded, statsStyle, GUILayout.Width(100));
+							}
 						}
 
 						if (GUILayout.Button(new GUIContent(Textures.Remove), Styles.FilterToggleButton(), iconWidth))
