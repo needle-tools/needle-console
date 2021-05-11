@@ -11,7 +11,7 @@
     "allowUnsafeCode": false,
     "overrideReferences": true,
     "precompiledReferences": [
-        "Demystify_Harmony.dll"
+        "Demystify-Harmony.dll"
     ],
     "autoReferenced": false,
     "defineConstraints": [],

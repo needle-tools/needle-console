@@ -1,9 +1,7 @@
 {
     "name": "Needle.Demystify.Editor",
     "rootNamespace": "Needle.Demystify",
-    "references": [
-        "GUID:190fcbce4bc335a4789824a5a58281a8"
-    ],
+    "references": [],
     "includePlatforms": [
         "Editor"
     ],
@@ -12,7 +10,7 @@
     "overrideReferences": true,
     "precompiledReferences": [
         "Ben.Demystifier.dll",
-        "Demystify_Harmony.dll"
+        "Demystify-Harmony.dll"
     ],
     "autoReferenced": false,
     "defineConstraints": [],
