@@ -12,7 +12,7 @@ namespace Needle.Demystify
 		private static PackageInfo[] allPackages;
 		private Dictionary<string, int> filePackageDict = new Dictionary<string, int>();
 
-		public PackageFilter(List<FilterEntry> packages) : base(packages)
+		public PackageFilter(ref List<FilterEntry> packages) : base(ref packages)
 		{
 		}
 

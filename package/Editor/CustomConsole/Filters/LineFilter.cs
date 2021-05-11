@@ -21,7 +21,7 @@ namespace Needle.Demystify
 	[Serializable]
 	public class LineFilter : FilterBase<FileLine>
 	{
-		public LineFilter(List<FilterEntry> list = null) : base(list){}
+		public LineFilter(ref List<FilterEntry> list) : base(ref list){}
 		
 		public override string GetLabel(int index) 
 		{

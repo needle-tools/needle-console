@@ -8,7 +8,7 @@ namespace Needle.Demystify
 	[Serializable]
 	public class MessageFilter : FilterBase<string>
 	{
-		public MessageFilter(List<FilterEntry> list = null) : base(list){}
+		public MessageFilter(ref List<FilterEntry> list) : base(ref list){}
 		
 		public const int MaxLenght = 50;
 		

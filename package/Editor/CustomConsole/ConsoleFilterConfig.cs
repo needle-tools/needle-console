@@ -80,11 +80,11 @@ namespace Needle.Demystify
 
 		private void OnEnable()
 		{
-			messageFilter = new MessageFilter(messages);
-			lineFilter = new LineFilter(lines);
-			fileFilter = new FileFilter(files);
-			idFilter = new ObjectIdFilter(ids);
-			packageFilter = new PackageFilter(packages);
+			messageFilter = new MessageFilter(ref messages);
+			lineFilter = new LineFilter(ref lines);
+			fileFilter = new FileFilter(ref files);
+			idFilter = new ObjectIdFilter(ref ids);
+			packageFilter = new PackageFilter(ref packages);
 			
 			if (!_allConfigs.Contains(this))
 				_allConfigs.Add(this);
@@ -110,6 +110,8 @@ namespace Needle.Demystify
 
 		private void OnDestroy()
 		{
+			if (DemystifySettings.instance.ActiveConsoleFilterConfig == this)
+				Deactivate();
 			_allConfigs.Remove(this);
 		}
 		
@@ -136,9 +138,12 @@ namespace Needle.Demystify
 		[ContextMenu(nameof(Deactivate))]
 		public void Deactivate()
 		{
-			if(DemystifySettings.instance.ActiveConsoleFilterConfig == this)
+			if (DemystifySettings.instance.ActiveConsoleFilterConfig == this)
+			{
+				Debug.Log("Deactivate"); 
 				DemystifySettings.instance.ActiveConsoleFilterConfig = null;
-			ConsoleFilter.RemoveAllFilter();
+				ConsoleFilter.RemoveAllFilter();
+			}
 		}
 
 		[CustomEditor(typeof(ConsoleFilterConfig))]

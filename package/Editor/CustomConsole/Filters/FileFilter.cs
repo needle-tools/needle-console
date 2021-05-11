@@ -9,7 +9,7 @@ namespace Needle.Demystify
 	[Serializable]
 	public class FileFilter : FilterBase<string>
 	{
-		public FileFilter(List<FilterEntry> list = null) : base(list){}
+		public FileFilter(ref List<FilterEntry> list) : base(ref list){}
 
 		public override string GetLabel(int index)
 		{

@@ -8,7 +8,7 @@ namespace Needle.Demystify
 	[Serializable]
 	public class ObjectIdFilter : FilterBase<int>
 	{
-		public ObjectIdFilter(List<FilterEntry> ids) : base(ids)
+		public ObjectIdFilter(ref List<FilterEntry> ids) : base(ref ids)
 		{
 		}
 

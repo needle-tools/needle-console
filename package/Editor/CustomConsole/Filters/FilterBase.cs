@@ -47,7 +47,7 @@ namespace Needle.Demystify
 			excludedCountPerFilter = new List<int>();
 		}
 
-		protected FilterBase(List<FilterEntry> list)
+		protected FilterBase(ref List<FilterEntry> list)
 		{
 			if (list != null)
 			{
@@ -56,7 +56,7 @@ namespace Needle.Demystify
 			}
 			else
 			{
-				list = new List<FilterEntry>();
+				entries = list = new List<FilterEntry>();
 				excludedCountPerFilter = new List<int>();
 			}
 		}
