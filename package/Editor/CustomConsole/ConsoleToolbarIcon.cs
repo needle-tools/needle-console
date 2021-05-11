@@ -24,7 +24,17 @@ namespace Needle.Demystify
 				: string.Empty;
 			var icon = ConsoleFilter.enabled ? filterIcon : filterIconDisabled;
 			var tooltip = ConsoleFilter.filteredCount > 1 ? ConsoleFilter.filteredCount + " logs hidden" : ConsoleFilter.filteredCount + " log hidden";
-			ConsoleFilter.enabled = !GUILayout.Toggle(!ConsoleFilter.enabled, new GUIContent(text, icon, tooltip), ConsoleWindow.Constants.MiniButtonRight);
+			var content = new GUIContent(text, icon, tooltip);
+			ConsoleFilter.enabled = !GUILayout.Toggle(!ConsoleFilter.enabled, content, ConsoleWindow.Constants.MiniButtonRight);
+			
+			// var rect = GUILayoutUtility.GetLastRect();
+			// rect.x += rect.width;
+			// rect.width = 50;
+			// GUILayout.Space(rect.width);
+			// if (EditorGUI.DropdownButton(rect, new GUIContent("Filter"), FocusType.Passive, EditorStyles.toolbarDropDown))
+			// {
+			// 	PopupWindow.Show(rect, new FilterFoldoutContent(), new[] {PopupLocation.Below});
+			// }
 		}
 	}
 }
