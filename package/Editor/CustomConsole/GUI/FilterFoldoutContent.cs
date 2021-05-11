@@ -7,8 +7,9 @@ namespace Needle.Demystify
 	{
 		public override Vector2 GetWindowSize()
 		{
+			var enabled = DemystifySettings.instance.CustomList;
 			var noConfig = ConsoleFilterConfig.AllConfigs.Count <= 0;
-			if (noConfig) return new Vector2(150, EditorGUIUtility.singleLineHeight * 1.3f);
+			if (noConfig && enabled) return new Vector2(150, EditorGUIUtility.singleLineHeight * 1.3f);
 			return new Vector2(400, 300);
 		}
 
@@ -22,7 +23,8 @@ namespace Needle.Demystify
 
 		public override void OnGUI(Rect rect)
 		{
-			if (!DemystifySettings.instance.CustomList)
+			var enabled = DemystifySettings.instance.CustomList;
+			if (!enabled)
 			{
 				EditorGUILayout.HelpBox("To support console filtering you need to enable \"Custom List\" in settings", MessageType.Warning);
 				if (GUILayout.Button("Enable Custom List", GUILayout.Height(30)))
@@ -33,16 +35,18 @@ namespace Needle.Demystify
 
 			if (ConsoleFilterConfig.AllConfigs.Count <= 0)
 			{
-				GUILayout.FlexibleSpace();
-				if (GUILayout.Button(new GUIContent("Create Filter Config",
-					"A filter config is used to store your settings for filtering console logs. Don't worry, logs are not deleted or anything, they will just not be shown when filtered and this is can be changed at any time")))
+				if (enabled)
 				{
-					var config = ConsoleFilterConfig.CreateAsset();
-					if (config)
-						config.Activate();
+					GUILayout.FlexibleSpace();
+					if (GUILayout.Button(new GUIContent("Create Filter Config",
+						"A filter config is used to store your settings for filtering console logs. Don't worry, logs are not deleted or anything, they will just not be shown when filtered and this is can be changed at any time")))
+					{
+						var config = ConsoleFilterConfig.CreateAsset();
+						if (config)
+							config.Activate();
+					}
+					GUILayout.FlexibleSpace();
 				}
-
-				GUILayout.FlexibleSpace();
 
 				return;
 			}
