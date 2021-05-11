@@ -318,7 +318,7 @@ namespace Needle.Demystify
 						EditorGUILayout.LabelField(new GUIContent(label, file.ToString()), GUILayout.ExpandWidth(true));
 
 						var excluded = GetExcluded(index);// ConsoleFilter.GetStats(this);
-						if (excluded > 0)
+						if (excluded > 0 && !ConsoleFilter.HasAnyFilterSolo)
 						{
 							using (new GUIColorScope(new Color(1, 1, 1, .7f)))
 							{
@@ -371,7 +371,8 @@ namespace Needle.Demystify
 				}
 				else
 				{
-					SetActiveAtIndex(index, ConsoleFilter.enabled);
+					ConsoleFilter.enabled = true;
+					SetActiveAtIndex(index, true);
 					SetSoloAtIndex(index, false);
 				}
 			});
