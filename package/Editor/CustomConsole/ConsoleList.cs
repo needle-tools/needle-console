@@ -15,7 +15,20 @@ namespace Needle.Demystify
 		}
 
 
-		private static Vector2 scroll, scrollStacktrace;
+		private static Vector2 scroll
+		{
+			get => SessionState.GetVector3("ConsoleList-Scroll", Vector3.zero);
+			set => SessionState.SetVector3("ConsoleList-Scroll", value);
+		}
+
+		private static void SetScroll(float y)
+		{
+			var s = scroll;
+			s.y = y;
+			scroll = s;
+		}
+		
+		private static Vector2 scrollStacktrace;
 		private static readonly List<CachedConsoleInfo> currentEntries = new List<CachedConsoleInfo>();
 		private static SplitterState spl = SplitterState.FromRelative(new float[] {70, 30}, new float[] {32, 32}, null); 
 
@@ -99,9 +112,9 @@ namespace Needle.Demystify
 
 			// scroll to bottom if logs changed and it was at the bottom previously
 			if (wasAtBottom && logsCountChanged)
-				scroll.y = Mathf.Max(0, contentHeight - scrollAreaHeight);
+				SetScroll(Mathf.Max(0, contentHeight - scrollAreaHeight));
 			else if (contentHeight < scrollAreaHeight)
-				scroll.y = scrollAreaHeight;
+				SetScroll(scrollAreaHeight);
 			scroll = GUI.BeginScrollView(scrollArea, scroll, contentSize);
 
 			var position = new Rect(0, 0, width, lineHeight);
@@ -276,7 +289,7 @@ namespace Needle.Demystify
 							newIndex = Mathf.Clamp(newIndex, 0, currentEntries.Count);
 							if (newIndex >= 0 && (newIndex) < currentEntries.Count)
 							{
-								scroll.y += (newIndex - selectedRowIndex) * lineHeight;
+								SetScroll(scroll.y + (newIndex - selectedRowIndex) * lineHeight);
 								SelectRow(newIndex);
 								console.Repaint();
 							}
@@ -292,7 +305,7 @@ namespace Needle.Demystify
 							newIndex = Mathf.Clamp(newIndex, 0, currentEntries.Count);
 							if (newIndex >= 0 && (newIndex) < currentEntries.Count)
 							{
-								scroll.y += (newIndex - selectedRowIndex) * lineHeight;
+								SetScroll(scroll.y + (newIndex - selectedRowIndex) * lineHeight);
 								SelectRow(newIndex);
 								console.Repaint();
 							}
@@ -303,7 +316,7 @@ namespace Needle.Demystify
 					case KeyCode.DownArrow:
 						if (selectedRowIndex >= 0 && (selectedRowIndex + 1) < currentEntries.Count)
 						{
-							scroll.y += lineHeight;
+							SetScroll(scroll.y + lineHeight);
 							SelectRow(selectedRowIndex + 1);
 							// if(selectedRow * lineHeight > scroll.y + (contentHeight - scrollAreaHeight))
 							// 	scrollArea
@@ -315,8 +328,8 @@ namespace Needle.Demystify
 						if (currentEntries.Count > 0 && selectedRowIndex > 0 && selectedRowIndex < currentEntries.Count)
 						{
 							SelectRow(selectedRowIndex - 1);
-							scroll.y -= lineHeight;
-							if (scroll.y < 0) scroll.y = 0;
+							SetScroll(scroll.y - lineHeight);
+							if (scroll.y < 0) SetScroll(0);
 							console.Repaint();
 						}
 						break;
