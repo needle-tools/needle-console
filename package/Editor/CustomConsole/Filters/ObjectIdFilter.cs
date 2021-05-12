@@ -16,7 +16,7 @@ namespace Needle.Demystify
 		{
 			var id = this[index];
 			var obj = EditorUtility.InstanceIDToObject(id);
-			return obj ? (obj.GetType().Name + " on " + obj.name) : "Missing Object? InstanceId=" + id;
+			return obj ? (obj.GetType().Name + " on " + obj.name) : "Missing Object? InstanceId=" + id; 
 		} 
 
 		protected override (FilterResult result, int index) OnFilter(string message, int mask, int row, LogEntryInfo info)

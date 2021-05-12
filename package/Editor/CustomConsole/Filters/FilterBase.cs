@@ -205,20 +205,25 @@ namespace Needle.Demystify
 
 		protected virtual (FilterResult result, int index) OnFilter(string message, int mask, int row, LogEntryInfo info)
 		{
-			for (var index = 0; index < Count; index++)
+			if (Count >= 0)
 			{
-				var ex = this[index];
-				if ((IsActiveAtIndex(index) || IsSoloAtIndex(index)) && MatchFilter(ex, index, message, mask, row, info)) // ex.Equals(info.file))
+				OnBeforeFilter();
+				for (var index = 0; index < Count; index++)
 				{
-					var res = IsSoloAtIndex(index) ? FilterResult.Solo : FilterResult.Exclude;
-					// Debug.Log((res == FilterResult.Solo) + ", " + Path.GetFileName(info.file));
-					return (res, index);
+					var ex = this[index];
+					if ((IsActiveAtIndex(index) || IsSoloAtIndex(index)) && MatchFilter(ex, index, message, mask, row, info)) // ex.Equals(info.file))
+					{
+						var res = IsSoloAtIndex(index) ? FilterResult.Solo : FilterResult.Exclude;
+						// Debug.Log((res == FilterResult.Solo) + ", " + Path.GetFileName(info.file));
+						return (res, index);
+					}
 				}
 			}
 
 			return (FilterResult.Keep, -1);
 		}
 
+		protected virtual void OnBeforeFilter(){}
 		protected abstract bool MatchFilter(T entry, int index, string message, int mask, int row, LogEntryInfo info);
 
 		public abstract void AddLogEntryContextMenuItems(GenericMenu menu, LogEntryInfo clickedLog, string preview);

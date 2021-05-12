@@ -50,14 +50,16 @@ namespace Needle.Demystify
 		private List<FilterBase<int>.FilterEntry> ids;
 		[SerializeField]
 		private List<FilterBase<FileLine>.FilterEntry> lines;
-		
+		[SerializeField]
+		private List<FilterBase<LogTime>.FilterEntry> times;
+
+
 		private MessageFilter messageFilter;
 		private LineFilter lineFilter;
 		private FileFilter fileFilter;
 		private ObjectIdFilter idFilter;
 		private PackageFilter packageFilter;
 		private TimeFilter timeFilter;
-
 		public IEnumerable<IConsoleFilter> EnumerateFilter()
 		{
 			yield return timeFilter;
@@ -73,7 +75,7 @@ namespace Needle.Demystify
 			if (!_allConfigs.Contains(this))
 				_allConfigs.Add(this);
 
-			timeFilter = new TimeFilter();
+			timeFilter = new TimeFilter(ref times);
 			messageFilter = new MessageFilter(ref messages);
 			lineFilter = new LineFilter(ref lines);
 			fileFilter = new FileFilter(ref files);

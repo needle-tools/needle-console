@@ -1,57 +1,101 @@
 using System;
+using System.Collections.Generic;
 using System.Globalization;
 using UnityEditor;
 
 
 namespace Needle.Demystify
 {
-    public class TimeFilter : FilterBase<DateTime>
-    { 
-        public override string GetLabel(int index)
-        {
-            return this[index].ToString("hh:mm:ss");
-        }
+	[Serializable]
+	public struct LogTime
+	{
+		public string TimeString;
 
-        protected override bool MatchFilter(DateTime entry, int index, string message, int mask, int row, LogEntryInfo info)
-        {
-            return false;
-        }
+		[NonSerialized] private DateTime _time;
+		[NonSerialized] private bool _hasTime;
 
-        public override void AddLogEntryContextMenuItems(GenericMenu menu, LogEntryInfo clickedLog, string preview)
-        {
-            var start = preview.IndexOf("[", StringComparison.InvariantCulture);
-            if (start < 0) return;
-            var end = preview.IndexOf("]", StringComparison.InvariantCulture);
-            if (end < 0 || end <= start) return;
-            var time = preview.Substring(start+1, end - 1);
-            if (string.IsNullOrEmpty(time)) return;
-            if (DateTime.TryParse(time, out var dt))
-            {
-                AddContextMenuItem_Hide(menu, HideMenuItemPrefix + dt.ToString("hh:mm:ss"), dt);
-            }
-        }
+		public DateTime Time
+		{
+			get
+			{
+				if (_hasTime) return _time;
+				_hasTime = DateTime.TryParse(TimeString, out _time);
+				return _time;
+			}
+		}
 
-        private bool TryGetTime(string str, out DateTime dt)
-        {
-            var start = str.IndexOf("[", StringComparison.InvariantCulture);
-            if (start < 0)
-            {
-                dt = DateTime.MaxValue;
-                return false;
-            }
-            var end = str.IndexOf("]", StringComparison.InvariantCulture);
-            if (end < 0 || end <= start)
-            {
-                dt = DateTime.MaxValue;
-                return false;
-            }
-            var time = str.Substring(start+1, end - 1);
-            if (string.IsNullOrEmpty(time))
-            {
-                dt = DateTime.MaxValue;
-                return false;
-            }
-            return DateTime.TryParse(time, out dt);
-        }
-    }
+
+		public override string ToString()
+		{
+			return Time.ToString(CultureInfo.CurrentCulture);
+		}
+	}
+
+	public class TimeFilter : FilterBase<LogTime>
+	{
+		public TimeFilter(ref List<FilterEntry> entries) : base(ref entries)
+		{
+		}
+
+		public override string GetLabel(int index)
+		{
+			return this[index].Time.ToString("HH:mm:ss");
+		}
+
+		private readonly Dictionary<string, DateTime> logTimes = new Dictionary<string, DateTime>();
+
+		protected override bool MatchFilter(LogTime entry, int index, string message, int mask, int row, LogEntryInfo info)
+		{
+			if (!logTimes.ContainsKey(message))
+			{
+				TryGetTime(message, out var logTime, out _);
+				logTimes.Add(message, logTime);
+			}
+
+			var log = logTimes[message];
+
+			if (IsSoloAtIndex(index))
+				return log == entry.Time;
+			return log <= entry.Time;
+		}
+
+		public override void AddLogEntryContextMenuItems(GenericMenu menu, LogEntryInfo clickedLog, string preview)
+		{
+			if (TryGetTime(preview, out _, out var timeString))
+			{
+				var lt = new LogTime {TimeString = timeString};
+				AddContextMenuItem_Hide(menu, HideMenuItemPrefix + "Logs until " + timeString, lt);
+				AddContextMenuItem_Solo(menu, SoloMenuItemPrefix + "Logs at " + timeString, lt);
+			}
+		}
+
+		private static bool TryGetTime(string str, out DateTime dt, out string timeString)
+		{
+			var start = str.IndexOf("[", StringComparison.InvariantCulture);
+			if (start < 0)
+			{
+				dt = DateTime.MaxValue;
+				timeString = null;
+				return false;
+			}
+
+			var end = str.IndexOf("]", StringComparison.InvariantCulture);
+			if (end < 0 || end <= start)
+			{
+				dt = DateTime.MaxValue;
+				timeString = null;
+				return false;
+			}
+
+			timeString = str.Substring(start + 1, end - 1);
+			if (string.IsNullOrEmpty(timeString))
+			{
+				dt = DateTime.MaxValue;
+				timeString = null;
+				return false;
+			}
+
+			return DateTime.TryParse(timeString, out dt);
+		}
+	}
 }
