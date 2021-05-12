@@ -14,31 +14,28 @@ namespace Needle.Demystify
 			set => DemystifySettings.instance.CustomList = value;
 		}
 
-
 		private static Vector2 scroll
 		{
 			get => SessionState.GetVector3("ConsoleList-Scroll", Vector3.zero);
 			set => SessionState.SetVector3("ConsoleList-Scroll", value);
 		}
-
-		private static void SetScroll(float y)
-		{
-			var s = scroll;
-			s.y = y;
-			scroll = s;
-		}
-		
 		private static Vector2 scrollStacktrace;
 		private static readonly List<CachedConsoleInfo> currentEntries = new List<CachedConsoleInfo>();
 		private static SplitterState spl = SplitterState.FromRelative(new float[] {70, 30}, new float[] {32, 32}, null); 
 
 		private static int selectedRowIndex = -1, previouslySelectedRow = -2, rowDoubleClicked = -1;
+		private static int selectedRowNumber = -1;
 		private static string selectedText;
 
 		private static int collapsedFlag = 1 << 0;
 
-		private static bool wasAtBottom, logsCountChanged;
-		private static int previousLogsCount;
+		/// <summary>
+		/// if scrollbar was at bottom, signal to continue scroll to bottom when logs change
+		/// can and should be interrupted by focus or click or manual scroll
+		/// </summary>
+		private static bool isAutoScrolling;
+		private static bool logsCountChanged, logsAdded;
+		private static int previousLogsCount, logCountDiff;
 		private static DateTime lastClickTime;
 		private static GUIStyle logStyle;
 
@@ -46,6 +43,7 @@ namespace Needle.Demystify
 		private static bool HasMode(int mode, ConsoleWindow.Mode modeToCheck) => (uint) ((ConsoleWindow.Mode) mode & modeToCheck) > 0U;
 
 		private static ConsoleWindow _consoleWindow;
+		private static bool shouldScrollToSelectedItem;
 
 		internal static void RequestRepaint()
 		{
@@ -68,6 +66,8 @@ namespace Needle.Demystify
 				{
 					LogEntries.StartGettingEntries();
 					count = LogEntries.GetCount();
+					logCountDiff = count - previousLogsCount;
+					logsAdded = count > previousLogsCount;
 					logsCountChanged = count != previousLogsCount;
 					previousLogsCount = count;
 					if (count <= 0)
@@ -76,8 +76,13 @@ namespace Needle.Demystify
 						selectedRowIndex = -1;
 						previouslySelectedRow = -1;
 					}
-					if (ConsoleFilter.ShouldUpdate(count))
+					var shouldUpdateLogs = ConsoleFilter.ShouldUpdate(count);
+					if (shouldUpdateLogs)
 					{
+						if (selectedRowIndex >= 0 && !logsAdded)
+						{
+							shouldScrollToSelectedItem = true;
+						}
 						ConsoleFilter.HandleUpdate(count, currentEntries);
 					}
 				}
@@ -100,7 +105,7 @@ namespace Needle.Demystify
 			var lineCount = ConsoleWindow.Constants.LogStyleLineCount;
 			var xOffset = ConsoleWindow.Constants.LogStyleLineCount == 1 ? 2 : 14;
 			var yTop = EditorGUIUtility.singleLineHeight + 3;
-			var lineHeight = EditorGUIUtility.singleLineHeight * 1.1f * lineCount;
+			var lineHeight = EditorGUIUtility.singleLineHeight * lineCount + 3;
 			count = currentEntries.Count;
 			var scrollAreaHeight = Screen.height - spl.realSizes[1] - 44;
 			var contentHeight = count * lineHeight;
@@ -111,10 +116,17 @@ namespace Needle.Demystify
 			var contentSize = new Rect(0, 0, width, contentHeight);
 
 			// scroll to bottom if logs changed and it was at the bottom previously
-			if (wasAtBottom && logsCountChanged)
-				SetScroll(Mathf.Max(0, contentHeight - scrollAreaHeight));
-			else if (contentHeight < scrollAreaHeight)
-				SetScroll(scrollAreaHeight);
+			if (!shouldScrollToSelectedItem)
+			{
+				if (isAutoScrolling && logsAdded)
+				{
+					SetScroll(Mathf.Max(0, contentHeight - scrollAreaHeight));
+				}
+				else if (contentHeight < scrollAreaHeight)
+				{
+					SetScroll(scrollAreaHeight);
+				}
+			}
 			scroll = GUI.BeginScrollView(scrollArea, scroll, contentSize);
 
 			var position = new Rect(0, 0, width, lineHeight);
@@ -132,12 +144,6 @@ namespace Needle.Demystify
 			var collapsed = HasFlag(collapsedFlag);
 
 
-			void SelectRow(int index)
-			{
-				selectedRowIndex = index;
-				selectedText = currentEntries[index].entry.message;
-			}
-
 			try
 			{
 				LogEntries.StartGettingEntries();
@@ -149,7 +155,7 @@ namespace Needle.Demystify
 						{
 							var row = k;
 							var item = currentEntries[k];
-							var entryIsSelected = k == selectedRowIndex;
+							var entryIsSelected = selectedRowNumber == item.row;
 							var entry = item.entry;
 							element.row = item.row;
 							element.position = position;
@@ -226,6 +232,7 @@ namespace Needle.Demystify
 								if (position.Contains(Event.current.mousePosition))
 								{
 									var entry = currentEntries[k].entry;
+									isAutoScrolling = false;
 									SelectRow(k);
 									
 									if (previouslySelectedRow == selectedRowIndex)
@@ -264,6 +271,21 @@ namespace Needle.Demystify
 							}
 						}
 					}
+					
+					if (shouldScrollToSelectedItem && selectedRowNumber == currentEntries[k].row)
+					{
+						shouldScrollToSelectedItem = false;
+						// if (!IsVisible(position.y, scroll.y, contentHeight))
+						{
+							var scrollTo = position.y;
+							if (contentHeight > scrollAreaHeight)
+							{
+								scrollTo -= scrollAreaHeight * .5f - lineHeight;
+							}
+							SetScroll(scrollTo);
+							RequestRepaint();
+						}
+					}
 
 					position.y += lineHeight;
 					strRect.y += lineHeight;
@@ -273,13 +295,34 @@ namespace Needle.Demystify
 			{
 				LogEntries.EndGettingEntries();
 			}
-			
-			
+
+			if (Event.current.type == EventType.ScrollWheel)
+			{
+				isAutoScrolling = false;
+			}
 			
 			if (selectedRowIndex >= 0 && Event.current.type == EventType.KeyDown)
 			{
 				switch (Event.current.keyCode)
 				{
+					case KeyCode.Escape:
+						selectedRowIndex = -1;
+						selectedRowNumber = -1;
+						selectedText = null;
+						isAutoScrolling = false;
+						break;
+					
+					// auto-scroll
+					case KeyCode.B:
+						isAutoScrolling = true;
+						break;
+					
+					case KeyCode.F:
+						shouldScrollToSelectedItem = true;
+						isAutoScrolling = false;
+						RequestRepaint();
+						break;
+					
 					case KeyCode.PageDown:
 					case KeyCode.D:
 					case KeyCode.RightArrow:
@@ -373,10 +416,10 @@ namespace Needle.Demystify
 
 			GUI.EndScrollView();
 
-			if (Event.current.type == EventType.Repaint)
+			if (Event.current.type == EventType.Repaint && selectedRowIndex < 0)
 			{
 				var diffToBottom = (contentHeight - scrollAreaHeight) - scroll.y;
-				wasAtBottom = diffToBottom < 1 || contentHeight < scrollAreaHeight;
+				isAutoScrolling = diffToBottom <= (lineHeight * Mathf.Max(0, logCountDiff)) || contentHeight < scrollAreaHeight;
 			}
 
 			// Display active text (We want word wrapped text with a vertical scrollbar)
@@ -393,6 +436,29 @@ namespace Needle.Demystify
 			SplitterGUILayout.EndVerticalSplit();
 
 			return false;
+		}
+		
+		private static void SelectRow(int index)
+		{
+			if (index >= 0 && index < currentEntries.Count)
+			{
+				selectedRowIndex = index;
+				var i = currentEntries[index];
+				selectedRowNumber = i.row;
+				selectedText = i.entry.message;
+			}
+		}
+		
+		private static void SetScroll(float y)
+		{
+			var s = scroll;
+			s.y = y;
+			scroll = s;
+		}
+
+		private static bool IsVisible(float y, float scrollPos, float contentHeight)
+		{
+			return y >= scrollPos && y <= scrollPos + contentHeight;
 		}
 
 		private static void AddConfigMenuItems(GenericMenu menu)
