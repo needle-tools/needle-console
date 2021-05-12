@@ -6,6 +6,11 @@
 	internal static class StacktraceMarkerUtil
 	{
 		public const string Marker = "";
+
+		public static string RemoveDemystifyStacktraceMarker(this string str)
+		{
+			return str.Replace(Marker, "");
+		}
 		
 		public static void AddMarker(ref string stacktrace)
 		{

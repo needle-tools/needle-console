@@ -6,7 +6,7 @@ namespace Needle.Demystify
 	{
 		public static string SanitizeMenuItemText(this string txt)
 		{
-			return txt.Replace("/", "_");
+			return txt.Replace("/", "_");//.Replace("\n", "").Replace("\t", "");
 		}
 		
 		public static bool TryFindIndex<T>(this List<T> list, T el, out int index)

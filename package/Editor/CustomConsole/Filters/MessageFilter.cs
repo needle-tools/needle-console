@@ -29,7 +29,7 @@ namespace Needle.Demystify
 		{
 			var message = clickedLog.message;
 			message = message.Substring(0, Mathf.Min(message.Length, MaxLenght));
-			var text = "Message \"" + message.SanitizeMenuItemText() + "\"";
+			var text = "Message \"" + message.SanitizeMenuItemText().RemoveDemystifyStacktraceMarker() + "\"";
 			AddContextMenuItem_Hide(menu, HideMenuItemPrefix + text, message);
 			AddContextMenuItem_Solo(menu, SoloMenuItemPrefix + text, message);
 		}

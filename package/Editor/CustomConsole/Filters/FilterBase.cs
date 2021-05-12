@@ -295,7 +295,7 @@ namespace Needle.Demystify
 						// var ex = EditorGUILayout.ToggleLeft(new GUIContent(label, file.ToString()), isActive);
 						// SetActiveAtIndex(index, ex);
 
-						var eye = new GUIContent(isActive ? Textures.EyeClosed : Textures.EyeOpen);
+						var eye = new GUIContent(isActive ? Textures.EyeClosed : Textures.EyeOpen, "Toggle active");
 						// eye.text = " 0";
 						using (new GUIColorScope(!ConsoleFilter.HasAnyFilterSolo ? Color.white : ConsoleFilterExtensions.DisabledColor))
 						{
@@ -310,7 +310,7 @@ namespace Needle.Demystify
 
 						using (new GUIColorScope(isSolo ? new Color(1, .5f, .5f) : GUI.color))
 						{
-							var res = GUILayout.Toggle(isSolo, new GUIContent(Textures.Solo), Styles.FilterToggleButton(), iconWidth);
+							var res = GUILayout.Toggle(isSolo, new GUIContent(Textures.Solo, "Toggle solo"), Styles.FilterToggleButton(), iconWidth);
 							if (res != isSolo)
 							{
 								SetSoloAtIndex(index, res);
@@ -331,7 +331,7 @@ namespace Needle.Demystify
 							}
 						}
 
-						if (GUILayout.Button(new GUIContent(Textures.Remove), Styles.FilterToggleButton(), iconWidth))
+						if (GUILayout.Button(new GUIContent(Textures.Remove, "Remove entry"), Styles.FilterToggleButton(), iconWidth))
 						{
 							Remove(index);
 							index -= 1;
