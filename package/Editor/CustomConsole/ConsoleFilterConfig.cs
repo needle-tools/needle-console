@@ -14,19 +14,7 @@ namespace Needle.Demystify
 	{
 		private static readonly List<ConsoleFilterConfig> _allConfigs = new List<ConsoleFilterConfig>();
 
-		public static IReadOnlyList<ConsoleFilterConfig> AllConfigs
-		{
-			get
-			{
-				for (var index = _allConfigs.Count - 1; index >= 0; index--)
-				{
-					var c = _allConfigs[index];
-					if (!c) _allConfigs.RemoveAt(index);
-				}
-
-				return _allConfigs;
-			}
-		}
+		public static IReadOnlyList<ConsoleFilterConfig> AllConfigs => _allConfigs;
 
 		private static string LastSelectedPath
 		{
@@ -80,14 +68,14 @@ namespace Needle.Demystify
 
 		private void OnEnable()
 		{
+			if (!_allConfigs.Contains(this))
+				_allConfigs.Add(this);
+			
 			messageFilter = new MessageFilter(ref messages);
 			lineFilter = new LineFilter(ref lines);
 			fileFilter = new FileFilter(ref files);
 			idFilter = new ObjectIdFilter(ref ids);
 			packageFilter = new PackageFilter(ref packages);
-			
-			if (!_allConfigs.Contains(this))
-				_allConfigs.Add(this);
 
 			foreach (var f in EnumerateFilter())
 			{

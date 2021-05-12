@@ -408,13 +408,16 @@ namespace Needle.Demystify
 					});
 				}
 			}
-			// if(menu.GetItemCount() > 0 && ConsoleFilterConfig.AllConfigs.Count > 0)
 			// 	menu.AddSeparator("Configs/");
-			// menu.AddItem(new GUIContent("Configs/New"), false, () =>
-			// {
-			// 	var config = ConsoleFilterConfig.CreateAsset();
-			// 	if(config) config.Activate();
-			// });
+
+			if (ConsoleFilterConfig.AllConfigs.Count <= 0)
+			{
+				menu.AddItem(new GUIContent("New Filter List"), false, () =>
+				{
+					var config = ConsoleFilterConfig.CreateAsset();
+					if(config) config.Activate();
+				});
+			}
 		}
 	}
 }
