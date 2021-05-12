@@ -14,7 +14,7 @@ namespace Needle.Demystify
 		
 		public override string GetLabel(int index)
 		{
-			var msg = (string)this[index];
+			var msg = this[index];
 			var lbi = msg.IndexOf("\n", StringComparison.Ordinal);
 			if (lbi < 0) lbi = 50;
 			return msg.Substring(0, Mathf.Min(msg.Length, lbi));
@@ -25,12 +25,12 @@ namespace Needle.Demystify
 			return info.message.StartsWith(entry);
 		}
 
-		public override void AddLogEntryContextMenuItems(GenericMenu menu, LogEntryInfo clickedLog)
+		public override void AddLogEntryContextMenuItems(GenericMenu menu, LogEntryInfo clickedLog, string preview)
 		{
 			var message = clickedLog.message;
 			message = message.Substring(0, Mathf.Min(message.Length, MaxLenght));
-			var text = "Message \"" + message.Replace('/', '_') + "\"";
-			AddContextMenuItem_Hide(menu, ExcludeMenuItemPrefix + text, message);
+			var text = "Message \"" + message.SanitizeMenuItemText() + "\"";
+			AddContextMenuItem_Hide(menu, HideMenuItemPrefix + text, message);
 			AddContextMenuItem_Solo(menu, SoloMenuItemPrefix + text, message);
 		}
 	}

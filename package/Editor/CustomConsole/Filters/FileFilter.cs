@@ -24,7 +24,7 @@ namespace Needle.Demystify
 			return entry == info.file;
 		}
 
-		public override void AddLogEntryContextMenuItems(GenericMenu menu, LogEntryInfo clickedLog)
+		public override void AddLogEntryContextMenuItems(GenericMenu menu, LogEntryInfo clickedLog, string preview)
 		{
 			string fileName;
 			try
@@ -42,7 +42,7 @@ namespace Needle.Demystify
 			}
 
 			var text = "File " + fileName;
-			AddContextMenuItem_Hide(menu, ExcludeMenuItemPrefix + text, clickedLog.file);
+			AddContextMenuItem_Hide(menu, HideMenuItemPrefix + text, clickedLog.file);
 			AddContextMenuItem_Solo(menu, SoloMenuItemPrefix + text, clickedLog.file);
 		}
 	}

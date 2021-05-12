@@ -56,9 +56,11 @@ namespace Needle.Demystify
 		private FileFilter fileFilter;
 		private ObjectIdFilter idFilter;
 		private PackageFilter packageFilter;
+		private TimeFilter timeFilter;
 
 		public IEnumerable<IConsoleFilter> EnumerateFilter()
 		{
+			yield return timeFilter;
 			yield return messageFilter;
 			yield return lineFilter;
 			yield return fileFilter;
@@ -70,7 +72,8 @@ namespace Needle.Demystify
 		{
 			if (!_allConfigs.Contains(this))
 				_allConfigs.Add(this);
-			
+
+			timeFilter = new TimeFilter();
 			messageFilter = new MessageFilter(ref messages);
 			lineFilter = new LineFilter(ref lines);
 			fileFilter = new FileFilter(ref files);

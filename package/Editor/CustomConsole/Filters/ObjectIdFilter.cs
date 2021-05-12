@@ -30,13 +30,13 @@ namespace Needle.Demystify
 			return entry == info.instanceID;
 		}
 
-		public override void AddLogEntryContextMenuItems(GenericMenu menu, LogEntryInfo clickedLog)
+		public override void AddLogEntryContextMenuItems(GenericMenu menu, LogEntryInfo clickedLog, string preview)
 		{
 			if (clickedLog.instanceID == 0) return;
 			var obj = EditorUtility.InstanceIDToObject(clickedLog.instanceID);
 			if (!obj) return;
 			var text = "Instance " + obj.GetType().Name + " on " + obj.name;
-			AddContextMenuItem_Hide(menu, ExcludeMenuItemPrefix + text, clickedLog.instanceID);
+			AddContextMenuItem_Hide(menu, HideMenuItemPrefix + text, clickedLog.instanceID);
 			AddContextMenuItem_Solo(menu, SoloMenuItemPrefix + text, clickedLog.instanceID);
 		}
 	}

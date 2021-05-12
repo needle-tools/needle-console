@@ -34,14 +34,14 @@ namespace Needle.Demystify
 			return entry.line == info.line && entry.file == info.file;
 		}
 
-		public override void AddLogEntryContextMenuItems(GenericMenu menu, LogEntryInfo clickedLog)
+		public override void AddLogEntryContextMenuItems(GenericMenu menu, LogEntryInfo clickedLog, string preview)
 		{
 			if (string.IsNullOrEmpty(clickedLog.file)) return;
 			if (clickedLog.line <= 0) return;
 			var fileName = Path.GetFileName(clickedLog.file);
 			var fl = new FileLine {file = clickedLog.file, line = clickedLog.line};
 			var text = "Line " + fileName + ":" + clickedLog.line;
-			AddContextMenuItem_Hide(menu, ExcludeMenuItemPrefix + text, fl);
+			AddContextMenuItem_Hide(menu, HideMenuItemPrefix + text, fl);
 			AddContextMenuItem_Solo(menu, SoloMenuItemPrefix + text, fl);
 		}
 	}

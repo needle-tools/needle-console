@@ -106,13 +106,13 @@ namespace Needle.Demystify
 		}
 
 
-		public override void AddLogEntryContextMenuItems(GenericMenu menu, LogEntryInfo clickedLog)
+		public override void AddLogEntryContextMenuItems(GenericMenu menu, LogEntryInfo clickedLog, string preview)
 		{
 			if (TryGetPackage(clickedLog.file, out var pack))
 			{
 				var str = pack.name;
 				var text = "Package " + str;
-				AddContextMenuItem_Hide(menu, ExcludeMenuItemPrefix + text, str);
+				AddContextMenuItem_Hide(menu, HideMenuItemPrefix + text, str);
 				AddContextMenuItem_Solo(menu, SoloMenuItemPrefix + text, str);
 			}
 		}

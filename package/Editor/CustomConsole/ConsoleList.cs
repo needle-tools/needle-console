@@ -254,7 +254,7 @@ namespace Needle.Demystify
 									var menu = new GenericMenu();
 									if (ConsoleFilter.RegisteredFilter.Count > 0)
 									{
-										ConsoleFilter.AddMenuItems(menu, item.entry);
+										ConsoleFilter.AddMenuItems(menu, item.entry, item.str);
 									}
 									AddConfigMenuItems(menu);
 									menu.ShowAsContext();
@@ -339,7 +339,8 @@ namespace Needle.Demystify
 							var menu = new GenericMenu();
 							if (ConsoleFilter.RegisteredFilter.Count > 0)
 							{
-								ConsoleFilter.AddMenuItems(menu, currentEntries[selectedRowIndex].entry);
+								var info = currentEntries[selectedRowIndex];
+								ConsoleFilter.AddMenuItems(menu, info.entry, info.str);
 							}
 							AddConfigMenuItems(menu);
 							var rect = position;

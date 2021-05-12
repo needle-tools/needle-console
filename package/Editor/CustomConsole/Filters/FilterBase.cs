@@ -10,7 +10,7 @@ namespace Needle.Demystify
 	[Serializable]
 	public abstract class FilterBase<T> : IConsoleFilter
 	{
-		public const string ExcludeMenuItemPrefix = "Hide/";
+		public const string HideMenuItemPrefix = "Hide/";
 		public const string SoloMenuItemPrefix = "Solo/";
 		
 		private bool _isEnabled = true;
@@ -221,7 +221,7 @@ namespace Needle.Demystify
 
 		protected abstract bool MatchFilter(T entry, int index, string message, int mask, int row, LogEntryInfo info);
 
-		public abstract void AddLogEntryContextMenuItems(GenericMenu menu, LogEntryInfo clickedLog);
+		public abstract void AddLogEntryContextMenuItems(GenericMenu menu, LogEntryInfo clickedLog, string preview);
 
 		
 		protected virtual void OnChanged()

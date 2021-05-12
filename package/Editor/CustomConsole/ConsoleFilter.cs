@@ -45,7 +45,7 @@ namespace Needle.Demystify
 		bool HasAnySolo();
 		void BeforeFilter();
 		FilterResult Filter(string message, int mask, int row, LogEntryInfo info);
-		void AddLogEntryContextMenuItems(GenericMenu menu, LogEntryInfo clickedLog);
+		void AddLogEntryContextMenuItems(GenericMenu menu, LogEntryInfo clickedLog, string preview);
 		void OnGUI();
 		int Count { get; }
 		event Action<IConsoleFilter> WillChange, HasChanged;
@@ -170,10 +170,10 @@ namespace Needle.Demystify
 		
 		public static Stats Global { get; private set; }
 
-		internal static void AddMenuItems(GenericMenu menu, LogEntryInfo clickedLog)
+		internal static void AddMenuItems(GenericMenu menu, LogEntryInfo clickedLog, string preview)
 		{
 			foreach (var fil in registeredFilters)
-				fil.AddLogEntryContextMenuItems(menu, clickedLog);
+				fil.AddLogEntryContextMenuItems(menu, clickedLog, preview);
 		}
 
 		private static int _prevCount, _lastFlags;

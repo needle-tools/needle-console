@@ -4,6 +4,11 @@ namespace Needle.Demystify
 {
 	internal static class Utils
 	{
+		public static string SanitizeMenuItemText(this string txt)
+		{
+			return txt.Replace("/", "_");
+		}
+		
 		public static bool TryFindIndex<T>(this List<T> list, T el, out int index)
 		{
 			for (var i = 0; i < list.Count; i++)
