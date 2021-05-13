@@ -53,7 +53,7 @@ namespace Needle.Demystify
 #if UNITY_2020_2_OR_NEWER
 			var splitRealSizes = (float[]) SplitterRelativeSizes.GetValue(splitState);
 #else
-			var splitRealSizes = (int[]) SplitterRealSizes.GetValue(splitState);
+			var splitRealSizes = (int[]) SplitterRelativeSizes.GetValue(splitState);
 #endif
 
 			var stackViewSize = splitRealSizes[1] * rect.height;
