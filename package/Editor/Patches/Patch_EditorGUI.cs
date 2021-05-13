@@ -38,6 +38,14 @@ namespace Needle.Demystify
 			
 			if (!Patch_Console.IsDrawingConsole && style.name != "CN Message") return;
 			if (!Patch_Console.ConsoleWindow) return;
+			
+			if (Event.current.type == EventType.KeyDown && Event.current.keyCode == settings.CodePreviewKeyCode)
+			{
+				lastTimeFoundKey = DateTime.Now.TimeOfDay.TotalSeconds;
+				EditorUtility.SetDirty(Patch_Console.ConsoleWindow);
+				Patch_Console.ConsoleWindow.Repaint();
+			}
+			
 			var evt = Event.current;
 			var mouse = evt.mousePosition;
 			if (!position.Contains(mouse))
