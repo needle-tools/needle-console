@@ -4,6 +4,7 @@ using System.Reflection;
 using System.Text.RegularExpressions;
 using HarmonyLib;
 using UnityEditor;
+using UnityEditor.ShortcutManagement;
 using UnityEngine;
 
 namespace Needle.Demystify
@@ -11,7 +12,7 @@ namespace Needle.Demystify
 	/// <summary>
 	/// patch that adds code preview support to console
 	/// </summary>
-	public class Patch_EditorGUI : PatchBase
+	public class Patch_CodePreview : PatchBase
 	{
 		protected override IEnumerable<MethodBase> GetPatches()
 		{
