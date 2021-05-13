@@ -59,6 +59,27 @@ namespace Needle.Demystify
 					{
 						inst.labels.Add(skipLabel);
 					}
+					
+					// this is before "GUILayout.FlexibleSpace"
+					// https://github.com/Unity-Technologies/UnityCsReference/blob/61f92bd79ae862c4465d35270f9d1d57befd1761/Editor/Mono/ConsoleWindow.cs#L539
+#if UNITY_2021_1_OR_NEWER
+					if (index == 172)
+#else
+					if (index == 189)
+#endif
+					{
+						yield return CodeInstruction.Call(typeof(ConsoleToolbarFoldout), nameof(ConsoleToolbarFoldout.OnDrawFoldouts));
+					}
+					
+					// this is before "EndHorizontal"
+#if UNITY_2021_1_OR_NEWER
+					if (index == 329)
+#else
+					if (index == 317)
+#endif
+					{
+						yield return CodeInstruction.Call(typeof(ConsoleToolbarIcon), nameof(ConsoleToolbarIcon.OnDrawToolbar));
+					}
 
 					// TODO: properly search for the right spots
 					// this is right before  SplitterGUILayout.BeginVerticalSplit(spl);
@@ -71,25 +92,6 @@ namespace Needle.Demystify
 						yield return new CodeInstruction(OpCodes.Ldarg_0);
 						yield return CodeInstruction.Call(typeof(ConsoleList), nameof(ConsoleList.OnDrawList));
 						yield return new CodeInstruction(OpCodes.Brfalse, skipLabel);
-					}
-					// this is before "EndHorizontal"
-#if UNITY_2021_1_OR_NEWER
-					if (index == 329)
-#else
-					if (index == 317)
-#endif
-					{
-						yield return CodeInstruction.Call(typeof(ConsoleToolbarIcon), nameof(ConsoleToolbarIcon.OnDrawToolbar));
-					}
-					// this is before "GUILayout.FlexibleSpace"
-					// https://github.com/Unity-Technologies/UnityCsReference/blob/61f92bd79ae862c4465d35270f9d1d57befd1761/Editor/Mono/ConsoleWindow.cs#L539
-#if UNITY_2021_1_OR_NEWER
-					if (index == 219)
-#else
-					if (index == 209)
-#endif
-					{
-						yield return CodeInstruction.Call(typeof(ConsoleToolbarFoldout), nameof(ConsoleToolbarFoldout.OnDrawFoldouts));
 					}
 					
 					yield return inst;
