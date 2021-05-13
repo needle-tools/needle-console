@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Reflection;
 using HarmonyLib;
+using Debug = UnityEngine.Debug;
 
 namespace Needle.Demystify
 {
@@ -24,12 +25,18 @@ namespace Needle.Demystify
 		{
 			if (__instance is Exception ex)
 			{
-				__result = ex.ToStringDemystified();
-				Hyperlinks.FixStacktrace(ref __result);
-				StacktraceMarkerUtil.AddMarker(ref __result);
+				try
+				{
+					__result = ex.ToStringDemystified();
+					Hyperlinks.FixStacktrace(ref __result);
+					StacktraceMarkerUtil.AddMarker(ref __result);
+				}
+				catch (TypeLoadException tl)
+				{
+					if (DemystifySettings.DevelopmentMode)
+						Debug.LogException(tl);
+				}
 			}
-			
-			
 		}
 	}
 }
