@@ -7,8 +7,9 @@ using UnityEngine;
 
 namespace Needle.Demystify
 {
-	public class Patch_Console
+	internal class Patch_Console
 	{
+		
 		internal static bool IsDrawingConsole { get; private set; }
 		private static Type _consoleWindowType;
 
@@ -80,6 +81,7 @@ namespace Needle.Demystify
 			private static void Prefix()
 			{
 				IsDrawingConsole = true;
+
 			}
 
 			private static void Postfix()
@@ -111,17 +113,15 @@ namespace Needle.Demystify
 							ConsoleWindow.Repaint();
 					}
 				}
-
-				;
 			}
 
 			private static bool Prefix(ref string stacktraceText)
 			{
-				var prev = GUI.color;
-				const float brightness = .4f;
-				GUI.color = new Color(brightness, brightness, brightness);
-				GUI.DrawTexture(new Rect(0,0,10000,1), Texture2D.whiteTexture);
-				GUI.color = prev;
+				if (DemystifySettings.instance.CustomList == false)
+				{
+					var r = GetStackScrollViewRect();
+					SeparatorLine.Draw(r.y);
+				}
 				
 				var textChanged = lastText != stacktraceText;
 				if (textChanged)

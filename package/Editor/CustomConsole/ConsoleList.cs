@@ -19,9 +19,10 @@ namespace Needle.Demystify
 			get => SessionState.GetVector3("ConsoleList-Scroll", Vector3.zero);
 			set => SessionState.SetVector3("ConsoleList-Scroll", value);
 		}
+		
 		private static Vector2 scrollStacktrace;
 		private static readonly List<CachedConsoleInfo> currentEntries = new List<CachedConsoleInfo>();
-		private static SplitterState spl = SplitterState.FromRelative(new float[] {70, 30}, new float[] {32, 32}, null); 
+		private static readonly SplitterState spl = SplitterState.FromRelative(new float[] {70, 30}, new float[] {32, 32}, null); 
 
 		private static int selectedRowIndex = -1, previouslySelectedRow = -2, rowDoubleClicked = -1;
 		private static int selectedRowNumber = -1;
@@ -425,6 +426,7 @@ namespace Needle.Demystify
 			// Display active text (We want word wrapped text with a vertical scrollbar)
 			GUILayout.Space(scrollAreaHeight + 2);
 			scrollStacktrace = GUILayout.BeginScrollView(scrollStacktrace, ConsoleWindow.Constants.Box);
+			SeparatorLine.Draw(scrollStacktrace.y);
 
 			var stackWithHyperlinks = ConsoleWindow.StacktraceWithHyperlinks(selectedText ?? string.Empty);
 			var height = ConsoleWindow.Constants.MessageStyle.CalcHeight(GUIContent.Temp(stackWithHyperlinks), position.width);
