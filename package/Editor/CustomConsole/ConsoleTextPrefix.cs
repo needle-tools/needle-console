@@ -9,7 +9,7 @@ using UnityEngine;
 
 namespace Needle.Demystify
 {
-	internal static class ConsolePreviewText
+	internal static class ConsoleTextPrefix
 	{
 		[InitializeOnLoadMethod]
 		private static void Init()
@@ -65,6 +65,22 @@ namespace Needle.Demystify
 							if (group.Success)
 							{
 								methodName = group.Value.Trim();
+								
+								// nicify local function names
+								const string localPrefix = "g__";
+								var localStart = methodName.IndexOf(localPrefix, StringComparison.InvariantCulture);
+								if (localStart > 0)
+								{
+									var sub = methodName.Substring(localStart+localPrefix.Length);
+									var localEnd = sub.IndexOf("|", StringComparison.InvariantCulture);
+									if (localEnd > 0)
+									{
+										sub = sub.Substring(0, localEnd);
+										if(!string.IsNullOrEmpty(sub))
+											methodName = sub;
+									}
+								}
+								
 								return true;
 							}
 						}

@@ -206,7 +206,7 @@ namespace Needle.Demystify
 							// draw text
 							var preview = item.str; // + " - " + item.entry.mode;
 							strRect.x = xOffset;
-							ConsolePreviewText.ModifyText(element, ref preview);
+							ConsoleTextPrefix.ModifyText(element, ref preview);
 							// preview += item.entry.instanceID;
 							GUI.Label(strRect, preview, logStyle);
 
