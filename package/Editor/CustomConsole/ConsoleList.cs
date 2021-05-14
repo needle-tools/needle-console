@@ -469,37 +469,30 @@ namespace Needle.Demystify
 			// menu.AddItem(content, ConsoleFilter.enabled, () => ConsoleFilter.enabled = !ConsoleFilter.enabled);
 			// menu.AddSeparator(string.Empty);
 
-			// if (ConsoleFilter.RegisteredFilter.Count <= 0)
-			{
-				if (menu.GetItemCount() > 0)
-					menu.AddSeparator(string.Empty);
-				
-				foreach (var config in ConsoleFilterPreset.AllConfigs)
-				{
-					menu.AddItem(new GUIContent("Configs/" + config.name), false, () =>
-					{
-						// if (config.IsActive)
-						// {
-						// 	config.Deactivate();
-						// }
-						// else
-						{
-							ConsoleFilter.enabled = true;
-							config.Apply();
-						}
-					});
-				}
-			}
+			// if (ConsoleFilterPreset.AllConfigs.Count > 0)
+			// {
+			// 	if (menu.GetItemCount() > 0)
+			// 		menu.AddSeparator(string.Empty);
+			// 	
+			// 	foreach (var config in ConsoleFilterPreset.AllConfigs)
+			// 	{
+			// 		menu.AddItem(new GUIContent("Presets/Apply " + config.name), false, () =>
+			// 		{
+			// 			ConsoleFilter.enabled = true;
+			// 			config.Apply();
+			// 		});
+			// 	}
+			// }
 			// 	menu.AddSeparator("Configs/");
 
-			if (ConsoleFilterPreset.AllConfigs.Count <= 0)
-			{
-				menu.AddItem(new GUIContent("New Filter List"), false, () =>
-				{
-					var config = ConsoleFilterPreset.CreateAsset();
-					if(config) config.Apply();
-				});
-			}
+			// if (ConsoleFilterPreset.AllConfigs.Count <= 0)
+			// {
+			// 	menu.AddItem(new GUIContent("New Preset"), false, () =>
+			// 	{
+			// 		var config = ConsoleFilterPreset.CreateAsset();
+			// 		if(config) config.Apply();
+			// 	});
+			// }
 		}
 	}
 }
