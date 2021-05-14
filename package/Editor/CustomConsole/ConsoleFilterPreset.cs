@@ -9,12 +9,23 @@ using UnityEngine;
 
 namespace Needle.Demystify
 {
-	[CreateAssetMenu(fileName = nameof(ConsoleFilterConfig), menuName = "Demystify/Console Filter")]
-	public class ConsoleFilterConfig : ScriptableObject
+	[CreateAssetMenu(fileName = nameof(ConsoleFilterPreset), menuName = "Demystify/" + nameof(ConsoleFilterPreset))]
+	public class ConsoleFilterPreset : ScriptableObject
 	{
-		private static readonly List<ConsoleFilterConfig> _allConfigs = new List<ConsoleFilterConfig>();
+		private static readonly List<ConsoleFilterPreset> _allConfigs = new List<ConsoleFilterPreset>();
 
-		public static IReadOnlyList<ConsoleFilterConfig> AllConfigs => _allConfigs;
+		public static IReadOnlyList<ConsoleFilterPreset> AllConfigs
+		{
+			get
+			{
+				// because OnDestroy is not called when item is deleted in ProjectView we need to double check if an item in this list still exists
+				for (var i = _allConfigs.Count - 1; i >= 0; i--)
+				{
+					if (!_allConfigs[i]) _allConfigs.RemoveAt(i);
+				}
+				return _allConfigs;
+			}
+		}
 
 		private static string LastSelectedPath
 		{
@@ -22,7 +33,7 @@ namespace Needle.Demystify
 			set => EditorPrefs.SetString("ConsoleFilterConfigLastPath", value);
 		}
 
-		public static ConsoleFilterConfig CreateAsset()
+		public static ConsoleFilterPreset CreateAsset()
 		{
 			var dir = LastSelectedPath;
 			if (!Directory.Exists(dir) || !dir.StartsWith(Application.dataPath.Replace("\\", "/"))) dir = Application.dataPath;
@@ -37,21 +48,19 @@ namespace Needle.Demystify
 
 			LastSelectedPath = Path.GetDirectoryName(path);
 			path = path.Substring(validPath.Length);
-			var inst = CreateInstance<ConsoleFilterConfig>();
+			var inst = CreateInstance<ConsoleFilterPreset>();
 			AssetDatabase.CreateAsset(inst, path);
 			return inst;
 		}
-
-		public bool IsActive => DemystifySettings.instance.ActiveConsoleFilterConfig == this;
-
+		
 		[SerializeField]
-		private List<FilterBase<string>.FilterEntry> messages, files, packages;
+		public List<FilterBase<string>.FilterEntry> messages, files, packages;
 		[SerializeField]
-		private List<FilterBase<int>.FilterEntry> ids;
+		public List<FilterBase<int>.FilterEntry> ids;
 		[SerializeField]
-		private List<FilterBase<FileLine>.FilterEntry> lines;
+		public List<FilterBase<FileLine>.FilterEntry> lines;
 		[SerializeField]
-		private List<FilterBase<LogTime>.FilterEntry> times;
+		public List<FilterBase<LogTime>.FilterEntry> times;
 
 
 		private MessageFilter messageFilter;
@@ -87,9 +96,6 @@ namespace Needle.Demystify
 				f.WillChange += OnFilterWillChange;
 				f.HasChanged += OnFilterChanged;
 			}
-
-			if (DemystifySettings.instance.ActiveConsoleFilterConfig == this)
-				Activate();
 		}
 
 		private void OnDisable()
@@ -103,8 +109,6 @@ namespace Needle.Demystify
 
 		private void OnDestroy()
 		{
-			if (DemystifySettings.instance.ActiveConsoleFilterConfig == this)
-				Deactivate();
 			_allConfigs.Remove(this);
 		}
 		
@@ -118,47 +122,23 @@ namespace Needle.Demystify
 			EditorUtility.SetDirty(this);
 		}
 
-		[ContextMenu(nameof(Activate))]
-		public void Activate()
+		[ContextMenu(nameof(Apply))]
+		public void Apply()
 		{
-			DemystifySettings.instance.ActiveConsoleFilterConfig = this;
-			ConsoleFilter.RemoveAllFilter();
-			foreach (var f in EnumerateFilter())
-				ConsoleFilter.AddFilter(f);
+			var settings = ConsoleFilterUserSettings.instance;
+			settings.ApplyPreset(this);
 		}
 
-
-		[ContextMenu(nameof(Deactivate))]
-		public void Deactivate()
-		{
-			if (DemystifySettings.instance.ActiveConsoleFilterConfig == this)
-			{
-				Debug.Log("Deactivate"); 
-				DemystifySettings.instance.ActiveConsoleFilterConfig = null;
-				ConsoleFilter.RemoveAllFilter();
-			}
-		}
-
-		[CustomEditor(typeof(ConsoleFilterConfig))]
+		[CustomEditor(typeof(ConsoleFilterPreset))]
 		private class ConsoleFilterEditor : Editor
 		{
 			public override void OnInspectorGUI()
 			{
-				var t = (ConsoleFilterConfig) target;
+				var t = (ConsoleFilterPreset) target;
 
-				if (t.IsActive)
+				if (GUILayout.Button(nameof(Apply), GUILayout.Height(30)))
 				{
-					if (GUILayout.Button("Deactivate", GUILayout.Height(30)))
-					{
-						t.Deactivate();
-					}
-				}
-				else
-				{
-					if (GUILayout.Button("Activate", GUILayout.Height(30)))
-					{
-						t.Activate();
-					}
+					t.Apply();
 				}
 
 				GUILayout.Space(10);

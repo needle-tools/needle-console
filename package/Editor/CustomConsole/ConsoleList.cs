@@ -474,30 +474,30 @@ namespace Needle.Demystify
 				if (menu.GetItemCount() > 0)
 					menu.AddSeparator(string.Empty);
 				
-				foreach (var config in ConsoleFilterConfig.AllConfigs)
+				foreach (var config in ConsoleFilterPreset.AllConfigs)
 				{
-					menu.AddItem(new GUIContent("Configs/" + config.name), config.IsActive, () =>
+					menu.AddItem(new GUIContent("Configs/" + config.name), false, () =>
 					{
-						if (config.IsActive)
-						{
-							config.Deactivate();
-						}
-						else
+						// if (config.IsActive)
+						// {
+						// 	config.Deactivate();
+						// }
+						// else
 						{
 							ConsoleFilter.enabled = true;
-							config.Activate();
+							config.Apply();
 						}
 					});
 				}
 			}
 			// 	menu.AddSeparator("Configs/");
 
-			if (ConsoleFilterConfig.AllConfigs.Count <= 0)
+			if (ConsoleFilterPreset.AllConfigs.Count <= 0)
 			{
 				menu.AddItem(new GUIContent("New Filter List"), false, () =>
 				{
-					var config = ConsoleFilterConfig.CreateAsset();
-					if(config) config.Activate();
+					var config = ConsoleFilterPreset.CreateAsset();
+					if(config) config.Apply();
 				});
 			}
 		}

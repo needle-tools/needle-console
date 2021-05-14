@@ -195,9 +195,11 @@ namespace Needle.Demystify
 
 		public FilterResult Filter(string message, int mask, int row, LogEntryInfo info)
 		{
-			var res = OnFilter(message, mask, row, info);
+			var res = OnFilter(message, mask, row, info); 
 			if (res.result == FilterResult.Exclude && res.index >= 0)
 			{
+				// this can happen on undo
+				while (res.index >= excludedCountPerFilter.Count) excludedCountPerFilter.Add(0);
 				excludedCountPerFilter[res.index] += 1;
 			}
 			return res.result;

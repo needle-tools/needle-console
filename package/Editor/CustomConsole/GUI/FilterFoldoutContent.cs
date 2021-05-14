@@ -7,9 +7,9 @@ namespace Needle.Demystify
 	{
 		public override Vector2 GetWindowSize()
 		{
-			var enabled = DemystifySettings.instance.CustomList;
-			var noConfig = ConsoleFilterConfig.AllConfigs.Count <= 0;
-			if (noConfig && enabled) return new Vector2(150, EditorGUIUtility.singleLineHeight * 1.3f);
+			// var enabled = DemystifySettings.instance.CustomList;
+			// var noConfig = ConsoleFilterConfig.AllConfigs.Count <= 0;
+			// if (!enabled) return new Vector2(150, EditorGUIUtility.singleLineHeight * 1.3f);
 			return new Vector2(400, 300);
 		}
 
@@ -17,7 +17,7 @@ namespace Needle.Demystify
 
 		private bool configsFoldout
 		{
-			get => SessionState.GetBool("ConsoleFilterConfigListFoldout", true);
+			get => SessionState.GetBool("ConsoleFilterConfigListFoldout", false);
 			set => SessionState.SetBool("ConsoleFilterConfigListFoldout", value);
 		}
 
@@ -33,65 +33,75 @@ namespace Needle.Demystify
 				}
 			}
 
-			if (ConsoleFilterConfig.AllConfigs.Count <= 0)
-			{
-				if (enabled)
-				{
-					GUILayout.FlexibleSpace();
-					if (GUILayout.Button(new GUIContent("Create Filter Config",
-						"A filter config is used to store your settings for filtering console logs. Don't worry, logs are not deleted or anything, they will just not be shown when filtered and this is can be changed at any time")))
-					{
-						var config = ConsoleFilterConfig.CreateAsset();
-						if (config)
-							config.Activate();
-					}
-					GUILayout.FlexibleSpace();
-				}
-
-				return;
-			}
+			// if (ConsoleFilterConfig.AllConfigs.Count <= 0)
+			// {
+			// 	if (enabled)
+			// 	{
+			// 		GUILayout.FlexibleSpace();
+			// 		if (GUILayout.Button(new GUIContent("Create Filter Config",
+			// 			"A filter config is used to store your settings for filtering console logs. Don't worry, logs are not deleted or anything, they will just not be shown when filtered and this is can be changed at any time")))
+			// 		{
+			// 			var config = ConsoleFilterConfig.CreateAsset();
+			// 			if (config)
+			// 				config.Activate();
+			// 		}
+			// 		GUILayout.FlexibleSpace();
+			// 	}
+			//
+			// 	return;
+			// }
 
 			scroll = EditorGUILayout.BeginScrollView(scroll);
-
-			configsFoldout = EditorGUILayout.BeginFoldoutHeaderGroup(configsFoldout, "Filter Configs In Project", null, r =>
+			
+			if (ConsoleFilterPreset.AllConfigs.Count > 0)
 			{
-				var menu = new GenericMenu();
-				menu.AddItem(new GUIContent("New"), false, () => ConsoleFilterConfig.CreateAsset());
-				menu.DropDown(r);
-			});
-			if (configsFoldout)
-			{
-				EditorGUI.indentLevel++;
-				foreach (var config in ConsoleFilterConfig.AllConfigs)
+				configsFoldout = EditorGUILayout.BeginFoldoutHeaderGroup(configsFoldout, "Presets", null, r =>
 				{
-					// using (new GUILayout.HorizontalScope())
+					var menu = new GenericMenu();
+					menu.AddItem(new GUIContent("New"), false, () => ConsoleFilterPreset.CreateAsset());
+					menu.DropDown(r);
+				});
+				if (configsFoldout)
+				{
+					EditorGUI.indentLevel++;
+					foreach (var config in ConsoleFilterPreset.AllConfigs)
 					{
-						using (var activeState = new EditorGUI.ChangeCheckScope())
+						// using (new GUILayout.HorizontalScope())
 						{
-							var res = EditorGUILayout.ToggleLeft(config.name, config.IsActive);
-							if (activeState.changed)
+							Rect labelRect;
+							using (new GUILayout.HorizontalScope())
 							{
-								if (res) config.Activate();
-								else config.Deactivate();
+								GUILayout.Space(16);
+								GUILayout.Label(config.name);
+								labelRect = GUILayoutUtility.GetLastRect();
+								GUILayout.FlexibleSpace();
+								if (GUILayout.Button("From Preset"))
+								{
+									config.Apply();
+								}
+								if (GUILayout.Button("Save To"))
+								{
+									ConsoleFilterUserSettings.instance.SaveToPreset(config);
+								}
 							}
-						}
 
-						if (Event.current.type == EventType.MouseDown)
-						{
-							if (GUILayoutUtility.GetLastRect().Contains(Event.current.mousePosition))
+							if (Event.current.type == EventType.MouseDown)
 							{
-								if (Event.current.button == 0)
-									EditorGUIUtility.PingObject(config);
+								if (labelRect.Contains(Event.current.mousePosition))
+								{
+									if (Event.current.button == 0)
+										EditorGUIUtility.PingObject(config);
+								}
 							}
 						}
 					}
+					EditorGUI.indentLevel--;
+
 				}
 
-				EditorGUI.indentLevel--;
+				EditorGUILayout.EndFoldoutHeaderGroup();
 			}
-
-			EditorGUILayout.EndFoldoutHeaderGroup();
-
+			
 			Draw.FilterList(ConsoleFilter.RegisteredFilter);
 
 			EditorGUILayout.EndScrollView();

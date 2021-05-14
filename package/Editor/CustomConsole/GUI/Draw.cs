@@ -31,7 +31,7 @@ namespace Needle.Demystify
 
 			if (!any)
 			{
-				ConsoleFilterConfig.DrawHowToFilterHelpBox();
+				ConsoleFilterPreset.DrawHowToFilterHelpBox();
 			}
 		}
 	}
