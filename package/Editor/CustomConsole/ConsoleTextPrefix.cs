@@ -51,7 +51,7 @@ namespace Needle.Demystify
 						if (!line.Contains(".cs")) continue;
 						Match match;
 						using (new ProfilerMarker("Regex").Auto())
-							match = Regex.Match(line, @".*?(\.(?<type_name>.*?)){0,}[\.\:](?<method_name>.*?)\(.*\.cs(:\d{1,})?", RegexOptions.Compiled | RegexOptions.ExplicitCapture); 
+							match = Regex.Match(line, @".*?(\.(?<type_name>.+?)){1,}[\.\:](?<method_name>.+?)\(.+\.cs(:\d{1,})?", RegexOptions.Compiled | RegexOptions.ExplicitCapture); 
 						using (new ProfilerMarker("Handle Match").Auto())
 						{
 							// var match = matches[i];
