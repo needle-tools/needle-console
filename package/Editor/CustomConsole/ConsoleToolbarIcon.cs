@@ -19,9 +19,11 @@ namespace Needle.Demystify
 				filterIconDisabled = EditorGUIUtility.FindTexture("animationvisibilitytoggleon");
 			}
 
-			var text = " " + (ConsoleFilter.filteredCount >= 1000 ? "999+" : ConsoleFilter.filteredCount.ToString());
+			var text = " " + (ConsoleFilter.HiddenCount >= 1000 ? "999+" : ConsoleFilter.HiddenCount.ToString());
 			var icon = ConsoleFilter.enabled ? filterIcon : filterIconDisabled;
-			var tooltip = ConsoleFilter.filteredCount > 1 ? ConsoleFilter.filteredCount + " logs" : ConsoleFilter.filteredCount + " log";
+			var tooltip = ConsoleFilter.HiddenCount > 1 ? ConsoleFilter.HiddenCount + " logs" : ConsoleFilter.HiddenCount + " log";
+			if (ConsoleFilter.enabled) tooltip += " hidden";
+			else tooltip += " would be hidden";
 			var content = new GUIContent(text, icon, tooltip);
 			ConsoleFilter.enabled = !GUILayout.Toggle(!ConsoleFilter.enabled, content, ConsoleWindow.Constants.MiniButtonRight);
 			

@@ -17,8 +17,8 @@ namespace Needle.Demystify
 
 	public struct Stats
 	{
-		public int Excluded { get; private set; }
-			
+		public int Hidden { get; private set; }
+
 		internal void Add(FilterResult res)
 		{
 			switch (res)
@@ -26,19 +26,19 @@ namespace Needle.Demystify
 				case FilterResult.Keep:
 					break;
 				case FilterResult.Exclude:
-					Excluded += 1;
+					Hidden += 1;
 					break;
 				case FilterResult.Solo:
 					break;
 			}
 		}
-			
+
 		internal void Clear()
 		{
-			Excluded = 0;
+			Hidden = 0;
 		}
 	}
-	
+
 	public interface IConsoleFilter
 	{
 		bool Enabled { get; set; }
@@ -83,25 +83,23 @@ namespace Needle.Demystify
 		private static void Init()
 		{
 			var name = Undo.GetCurrentGroupName();
-			EditorApplication.update += () =>
-			{
-				name = Undo.GetCurrentGroupName();
-			};
+			EditorApplication.update += () => { name = Undo.GetCurrentGroupName(); };
 			Undo.undoRedoPerformed += () =>
 			{
-				if(name.EndsWith(UndoPostfix))
+				if (name.EndsWith(UndoPostfix))
 					MarkDirty();
 			};
 		}
 
 		public const string UndoPostfix = "(Console Filter)";
-		
+
 		public static void RegisterUndo(Object obj, string name)
 		{
 			Undo.RegisterCompleteObjectUndo(obj, $"{name} {UndoPostfix}");
 		}
 
-		internal static bool enabled {
+		internal static bool enabled
+		{
 			set
 			{
 				var _enabled = EditorPrefs.GetBool("ConsoleFilter_Enabled", true);
@@ -111,14 +109,17 @@ namespace Needle.Demystify
 			}
 			get => EditorPrefs.GetBool("ConsoleFilter_Enabled", true);
 		}
-		
+
 		private static bool isDirty = true;
 		private static readonly List<IConsoleFilter> registeredFilters = new List<IConsoleFilter>();
 		private static readonly List<Stats> registeredFiltersStats = new List<Stats>();
-		private static readonly Dictionary<(string preview, int instanceId), bool> cachedLogResultForMask = new Dictionary<(string preview, int instanceId), bool>();
+
+		private static readonly Dictionary<(string preview, int instanceId), bool> cachedLogResultForMask =
+			new Dictionary<(string preview, int instanceId), bool>();
+
 		private static readonly List<LogEntry> logEntries = new List<LogEntry>();
-		
-		internal static int filteredCount { get; private set; }
+
+		internal static int HiddenCount => Global.Hidden;
 
 		public static IReadOnlyList<IConsoleFilter> RegisteredFilter => registeredFilters;
 
@@ -146,7 +147,7 @@ namespace Needle.Demystify
 			var anyActive = registeredFilters.Any(r => r.Enabled);
 			registeredFilters.Clear();
 			registeredFiltersStats.Clear();
-			if(anyActive) MarkDirty();
+			if (anyActive) MarkDirty();
 		}
 
 		public static bool RemoveFilter(IConsoleFilter filter)
@@ -158,6 +159,7 @@ namespace Needle.Demystify
 				MarkDirty();
 				return true;
 			}
+
 			return false;
 		}
 
@@ -167,7 +169,7 @@ namespace Needle.Demystify
 				return registeredFiltersStats[i];
 			return new Stats();
 		}
-		
+
 		public static Stats Global { get; private set; }
 
 		internal static void AddMenuItems(GenericMenu menu, LogEntryInfo clickedLog, string preview)
@@ -186,6 +188,7 @@ namespace Needle.Demystify
 			{
 				return true;
 			}
+
 			return isDirty;
 		}
 
@@ -194,7 +197,6 @@ namespace Needle.Demystify
 			using (new ProfilerMarker("ConsoleFilter.HandleUpdate").Auto())
 			{
 				var start = _prevCount;
-
 				var cleared = count < _prevCount;
 				var flagsChanged = LogEntries.consoleFlags != _lastFlags;
 				if (isDirty || cleared || flagsChanged)
@@ -203,9 +205,9 @@ namespace Needle.Demystify
 					entries.Clear();
 					cachedLogResultForMask.Clear();
 					logEntries.Clear();
-					filteredCount = 0;
+					Global = new Stats();
 				}
-				
+
 				isDirty = false;
 				_prevCount = count;
 				_lastFlags = LogEntries.consoleFlags;
@@ -220,7 +222,7 @@ namespace Needle.Demystify
 					registeredFiltersStats[index] = stat;
 					registeredFilters[index].BeforeFilter();
 				}
-				Global = new Stats();
+
 
 				for (var i = start; i < count; i++)
 				{
@@ -238,7 +240,7 @@ namespace Needle.Demystify
 							logEntries.Add(entry);
 						}
 					}
-					
+
 					var mask = 0;
 					var preview = default(string);
 					using (new ProfilerMarker("GetLinesAndModeFromEntryInternal").Auto())
@@ -246,7 +248,8 @@ namespace Needle.Demystify
 						LogEntries.GetLinesAndModeFromEntryInternal(i, ConsoleWindow.Constants.LogStyleLineCount, ref mask, ref preview);
 					}
 
-					bool isCached = false, cacheRes = false;
+					bool isCached;
+					bool cacheRes;
 					using (new ProfilerMarker("Filter.GetCachedValue").Auto())
 					{
 						isCached = cachedLogResultForMask.TryGetValue((preview, entry.instanceID), out cacheRes);
@@ -257,63 +260,65 @@ namespace Needle.Demystify
 						using (new ProfilerMarker("Filter Skip From Cache").Auto())
 						{
 							if (cacheRes)
-								continue;
-						}
-					}
-					// else if(enabled)
-					{
-						LogEntryInfo info = new LogEntryInfo(entry);
-						var skip = false;
-						for (var index = 0; index < registeredFilters.Count; index++)
-						{
-							var filter = registeredFilters[index];
-							if (!filter.Enabled) continue;
-							using (new ProfilerMarker("Filter Exclude").Auto())
 							{
-								var res = filter.Filter(preview, mask, i, info);
-
-								void RegisterStat()
+								if (enabled)
 								{
-									var stats = registeredFiltersStats[index];
-									stats.Add(res);
-									registeredFiltersStats[index] = stats;
-									
-									var glob = Global;
-										glob.Add(res);
-										Global = glob;
-								}
-								
-								if (HasAnyFilterSolo)
-								{
-									skip = true;
-									if (res == FilterResult.Solo)
-									{
-										skip = false;
-										RegisterStat();
-										break;
-									}
-								}
-								else
-								{
-									if (res == FilterResult.Exclude)
-									{
-										filteredCount += 1;
-										skip = true;
-										RegisterStat();
-										break;
-									}
+									AddGlobalStat(FilterResult.Exclude);
+									continue;
 								}
 							}
 						}
-
-						var key = (preview, entry.instanceID);
-						if(!cachedLogResultForMask.ContainsKey(key))
-							cachedLogResultForMask.Add(key, skip);
-						if (enabled && skip) continue;
 					}
 
+					// else if(enabled)
+					LogEntryInfo info = new LogEntryInfo(entry);
+					var skip = false;
+					for (var index = 0; index < registeredFilters.Count; index++)
+					{
+						var filter = registeredFilters[index];
+						if (!filter.Enabled) continue;
+						using (new ProfilerMarker("Filter Exclude").Auto())
+						{
+							var res = filter.Filter(preview, mask, i, info);
 
-					// preview += " #" + i;
+							void AddResultToStat()
+							{
+								var stats = registeredFiltersStats[index];
+								stats.Add(res);
+								registeredFiltersStats[index] = stats;
+							}
+
+							if (HasAnyFilterSolo)
+							{
+								skip = true;
+								if (res == FilterResult.Solo)
+								{
+									skip = false;
+									AddResultToStat();
+									break;
+								}
+							}
+							else
+							{
+								if (res == FilterResult.Exclude)
+								{
+									skip = true;
+									AddResultToStat();
+									break;
+								}
+							}
+						}
+					}
+
+					if (skip)
+					{
+						AddGlobalStat(FilterResult.Exclude);
+					}
+
+					var key = (preview, entry.instanceID);
+					if (!cachedLogResultForMask.ContainsKey(key))
+						cachedLogResultForMask.Add(key, skip);
+					if (enabled && skip) continue;
 
 					entries.Add(new CachedConsoleInfo()
 					{
@@ -323,6 +328,13 @@ namespace Needle.Demystify
 					});
 				}
 			}
+		}
+
+		private static void AddGlobalStat(FilterResult fr)
+		{
+			var glob = Global;
+			glob.Add(fr);
+			Global = glob;
 		}
 	}
 }
