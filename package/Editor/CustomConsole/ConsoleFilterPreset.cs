@@ -1,10 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Security.Cryptography;
 using UnityEditor;
-using UnityEditor.Hardware;
 using UnityEngine;
 
 namespace Needle.Demystify
@@ -12,17 +9,34 @@ namespace Needle.Demystify
 	[CreateAssetMenu(fileName = nameof(ConsoleFilterPreset), menuName = "Demystify/" + nameof(ConsoleFilterPreset))]
 	public class ConsoleFilterPreset : ScriptableObject
 	{
+		#region Static API
 		private static readonly List<ConsoleFilterPreset> _allConfigs = new List<ConsoleFilterPreset>();
-
+		private static void Add(ConsoleFilterPreset p)
+		{
+			if (!_allConfigs.Contains(p)) _allConfigs.Add(p);
+		}
+		private static bool _didSearchAll;
 		public static IReadOnlyList<ConsoleFilterPreset> AllConfigs
 		{
 			get
 			{
+				if (!_didSearchAll)
+				{
+					_didSearchAll = true;
+					var guids = AssetDatabase.FindAssets("t:" + nameof(ConsoleFilterPreset));
+					foreach (var p in guids)
+					{
+						var instance = AssetDatabase.LoadAssetAtPath<ConsoleFilterPreset>(AssetDatabase.GUIDToAssetPath(p));
+						Add(instance);
+					}
+				}
+
 				// because OnDestroy is not called when item is deleted in ProjectView we need to double check if an item in this list still exists
 				for (var i = _allConfigs.Count - 1; i >= 0; i--)
 				{
 					if (!_allConfigs[i]) _allConfigs.RemoveAt(i);
 				}
+
 				return _allConfigs;
 			}
 		}
@@ -52,16 +66,12 @@ namespace Needle.Demystify
 			AssetDatabase.CreateAsset(inst, path);
 			return inst;
 		}
-		
-		[SerializeField]
-		public List<FilterBase<string>.FilterEntry> messages, files, packages;
-		[SerializeField]
-		public List<FilterBase<int>.FilterEntry> ids;
-		[SerializeField]
-		public List<FilterBase<FileLine>.FilterEntry> lines;
-		[SerializeField]
-		public List<FilterBase<LogTime>.FilterEntry> times;
+		#endregion
 
+		[SerializeField] public List<FilterBase<string>.FilterEntry> messages, files, packages;
+		[SerializeField] public List<FilterBase<int>.FilterEntry> ids;
+		[SerializeField] public List<FilterBase<FileLine>.FilterEntry> lines;
+		[SerializeField] public List<FilterBase<LogTime>.FilterEntry> times;
 
 		private MessageFilter messageFilter;
 		private LineFilter lineFilter;
@@ -69,7 +79,7 @@ namespace Needle.Demystify
 		private ObjectIdFilter idFilter;
 		private PackageFilter packageFilter;
 		private TimeFilter timeFilter;
-		public IEnumerable<IConsoleFilter> EnumerateFilter()
+		private IEnumerable<IConsoleFilter> EnumerateFilter()
 		{
 			yield return timeFilter;
 			yield return messageFilter;
@@ -111,7 +121,7 @@ namespace Needle.Demystify
 		{
 			_allConfigs.Remove(this);
 		}
-		
+
 		private void OnFilterWillChange(IConsoleFilter filter)
 		{
 			ConsoleFilter.RegisterUndo(this, filter.GetType().Name + " changed");
@@ -149,7 +159,9 @@ namespace Needle.Demystify
 
 		internal static void DrawHowToFilterHelpBox()
 		{
-			EditorGUILayout.HelpBox("You haven't selected any logs for filtering yet. Try right clicking a log in the console window. Select an option in the menu to start using console filters", MessageType.Info);
+			EditorGUILayout.HelpBox(
+				"You haven't selected any logs for filtering yet. Try right clicking a log in the console window. Select an option in the menu to start using console filters",
+				MessageType.Info);
 		}
 	}
 }

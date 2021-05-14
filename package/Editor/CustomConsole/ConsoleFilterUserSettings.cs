@@ -21,6 +21,7 @@ namespace Needle.Demystify
 			Apply(lines, preset.lines);
 			Apply(times, preset.times);
 			RecreateFilters();
+			Save(true);
 		}
 		
 		public void SaveToPreset(ConsoleFilterPreset preset)

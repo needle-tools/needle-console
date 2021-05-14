@@ -1,4 +1,5 @@
-﻿using UnityEditor;
+﻿using System.Linq;
+using UnityEditor;
 using UnityEngine;
 
 namespace Needle.Demystify
@@ -19,6 +20,11 @@ namespace Needle.Demystify
 		{
 			get => SessionState.GetBool("ConsoleFilterConfigListFoldout", false);
 			set => SessionState.SetBool("ConsoleFilterConfigListFoldout", value);
+		}
+
+		public override void OnOpen()
+		{
+			base.OnOpen();
 		}
 
 		public override void OnGUI(Rect rect)
@@ -52,7 +58,7 @@ namespace Needle.Demystify
 			// }
 
 			scroll = EditorGUILayout.BeginScrollView(scroll);
-			
+
 			if (ConsoleFilterPreset.AllConfigs.Count > 0)
 			{
 				configsFoldout = EditorGUILayout.BeginFoldoutHeaderGroup(configsFoldout, "Presets", null, r =>
