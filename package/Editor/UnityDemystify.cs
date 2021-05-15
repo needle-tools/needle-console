@@ -13,6 +13,8 @@ namespace Needle.Demystify
 		{
 			var settings = DemystifySettings.instance;
 			var projectSettings = DemystifyProjectSettings.instance;
+			var link = new GenericHyperlink("OpenDemystifySettings", "Edit/Preferences/Needle/Demystify",
+				() => SettingsService.OpenUserPreferences("Preferences/Needle/Demystify"));
 			if (projectSettings.FirstInstall)
 			{
 				async void InstalledLog()
@@ -21,8 +23,6 @@ namespace Needle.Demystify
 					Enable();
 					projectSettings.FirstInstall = false;
 					projectSettings.Save();
-					var link = new GenericHyperlink("OpenDemystifySettings", "Edit/Preferences/Needle/Demystify",
-						() => SettingsService.OpenUserPreferences("Preferences/Needle/Demystify"));
 					Debug.Log(
 						$"Thanks for installing Demystify. You can find Settings under {link}\n" +
 						$"If you discover issues please report them <a href=\"https://github.com/needle-tools/demystify/issues\">on github</a>\n" +
