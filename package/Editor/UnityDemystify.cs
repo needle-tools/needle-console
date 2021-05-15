@@ -21,7 +21,12 @@ namespace Needle.Demystify
 					Enable();
 					projectSettings.FirstInstall = false;
 					projectSettings.Save();
-					Debug.Log("Thanks for installing Demystify. You can find Settings under Edit/Preferences Needle/Demystify");
+					var link = new GenericHyperlink("OpenDemystifySettings", "Edit/Preferences/Needle/Demystify",
+						() => SettingsService.OpenUserPreferences("Preferences/Needle/Demystify"));
+					Debug.Log(
+						$"Thanks for installing Demystify. You can find Settings under {link}\n" +
+						$"If you discover issues please report them <a href=\"https://github.com/needle-tools/demystify/issues\">on github</a>\n" +
+						$"Also feel free to join <a href=\"https://discord.gg/CFZDp4b\">our discord</a>");
 				}
 
 				InstalledLog();
@@ -47,6 +52,7 @@ namespace Needle.Demystify
 		}
 
 		private static readonly StringBuilder builder = new StringBuilder();
+
 		public static void Apply(ref string stacktrace)
 		{
 			try
@@ -54,7 +60,7 @@ namespace Needle.Demystify
 				using (new ProfilerMarker("Demystify.Apply").Auto())
 				{
 					string[] lines = null;
-					using(new ProfilerMarker("Split Lines").Auto())
+					using (new ProfilerMarker("Split Lines").Auto())
 						lines = stacktrace.Split('\n');
 					var settings = DemystifySettings.instance;
 					var foundPrefix = false;
@@ -67,7 +73,7 @@ namespace Needle.Demystify
 							if (StacktraceMarkerUtil.IsPrefix(line))
 							{
 								StacktraceMarkerUtil.RemoveMarkers(ref line);
-								if(!string.IsNullOrEmpty(settings.Separator))
+								if (!string.IsNullOrEmpty(settings.Separator))
 									builder.AppendLine(settings.Separator);
 								foundPrefix = true;
 							}
@@ -81,7 +87,7 @@ namespace Needle.Demystify
 						{
 							if (!l.EndsWith("\n"))
 								builder.AppendLine(l);
-							else 
+							else
 								builder.Append(l);
 						}
 					}
@@ -91,6 +97,7 @@ namespace Needle.Demystify
 					{
 						stacktrace = res;
 					}
+
 					builder.Clear();
 				}
 			}
