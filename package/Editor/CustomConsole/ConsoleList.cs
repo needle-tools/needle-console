@@ -348,7 +348,7 @@ namespace Needle.Demystify
 			var stackWithHyperlinks = ConsoleWindow.StacktraceWithHyperlinks(selectedText ?? string.Empty);
 			var height = ConsoleWindow.Constants.MessageStyle.CalcHeight(GUIContent.Temp(stackWithHyperlinks), position.width);
 			EditorGUILayout.SelectableLabel(stackWithHyperlinks, ConsoleWindow.Constants.MessageStyle, GUILayout.ExpandWidth(true),
-				GUILayout.ExpandHeight(true), GUILayout.MinHeight(height + 10));
+				GUILayout.ExpandHeight(true), GUILayout.MinHeight(height + EditorGUIUtility.singleLineHeight*2));
 
 			GUILayout.EndScrollView();
 
