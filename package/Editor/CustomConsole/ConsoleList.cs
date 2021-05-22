@@ -401,6 +401,7 @@ namespace Needle.Demystify
 			if (collapsed || isGrouped)
 			{
 				var badgeRect = element.position;
+				badgeRect.height = lineHeight;
 				var entryCount = collapsed ? LogEntries.GetEntryCount(item.row) : 0;
 				entryCount += item.groupSize;
 				tempContent.text = entryCount.ToString(CultureInfo.InvariantCulture);

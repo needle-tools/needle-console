@@ -22,7 +22,7 @@ namespace Needle.Demystify
 				}
 
 				var custom = ConsoleList.CurrentEntries[index].groupSize > 0;
-				const int graphHeight = 40;
+				var graphHeight = rect.height;
 				var orig = rect;
 				if (custom)
 				{
@@ -64,10 +64,10 @@ namespace Needle.Demystify
 
 		private static void OnLogEntryContext(GenericMenu menu, int itemIndex)
 		{
-			if (itemIndex <= 0) return;
-			var item = ConsoleList.CurrentEntries[itemIndex];
-			Debug.Log(item.str);
-			menu.AddItem(new GUIContent(item.str.SanitizeMenuItemText()), false, () => { });
+			// if (itemIndex <= 0) return;
+			// var item = ConsoleList.CurrentEntries[itemIndex];
+			// Debug.Log(item.str);
+			// menu.AddItem(new GUIContent(item.str.SanitizeMenuItemText()), false, () => { });
 		}
 
 		private static void OnClear()
