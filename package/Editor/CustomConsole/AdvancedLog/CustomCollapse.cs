@@ -5,6 +5,7 @@ using Unity.Profiling;
 using UnityEditor;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
+using Random = UnityEngine.Random;
 
 namespace Needle.Demystify
 {
@@ -14,21 +15,43 @@ namespace Needle.Demystify
 		{
 			public bool OnDrawEntry(int index, bool isSelected, Rect rect, bool visible, out float height)
 			{
-				if (index % 3 == 0) rect.height *= 2;
+				if (!visible)
+				{
+					height = 0;
+					return false;
+				}
+				var custom = index % 3 == 0;
+				const int graphHeight = 40;
+				var orig = rect;
+				if (custom)
+				{
+					rect.height += graphHeight;
+				}
 				height = ConsoleList.DrawDefaultRow(index, rect);
-				
-				GUIUtils.SimpleColored.SetPass(0);
-				GL.PushMatrix();
-				GL.Begin(GL.LINES);
-				GL.Color(Color.red);
-				GL.Vertex3(0, rect.y + height, 0);
-				GL.Vertex3(rect.width, rect.y, 0);
-				GL.End();
-				GL.PopMatrix();
+
+				if (custom)
+				{
+					var graphRect = new Rect(rect.x, orig.y + orig.height, orig.width, graphHeight);
+					GUIUtils.SimpleColored.SetPass(0);
+					GL.PushMatrix();
+					GL.Begin(GL.LINE_STRIP);
+					for (int i = 0; i < 100; i++)
+					{
+						var t = i / 100f;
+						var x = t * graphRect.width;
+						var y = t + Random.value * .1f;
+						GL.Color(Color.Lerp(Color.green, Color.red, t));
+						GL.Vertex3(x, graphRect.y + graphRect.height - graphHeight * y, 0);
+					}
+
+					GL.End();
+					GL.PopMatrix();
+				}
+
 				return true;
 			}
 		}
-		
+
 		[InitializeOnLoadMethod]
 		private static void Init()
 		{
@@ -43,7 +66,7 @@ namespace Needle.Demystify
 			if (itemIndex <= 0) return;
 			var item = ConsoleList.CurrentEntries[itemIndex];
 			Debug.Log(item.str);
-			menu.AddItem(new GUIContent(item.str.SanitizeMenuItemText()), false, () =>{});
+			menu.AddItem(new GUIContent(item.str.SanitizeMenuItemText()), false, () => { });
 		}
 
 		private static void OnClear()
@@ -57,9 +80,8 @@ namespace Needle.Demystify
 
 		private class CollapseData
 		{
-			
 		}
-		
+
 		private static readonly StringBuilder builder = new StringBuilder();
 
 		// number matcher https://regex101.com/r/D0dFIj/1/
@@ -78,7 +100,7 @@ namespace Needle.Demystify
 				var text = preview;
 				const string marker = "<group>";
 				var start = text.IndexOf(marker, StringComparison.InvariantCulture);
-				if (start <= 0) return false;
+				if (start <= 0) return true;
 				const string timestampEnd = "] ";
 				var timestampIndex = text.IndexOf(timestampEnd, StringComparison.Ordinal);
 				var timestamp = string.Empty;
@@ -125,10 +147,6 @@ namespace Needle.Demystify
 				}
 
 				return false;
-				// if (match.Success)
-				// {
-				// }
-				// return false;
 			}
 		}
 	}

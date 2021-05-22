@@ -174,8 +174,6 @@ namespace Needle.Demystify
 			}
 
 			tempContent = new GUIContent();
-			var collapsed = IsCollapsed();
-
 			var evt = Event.current;
 			if (evt.type == EventType.Repaint || evt.type == EventType.MouseUp)
 			{
@@ -188,7 +186,8 @@ namespace Needle.Demystify
 
 					for (var k = 0; k < currentEntries.Count; k++)
 					{
-						var isVisible = position.y + position.height >= scroll.y && position.y <= scroll.y + scrollAreaHeight;
+						var isVisible = IsVisible(position);
+						bool IsVisible(Rect r) => r.y + r.height >= scroll.y && r.y <= scroll.y + scrollAreaHeight;
 
 						if (Event.current.type == EventType.Repaint)
 						{
@@ -223,6 +222,7 @@ namespace Needle.Demystify
 						}
 
 						var rect = currentEntriesRects[k];
+						isVisible = IsVisible(rect);
 						if (isVisible && Event.current.type == EventType.MouseUp)
 						{
 							if (Event.current.button == 0)
@@ -315,7 +315,7 @@ namespace Needle.Demystify
 				previouslySelectedRow = -1;
 			}
 
-			UnityEngine.GUI.EndScrollView();
+			GUI.EndScrollView();
 
 			if (Event.current.type == EventType.Repaint && selectedRowIndex < 0)
 			{
@@ -542,10 +542,10 @@ namespace Needle.Demystify
 			scroll = s;
 		}
 
-		private static bool IsVisible(float y, float scrollPos, float contentHeight)
-		{
-			return y >= scrollPos && y <= scrollPos + contentHeight;
-		}
+		// private static bool IsVisible(float y, float scrollPos, float contentHeight)
+		// {
+		// 	return y >= scrollPos && y <= scrollPos + contentHeight;
+		// }
 
 		private static void AddConfigMenuItems(GenericMenu menu, int itemIndex)
 		{
