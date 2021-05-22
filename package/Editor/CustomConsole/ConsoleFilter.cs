@@ -383,37 +383,38 @@ namespace Needle.Demystify
 				}
 
 
-				var match = noNumberMatcher.Match(text);
+				// var match = noNumberMatcher.Match(text);
 				text = text.Substring(start + marker.Length).TrimStart();
-				if (match.Success)
+				
+				builder.Clear();
+				var key = builder.Append(entry.file).Append("::").Append(entry.line).Append("::").ToString();
+				builder.Clear();
+				text = builder.Append(timestamp).Append(text).ToString();
+				var newEntry = new CachedConsoleInfo()
 				{
-					builder.Clear();
-					var key = builder.Append(entry.file).Append("::").Append(entry.line).Append("::").Append(match.Value).ToString();
-					builder.Clear();
-					text = builder.Append(timestamp).Append(text).ToString();
-					var newEntry = new CachedConsoleInfo()
-					{
-						entry = new LogEntryInfo(entry),
-						row = row,
-						str = text,
-						groupSize = 1
-					};
-					if (groupedLogs.TryGetValue(key, out var val))
-					{
-						var ex = entries[val];
-						newEntry.row = ex.row;
-						newEntry.groupSize = ex.groupSize + 1;
-						entries[val] = newEntry;
-					}
-					else
-					{
-						groupedLogs.Add(key, entries.Count);
-						entries.Add(newEntry);
-					}
-
-					return true;
+					entry = new LogEntryInfo(entry),
+					row = row,
+					str = text,
+					groupSize = 1
+				};
+				if (groupedLogs.TryGetValue(key, out var val))
+				{
+					var ex = entries[val];
+					newEntry.row = ex.row;
+					newEntry.groupSize = ex.groupSize + 1;
+					entries[val] = newEntry;
 				}
-				return false;
+				else
+				{
+					groupedLogs.Add(key, entries.Count);
+					entries.Add(newEntry);
+				}
+
+				return true;
+				// if (match.Success)
+				// {
+				// }
+				// return false;
 			}
 		}
 	}

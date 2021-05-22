@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using UnityEngine;
 
 public class PrintSomeValues : MonoBehaviour
@@ -8,6 +9,8 @@ public class PrintSomeValues : MonoBehaviour
 	public float TimeInterval;
 
 	private float lastTime = -10000;
+	private int index;
+	private string[] someStrings = new[] {"one", "two", "three"};
 	
 	private void Update()
 	{
@@ -19,5 +22,7 @@ public class PrintSomeValues : MonoBehaviour
 		Debug.Log("<group> Random Value: " + Random.value.ToString("0.00")); // + ", " + Random.insideUnitSphere);
 		Debug.Log("<group> Bit more complex: " + Random.value.ToString("0.00") + ", " + Random.insideUnitSphere);
 		Debug.Log("<group> Frame: " + Time.frameCount + ", " + Time.time + ", " + Random.rotation);
+		Debug.Log("<group> Group without value " + someStrings[index % someStrings.Length]);
+		index += 1;
 	}
 }
