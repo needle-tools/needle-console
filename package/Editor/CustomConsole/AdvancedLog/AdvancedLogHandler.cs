@@ -74,14 +74,12 @@ namespace Needle.Demystify
 			return 0;
 		}
 
-		
-		
-		
+
 		// number matcher https://regex101.com/r/D0dFIj/1/
 		// non number matcher https://regex101.com/r/VRXwpC/1/
 		// private static readonly Regex noNumberMatcher = new Regex(@"[^-\d.]+", RegexOptions.Compiled | RegexOptions.Multiline);
 
-		
+
 		private static readonly Dictionary<string, int> logs = new Dictionary<string, int>();
 		private static readonly StringBuilder builder = new StringBuilder();
 
@@ -97,21 +95,21 @@ namespace Needle.Demystify
 				var selected = selectedLogs[i];
 				if (!selected.Active) continue;
 				if (selected.Line == entry.line && selected.File == entry.file)
-				{var text = preview;
-					const string timestampEnd = "] ";
-					var timestampIndex = text.IndexOf(timestampEnd, StringComparison.Ordinal);
-					var timestamp = string.Empty;
-					if (timestampIndex > 0)
-					{
-						timestamp = text.Substring(0, timestampIndex + timestampEnd.Length);
-					}
+				{
+					var text = preview;
+					// const string timestampEnd = "] ";
+					// var timestampIndex = text.IndexOf(timestampEnd, StringComparison.Ordinal);
+					// var timestamp = string.Empty;
+					// if (timestampIndex > 0)
+					// {
+					// 	timestamp = text.Substring(0, timestampIndex + timestampEnd.Length);
+					// }
 
 					builder.Clear();
-					var key = builder.Append(entry.file).Append("::").Append(entry.line).Append("::").ToString();
+					var key = builder.Append(entry.file).Append("::").Append(entry.line).ToString();
 					builder.Clear();
 
-
-					text = builder.Append(timestamp).Append(text).ToString();
+					text = builder.Append(text).ToString();
 
 					entry.message += "\n" + UnityDemystify.DemystifyEndMarker;
 					var newEntry = new CachedConsoleInfo()

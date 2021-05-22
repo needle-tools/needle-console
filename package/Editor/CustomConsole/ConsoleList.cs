@@ -144,7 +144,7 @@ namespace Needle.Demystify
 			lineHeight = EditorGUIUtility.singleLineHeight * lineCount + 3;
 			count = currentEntries.Count;
 			var scrollAreaHeight = Screen.height - spl.realSizes[1] - 44;
-			
+
 			var contentHeight = count * lineHeight;
 			if (Event.current.type == EventType.Repaint)
 			{
@@ -155,12 +155,13 @@ namespace Needle.Demystify
 					foreach (var dr in customDrawers)
 					{
 						contentHeight += dr.GetContentHeight(lineHeight, currentEntries.Count, out var linesHandled);
-						linesDrawnDefault -= (int)linesHandled;
+						linesDrawnDefault -= (int) linesHandled;
 					}
+
 					contentHeight += lineHeight * Mathf.Max(0, linesDrawnDefault);
 				}
 			}
-			
+
 			var scrollArea = new Rect(0, yTop, Screen.width - 3, scrollAreaHeight);
 			var width = Screen.width - 3;
 			if (contentHeight > scrollArea.height)
@@ -343,7 +344,7 @@ namespace Needle.Demystify
 			GUILayout.Space(scrollAreaHeight);
 			scrollStacktrace = GUILayout.BeginScrollView(scrollStacktrace, ConsoleWindow.Constants.Box);
 			SeparatorLine.Draw(scrollStacktrace.y);
-			
+
 			var didDrawStacktrace = false;
 			var text = selectedText ?? string.Empty;
 			var stacktraceContentRect = new Rect(0, scrollAreaHeight, width, Screen.height - scrollAreaHeight);
@@ -360,7 +361,7 @@ namespace Needle.Demystify
 					}
 				}
 			}
-			catch(Exception e)
+			catch (Exception e)
 			{
 				Debug.LogException(e);
 			}
@@ -384,9 +385,10 @@ namespace Needle.Demystify
 					GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true),
 					GUILayout.MinHeight(height + EditorGUIUtility.singleLineHeight * 2));
 			}
-			catch (ArgumentException ex)
+			catch 
+				// (ArgumentException ex)
 			{
-				Debug.LogException(ex);
+				// Debug.LogException(ex);
 			}
 		}
 
@@ -456,6 +458,8 @@ namespace Needle.Demystify
 				badgeRect.height = lineHeight;
 				var entryCount = collapsed ? LogEntries.GetEntryCount(item.row) : 0;
 				entryCount += item.groupSize;
+				// if (collapsed && item.groupSize > 0) entryCount -= 1;
+				
 				tempContent.text = entryCount.ToString(CultureInfo.InvariantCulture);
 				var badgeSize = ConsoleWindow.Constants.CountBadge.CalcSize(tempContent);
 				if (ConsoleWindow.Constants.CountBadge.fixedHeight > 0)
