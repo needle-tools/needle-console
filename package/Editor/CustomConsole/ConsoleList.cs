@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using UnityEditor;
 using UnityEngine;
@@ -143,7 +144,23 @@ namespace Needle.Demystify
 			lineHeight = EditorGUIUtility.singleLineHeight * lineCount + 3;
 			count = currentEntries.Count;
 			var scrollAreaHeight = Screen.height - spl.realSizes[1] - 44;
+			
 			var contentHeight = count * lineHeight;
+			if (Event.current.type == EventType.Repaint)
+			{
+				if (customDrawers.Any())
+				{
+					contentHeight = 0;
+					var linesDrawnDefault = currentEntries.Count;
+					foreach (var dr in customDrawers)
+					{
+						contentHeight += dr.GetContentHeight(lineHeight, currentEntries.Count, out var linesHandled);
+						linesDrawnDefault -= (int)linesHandled;
+					}
+					contentHeight += lineHeight * Mathf.Max(0, linesDrawnDefault);
+				}
+			}
+			
 			var scrollArea = new Rect(0, yTop, Screen.width - 3, scrollAreaHeight);
 			var width = Screen.width - 3;
 			if (contentHeight > scrollArea.height)
@@ -159,9 +176,10 @@ namespace Needle.Demystify
 				}
 				else if (contentHeight < scrollAreaHeight)
 				{
-					SetScroll(scrollAreaHeight);
+					SetScroll(0);
 				}
 			}
+
 
 			scroll = GUI.BeginScrollView(scrollArea, scroll, contentSize);
 
@@ -326,16 +344,42 @@ namespace Needle.Demystify
 			scrollStacktrace = GUILayout.BeginScrollView(scrollStacktrace, ConsoleWindow.Constants.Box);
 			SeparatorLine.Draw(scrollStacktrace.y);
 
-			var stackWithHyperlinks = ConsoleWindow.StacktraceWithHyperlinks(selectedText ?? string.Empty);
-			var height = ConsoleWindow.Constants.MessageStyle.CalcHeight(GUIContent.Temp(stackWithHyperlinks), position.width);
-			EditorGUILayout.SelectableLabel(stackWithHyperlinks, ConsoleWindow.Constants.MessageStyle, GUILayout.ExpandWidth(true),
-				GUILayout.ExpandHeight(true), GUILayout.MinHeight(height + EditorGUIUtility.singleLineHeight * 2));
+			var didDrawStacktrace = false;
+			var text = selectedText ?? string.Empty;
+			try
+			{
+				foreach (var drawer in customDrawers)
+				{
+					if (drawer.OnDrawStacktrace(selectedRowIndex, text))
+					{
+						didDrawStacktrace = true;
+						break;
+					}
+				}
+			}
+			catch
+			{
+				// ignored
+			}
+
+			if (!didDrawStacktrace)
+			{
+				DrawDefaultStacktrace(text, position.width);
+			}
 
 			GUILayout.EndScrollView();
-
 			SplitterGUILayout.EndVerticalSplit();
-
 			return false;
+		}
+
+		internal static void DrawDefaultStacktrace(string text, float width)
+		{
+			var stackWithHyperlinks = ConsoleWindow.StacktraceWithHyperlinks(text);
+			var height = ConsoleWindow.Constants.MessageStyle.CalcHeight(GUIContent.Temp(stackWithHyperlinks), width);
+			EditorGUILayout.SelectableLabel(stackWithHyperlinks, 
+				ConsoleWindow.Constants.MessageStyle, 
+				GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true), 
+				GUILayout.MinHeight(height + EditorGUIUtility.singleLineHeight * 2));
 		}
 
 		internal static float DrawDefaultRow(int index, Rect rect)

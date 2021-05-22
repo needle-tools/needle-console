@@ -51,7 +51,7 @@ namespace Needle.Demystify
 		int GetExcluded(int index);
 	}
 
-	internal struct CachedConsoleInfo
+	public struct CachedConsoleInfo
 	{
 		public LogEntryInfo entry;
 		public string str;

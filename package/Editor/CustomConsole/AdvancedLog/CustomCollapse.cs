@@ -1,10 +1,10 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using Unity.Profiling;
 using UnityEditor;
 using UnityEngine;
-using Debug = UnityEngine.Debug;
 using Random = UnityEngine.Random;
 
 namespace Needle.Demystify
@@ -13,12 +13,27 @@ namespace Needle.Demystify
 	{
 		private class CustomDrawer : ICustomLogDrawer
 		{
+			public float GetContentHeight(float defaultRowHeight, int totalRows, out uint linesHandled)
+			{
+				linesHandled = (uint)ConsoleList.CurrentEntries.Count(e => e.groupSize > 0);
+				return linesHandled * defaultRowHeight * 2;
+			}
+
+			public bool OnDrawStacktrace(int selectedRowIndex, string text)
+			{
+				var custom = ConsoleList.CurrentEntries[selectedRowIndex].groupSize > 0;
+				if (!custom) return false;
+				DrawGraph(selectedRowIndex, new Rect(0,0, Screen.width, 90));
+				GUILayout.Space(100);
+				return false;
+			}
+
 			public bool OnDrawEntry(int index, bool isSelected, Rect rect, bool visible, out float height)
 			{
+				height = 0;
+				return false;
 				if (!visible)
 				{
-					height = 0;
-					return false;
 				}
 
 				var custom = ConsoleList.CurrentEntries[index].groupSize > 0;
@@ -32,24 +47,33 @@ namespace Needle.Demystify
 
 				if (custom)
 				{
-					var graphRect = new Rect(rect.x, orig.y + orig.height, orig.width, graphHeight);
-					GUIUtils.SimpleColored.SetPass(0);
-					GL.PushMatrix();
-					GL.Begin(GL.LINE_STRIP);
-					for (int i = 0; i < 100; i++)
-					{
-						var t = i / 100f;
-						var x = t * graphRect.width;
-						var y = t + Random.value * .1f;
-						GL.Color(Color.Lerp(Color.green, Color.red, t));
-						GL.Vertex3(x, graphRect.y + graphRect.height - graphHeight * y, 0);
-					}
-
-					GL.End();
-					GL.PopMatrix();
+					DrawGraph(index, new Rect(rect.x, rect.y + orig.height, rect.width, graphHeight));
 				}
 
 				return true;
+			}
+
+			private void DrawGraph(int index, Rect rect)
+			{
+				GUIUtils.SimpleColored.SetPass(0);
+				GL.PushMatrix();
+				GL.Begin(GL.LINE_STRIP);
+				for (int i = 0; i < 100; i++)
+				{
+					var t = i / 100f;
+					var x = t * rect.width;
+					var y = t + Random.value * .1f;
+					GL.Color(Color.Lerp(Color.green, Color.red, t));
+					GL.Vertex3(x, rect.y + rect.height - rect.height * y, 0);
+				}
+
+				GL.End();
+				GL.PopMatrix();
+			}
+
+			public bool OnHandleLog(LogEntry entry, int row, string preview, List<CachedConsoleInfo> entries)
+			{
+				return false;
 			}
 		}
 
@@ -75,6 +99,13 @@ namespace Needle.Demystify
 			groupedLogs.Clear();
 			collapsed.Clear();
 		}
+		
+		public interface ICustomLogCollapser
+		{
+			int GetCount(int index);
+			bool OnHandleLog(LogEntryInfo entry, int row, string preview, List<CachedConsoleInfo> entries);
+		}
+
 
 		private static readonly Dictionary<string, int> groupedLogs = new Dictionary<string, int>();
 		private static readonly Dictionary<int, CollapseData> collapsed = new Dictionary<int, CollapseData>();
@@ -102,6 +133,7 @@ namespace Needle.Demystify
 				const string marker = "<group>";
 				var start = text.IndexOf(marker, StringComparison.InvariantCulture);
 				if (start <= 0) return true;
+				
 				const string timestampEnd = "] ";
 				var timestampIndex = text.IndexOf(timestampEnd, StringComparison.Ordinal);
 				var timestamp = string.Empty;
