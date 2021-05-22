@@ -163,7 +163,7 @@ namespace Needle.Demystify
 				}
 			}
 
-			scroll = UnityEngine.GUI.BeginScrollView(scrollArea, scroll, contentSize);
+			scroll = GUI.BeginScrollView(scrollArea, scroll, contentSize);
 
 			var position = new Rect(0, 0, width, lineHeight);
 			element = new ListViewElement();
@@ -218,12 +218,10 @@ namespace Needle.Demystify
 							if (handledByCustomDrawer) continue;
 							RegisterRect(position);
 							position.y += DrawDefaultRow(k, position);
-							continue;
 						}
 
 						var rect = currentEntriesRects[k];
-						isVisible = IsVisible(rect);
-						if (isVisible && Event.current.type == EventType.MouseUp)
+						if (Event.current.type == EventType.MouseUp && IsVisible(rect))
 						{
 							if (Event.current.button == 0)
 							{
@@ -251,7 +249,7 @@ namespace Needle.Demystify
 									break;
 								}
 							}
-							else if (isVisible && Event.current.button == 1)
+							else if (Event.current.button == 1 && IsVisible(rect))
 							{
 								if (rect.Contains(Event.current.mousePosition))
 								{
@@ -352,10 +350,10 @@ namespace Needle.Demystify
 			// draw background
 			void DrawBackground(Color col)
 			{
-				var prevCol = UnityEngine.GUI.color;
-				UnityEngine.GUI.color = col;
-				UnityEngine.GUI.DrawTexture(rect, Texture2D.whiteTexture);
-				UnityEngine.GUI.color = prevCol;
+				var prevCol = GUI.color;
+				GUI.color = col;
+				GUI.DrawTexture(rect, Texture2D.whiteTexture);
+				GUI.color = prevCol;
 			}
 
 			bool IsOdd() => row % 2 != 0;
@@ -395,7 +393,7 @@ namespace Needle.Demystify
 			strRect.x = xOffset;
 			ConsoleTextPrefix.ModifyText(element, ref preview);
 			// preview += item.entry.instanceID;
-			UnityEngine.GUI.Label(strRect, preview, logStyle);
+			GUI.Label(strRect, preview, logStyle);
 
 			// draw badge
 			var collapsed = IsCollapsed();
@@ -412,7 +410,7 @@ namespace Needle.Demystify
 				badgeRect.xMin = badgeRect.xMax - badgeSize.x;
 				badgeRect.yMin += ((badgeRect.yMax - badgeRect.yMin) - badgeSize.y) * 0.5f;
 				badgeRect.x -= 5f;
-				UnityEngine.GUI.Label(badgeRect, tempContent, ConsoleWindow.Constants.CountBadge);
+				GUI.Label(badgeRect, tempContent, ConsoleWindow.Constants.CountBadge);
 			}
 
 			return rect.height;

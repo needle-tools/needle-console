@@ -20,7 +20,8 @@ namespace Needle.Demystify
 					height = 0;
 					return false;
 				}
-				var custom = index % 3 == 0;
+
+				var custom = ConsoleList.CurrentEntries[index].groupSize > 0;
 				const int graphHeight = 40;
 				var orig = rect;
 				if (custom)
