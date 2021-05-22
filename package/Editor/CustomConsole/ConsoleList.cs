@@ -192,8 +192,12 @@ namespace Needle.Demystify
 
 						if (Event.current.type == EventType.Repaint)
 						{
-							currentEntriesRects.Add(position);
+							void RegisterRect(Rect _rect)
+							{
+								currentEntriesRects.Add(_rect);
+							}
 
+							position.height = lineHeight;
 							strRect = position;
 							strRect.x += xOffset;
 							strRect.y -= 1;
@@ -204,6 +208,8 @@ namespace Needle.Demystify
 							{
 								if (drawer.OnDrawEntry(k, selectedRowIndex == k, position, isVisible, out var res))
 								{
+									position.height = res;
+									RegisterRect(position);
 									position.y += res;
 									handledByCustomDrawer = true;
 									break;
@@ -211,6 +217,7 @@ namespace Needle.Demystify
 							}
 
 							if (handledByCustomDrawer) continue;
+							RegisterRect(position);
 							position.y += DrawDefaultRow(k, position);
 							continue;
 						}
