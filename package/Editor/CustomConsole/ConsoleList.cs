@@ -219,11 +219,13 @@ namespace Needle.Demystify
 								GUI.Label(strRect, preview, logStyle);
 
 								// draw badge
-								if (collapsed)
+								var isGrouped = item.groupSize > 0;
+								if (collapsed || isGrouped)
 								{
 									var badgeRect = element.position;
-									tempContent.text = LogEntries.GetEntryCount(item.row)
-										.ToString(CultureInfo.InvariantCulture);
+									var entryCount = collapsed ? LogEntries.GetEntryCount(item.row) : 0;
+									entryCount += item.groupSize;
+									tempContent.text = entryCount.ToString(CultureInfo.InvariantCulture);
 									var badgeSize = ConsoleWindow.Constants.CountBadge.CalcSize(tempContent);
 									if (ConsoleWindow.Constants.CountBadge.fixedHeight > 0)
 										badgeSize.y = ConsoleWindow.Constants.CountBadge.fixedHeight;

@@ -24,6 +24,12 @@ namespace Needle.Demystify
 				data => { DemystifySettings.instance.ShowFileName = !DemystifySettings.instance.ShowFileName; }, null);
 			menu.AddItem(new GUIContent(prefix + "Custom List"), DemystifySettings.instance.CustomList,
 				data => { DemystifySettings.instance.CustomList = !DemystifySettings.instance.CustomList; }, null);
+			menu.AddItem(new GUIContent(prefix + "Dynamic Grouping"), DemystifySettings.instance.DynamicGrouping,
+				data =>
+				{
+					DemystifySettings.instance.DynamicGrouping = !DemystifySettings.instance.DynamicGrouping;
+					ConsoleFilter.MarkDirty();
+				}, null);
 		}
 	}
 }

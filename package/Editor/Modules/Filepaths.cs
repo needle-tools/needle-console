@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Net;
 using System.Text.RegularExpressions;
 using UnityEngine;
@@ -9,7 +10,7 @@ namespace Needle.Demystify
 	{
 		// pattern: match absolute disc path for cs files
 		private const string Pattern = @" \(at (?<filepath>\w{1}\:\/.*\.cs)\:\d{1,}";
-		private static Regex Regex = new Regex(Pattern, RegexOptions.Compiled);
+		private static readonly Regex Regex = new Regex(Pattern, RegexOptions.Compiled);
 		
 		public static void TryMakeRelative(ref string line)
 		{
@@ -21,12 +22,16 @@ namespace Needle.Demystify
 				var pathGroup = match.Groups["filepath"];
 				if (!pathGroup.Success) return;
 				var filePath = new Uri(pathGroup.Value, UriKind.RelativeOrAbsolute);
-				var appPath = new Uri(Application.dataPath, UriKind.Absolute);
-				var relativePath = appPath.MakeRelativeUri(filePath).ToString();
-				relativePath = WebUtility.UrlDecode(relativePath);
-				// relativePath = relativePath.Replace("%20", " ");
-				// if (makeHyperlink) relativePath = "<a href=\"" + pathGroup.Value + "\">" + relativePath + "</a>";
-				line = line.Replace(pathGroup.Value, relativePath);
+				if (filePath.IsAbsoluteUri)
+				{
+					var appPath = new Uri(Application.dataPath, UriKind.Absolute);
+					// TODO: MakeRelativeUri produces quite a lot of garbage
+					var relativePath = appPath.MakeRelativeUri(filePath).ToString();
+					relativePath = WebUtility.UrlDecode(relativePath);
+					// relativePath = relativePath.Replace("%20", " ");
+					// if (makeHyperlink) relativePath = "<a href=\"" + pathGroup.Value + "\">" + relativePath + "</a>";
+					line = line.Replace(pathGroup.Value, relativePath);
+				}
 			}
 			catch
 				// (Exception e)

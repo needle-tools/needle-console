@@ -6,6 +6,7 @@ using System.Text.RegularExpressions;
 using Unity.Profiling;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.UIElements;
 using Object = UnityEngine.Object;
 
 namespace Needle.Demystify
@@ -59,6 +60,7 @@ namespace Needle.Demystify
 		public LogEntryInfo entry;
 		public string str;
 		public int row;
+		public int groupSize;
 	}
 
 	public struct LogEntryInfo
@@ -91,6 +93,12 @@ namespace Needle.Demystify
 				if (name.EndsWith(UndoPostfix))
 					MarkDirty();
 			};
+			DemystifySettings.Changed += OnSettingsChanged;
+		}
+
+		private static void OnSettingsChanged()
+		{
+			MarkDirty();
 		}
 
 		public const string UndoPostfix = "(Console Filter)";
@@ -226,6 +234,7 @@ namespace Needle.Demystify
 					registeredFilters[index].BeforeFilter();
 				}
 
+				var useDynamicGrouping = DemystifySettings.instance.DynamicGrouping;
 
 				for (var i = start; i < count; i++)
 				{
@@ -323,7 +332,7 @@ namespace Needle.Demystify
 						cachedLogResultForMask.Add(key, skip);
 					if (enabled && skip) continue;
 
-					if (!HandleGrouping(entry, i, preview, entries))
+					if (!HandleGrouping(useDynamicGrouping, entry, i, preview, entries))
 					{
 						entries.Add(new CachedConsoleInfo()
 						{
@@ -345,68 +354,67 @@ namespace Needle.Demystify
 
 		private static readonly Dictionary<string, int> groupedLogs = new Dictionary<string, int>();
 		private static void ClearGrouping() => groupedLogs.Clear();
-		private static StringBuilder builder = new StringBuilder();
+
+		private static readonly StringBuilder builder = new StringBuilder();
+
 		// number matcher https://regex101.com/r/D0dFIj/1/
 		// non number matcher https://regex101.com/r/VRXwpC/1/
-		private static Regex noNumberMatcher = new Regex(@"[^-\d.]+", RegexOptions.Compiled | RegexOptions.Multiline);
-		private static bool HandleGrouping(LogEntry entry, int row, string preview, List<CachedConsoleInfo> entries)
+		private static readonly Regex noNumberMatcher = new Regex(@"[^-\d.]+", RegexOptions.Compiled | RegexOptions.Multiline);
+
+		private static bool HandleGrouping(bool isEnabled, LogEntry entry, int row, string preview, List<CachedConsoleInfo> entries)
 		{
-			var text = preview;
-			const string marker = "<group>";
-			var start = text.IndexOf(marker, StringComparison.InvariantCulture);
-			if (start <= 0) return false;
-			const string timestampEnd = "] ";
-			var timestampIndex = text.IndexOf(timestampEnd, StringComparison.Ordinal);
-			var timestamp = string.Empty;
-			if (timestampIndex < start)
+			if (!isEnabled)
 			{
-				timestamp = text.Substring(0, timestampIndex + timestampEnd.Length);
+				return false;
 			}
-			var match = noNumberMatcher.Match(text);
-			text = text.Substring(start + marker.Length).TrimStart();
-			if (match.Success)
+			
+			using (new ProfilerMarker("Console Log Grouping").Auto())
 			{
-				builder.Clear();
-				var key = builder.Append(entry.file).Append("::").Append(entry.line).Append("::").Append(match.Value).ToString();
-				builder.Clear();
-				text = builder.Append(timestamp).Append(text).ToString();
-				var newEntry = new CachedConsoleInfo()
+				var text = preview;
+				const string marker = "<group>";
+				var start = text.IndexOf(marker, StringComparison.InvariantCulture);
+				if (start <= 0) return false;
+				const string timestampEnd = "] ";
+				var timestampIndex = text.IndexOf(timestampEnd, StringComparison.Ordinal);
+				var timestamp = string.Empty;
+				if (timestampIndex < start)
 				{
-					entry = new LogEntryInfo(entry),
-					row = row,
-					str = text
-				};
-				if (groupedLogs.TryGetValue(key, out var val))
-				{
-					var ex = entries[val];
-					newEntry.row = ex.row;
-					entries[val] = newEntry;
-				}
-				else
-				{
-					groupedLogs.Add(key, entries.Count);
-					entries.Add(newEntry);
+					timestamp = text.Substring(0, timestampIndex + timestampEnd.Length);
 				}
 
-				return true;
+
+				var match = noNumberMatcher.Match(text);
+				text = text.Substring(start + marker.Length).TrimStart();
+				if (match.Success)
+				{
+					builder.Clear();
+					var key = builder.Append(entry.file).Append("::").Append(entry.line).Append("::").Append(match.Value).ToString();
+					builder.Clear();
+					text = builder.Append(timestamp).Append(text).ToString();
+					var newEntry = new CachedConsoleInfo()
+					{
+						entry = new LogEntryInfo(entry),
+						row = row,
+						str = text,
+						groupSize = 1
+					};
+					if (groupedLogs.TryGetValue(key, out var val))
+					{
+						var ex = entries[val];
+						newEntry.row = ex.row;
+						newEntry.groupSize = ex.groupSize + 1;
+						entries[val] = newEntry;
+					}
+					else
+					{
+						groupedLogs.Add(key, entries.Count);
+						entries.Add(newEntry);
+					}
+
+					return true;
+				}
+				return false;
 			}
-
-
-			// https://regex101.com/r/D0dFIj/1
-			// bool isInNumberSequence;
-			// for (var index = 0; index < text.Length; index++)
-			// {
-			// 	var c = text[index];
-			// 	// if(int.TryParse(c, out _
-			// }
-
-			// if (float.TryParse(text, out var res))  
-			// {
-			// 	
-			// 	return true; 
-			// }
-
-			return false;
 		}
 	}
 }

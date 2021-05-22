@@ -76,6 +76,7 @@ namespace Needle.Demystify
 		
 		public bool CustomList = true;
 		public bool RowColors = true;
+		public bool DynamicGrouping = true;
 	}
 	
 }

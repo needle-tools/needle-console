@@ -79,6 +79,7 @@ namespace Needle.Demystify
 				settings.CustomList = EditorGUILayout.Toggle(new GUIContent("Custom List", "The custom list replaces the console log drawing with a custom implementation that allows for advanced features such like very custom log filtering via context menus"), settings.CustomList);
 				EditorGUI.indentLevel++;
 				settings.RowColors = EditorGUILayout.Toggle(new GUIContent("Row Colors", "Allow custom list to tint row background for warnings and errors"), settings.RowColors);
+				settings.DynamicGrouping = EditorGUILayout.Toggle(new GUIContent("Dynamic Grouping"), settings.DynamicGrouping);
 				EditorGUI.indentLevel--;
 
 				if(DemystifySettings.DevelopmentMode)
