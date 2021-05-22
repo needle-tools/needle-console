@@ -14,8 +14,8 @@ namespace Needle.Demystify
 		{
 			public bool OnDrawEntry(int index, bool isSelected, Rect rect, bool visible, out float height)
 			{
-
-				height = ConsoleList.DrawDefaultRow(index);
+				if (index % 3 == 0) rect.height *= 2;
+				height = ConsoleList.DrawDefaultRow(index, rect);
 				
 				GUIUtils.SimpleColored.SetPass(0);
 				GL.PushMatrix();

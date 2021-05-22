@@ -71,7 +71,7 @@ namespace Needle.Demystify
 		private static ConsoleWindow _consoleWindow;
 		private static bool shouldScrollToSelectedItem;
 		private static GUIContent tempContent;
-		private static Rect position, strRect;
+		private static Rect strRect;
 		private static ListViewElement element;
 		private static int xOffset;
 		private static float lineHeight;
@@ -165,7 +165,7 @@ namespace Needle.Demystify
 
 			scroll = UnityEngine.GUI.BeginScrollView(scrollArea, scroll, contentSize);
 
-			position = new Rect(0, 0, width, lineHeight);
+			var position = new Rect(0, 0, width, lineHeight);
 			element = new ListViewElement();
 			if (logStyle == null)
 			{
@@ -211,7 +211,7 @@ namespace Needle.Demystify
 							}
 
 							if (handledByCustomDrawer) continue;
-							position.y += DrawDefaultRow(k);
+							position.y += DrawDefaultRow(k, position);
 							continue;
 						}
 
@@ -333,21 +333,21 @@ namespace Needle.Demystify
 			return false;
 		}
 
-		internal static float DrawDefaultRow(int index)
+		internal static float DrawDefaultRow(int index, Rect rect)
 		{
 			var row = index;
 			var item = currentEntries[index];
 			var entryIsSelected = selectedRowNumber == item.row;
 			var entry = item.entry;
 			element.row = item.row;
-			element.position = position;
+			element.position = rect;
 
 			// draw background
 			void DrawBackground(Color col)
 			{
 				var prevCol = UnityEngine.GUI.color;
 				UnityEngine.GUI.color = col;
-				UnityEngine.GUI.DrawTexture(position, Texture2D.whiteTexture);
+				UnityEngine.GUI.DrawTexture(rect, Texture2D.whiteTexture);
 				UnityEngine.GUI.color = prevCol;
 			}
 
@@ -379,7 +379,7 @@ namespace Needle.Demystify
 
 			// draw icon
 			GUIStyle iconStyle = ConsoleWindow.GetStyleForErrorMode(entry.mode, true, ConsoleWindow.Constants.LogStyleLineCount == 1);
-			Rect iconRect = position;
+			Rect iconRect = rect;
 			iconRect.y += 2;
 			iconStyle.Draw(iconRect, false, false, entryIsSelected, false);
 
@@ -408,7 +408,7 @@ namespace Needle.Demystify
 				UnityEngine.GUI.Label(badgeRect, tempContent, ConsoleWindow.Constants.CountBadge);
 			}
 
-			return lineHeight;
+			return rect.height;
 		}
 
 		private static void HandleKeyboardInput(Rect position, ConsoleWindow console, float scrollAreaHeight, float lineHeight)
