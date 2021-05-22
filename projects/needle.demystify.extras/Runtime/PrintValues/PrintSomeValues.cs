@@ -16,10 +16,10 @@ public class PrintSomeValues : MonoBehaviour
 		
 		if (LogUngroupedMessage)
 			Debug.Log("This is not grouped " + Time.time);
-		Debug.Log("<group> Random Value: " + Random.value.ToString("0.00")); // + ", " + Random.insideUnitSphere);
-		Debug.Log("<group> Bit more complex: " + Random.value.ToString("0.00") + ", " + Random.insideUnitSphere);
-		Debug.Log("<group> Frame: " + Time.frameCount + ", " + Time.time + ", " + Random.rotation);
-		Debug.Log("<group> Group without value " + someStrings[index % someStrings.Length]);
+		Debug.Log("Random Value: " + Random.value.ToString("0.00")); // + ", " + Random.insideUnitSphere);
+		Debug.Log("Bit more complex: " + Random.value.ToString("0.00") + ", " + Random.insideUnitSphere);
+		Debug.Log("Frame: " + Time.frameCount + ", " + Time.time + ", " + Random.rotation);
+		Debug.Log("Group without value " + someStrings[index % someStrings.Length]);
 		index += 1;
 	}
 }

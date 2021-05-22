@@ -49,7 +49,7 @@ namespace Needle.Demystify
 		private static readonly List<Rect> currentEntriesRects = new List<Rect>();
 		private static readonly SplitterState spl = SplitterState.FromRelative(new float[] {70, 30}, new float[] {32, 32}, null);
 
-		private static int selectedRowIndex = -1, previouslySelectedRow = -2, rowDoubleClicked = -1;
+		private static int selectedRowIndex = -1, previouslySelectedRowIndex = -2, rowDoubleClicked = -1;
 		private static int selectedRowNumber = -1;
 		private static string selectedText;
 
@@ -108,7 +108,7 @@ namespace Needle.Demystify
 					{
 						selectedText = null;
 						selectedRowIndex = -1;
-						previouslySelectedRow = -1;
+						previouslySelectedRowIndex = -1;
 					}
 
 					var shouldUpdateLogs = ConsoleFilter.ShouldUpdate(count);
@@ -131,8 +131,8 @@ namespace Needle.Demystify
 			if (Event.current.type == EventType.MouseDown)
 			{
 				rowDoubleClicked = -1;
-				previouslySelectedRow = selectedRowIndex;
-				selectedRowIndex = -1;
+				previouslySelectedRowIndex = selectedRowIndex;
+				// selectedRowIndex = -1;
 			}
 
 
@@ -249,7 +249,7 @@ namespace Needle.Demystify
 									isAutoScrolling = false;
 									SelectRow(k);
 
-									if (previouslySelectedRow == selectedRowIndex)
+									if (previouslySelectedRowIndex == selectedRowIndex)
 									{
 										var td = (DateTime.Now - lastClickTime).Seconds;
 										if (td < 1)
@@ -301,7 +301,6 @@ namespace Needle.Demystify
 					}
 				}
 				finally
-
 				{
 					LogEntries.EndGettingEntries();
 				}
@@ -328,7 +327,7 @@ namespace Needle.Demystify
 			{
 				LogEntries.RowGotDoubleClicked(rowDoubleClicked);
 				rowDoubleClicked = -1;
-				previouslySelectedRow = -1;
+				previouslySelectedRowIndex = -1;
 			}
 
 			GUI.EndScrollView();
@@ -340,31 +339,35 @@ namespace Needle.Demystify
 			}
 
 			// Display active text (We want word wrapped text with a vertical scrollbar)
-			GUILayout.Space(scrollAreaHeight + 2);
+			scrollAreaHeight += 2;
+			GUILayout.Space(scrollAreaHeight);
 			scrollStacktrace = GUILayout.BeginScrollView(scrollStacktrace, ConsoleWindow.Constants.Box);
 			SeparatorLine.Draw(scrollStacktrace.y);
-
+			
 			var didDrawStacktrace = false;
 			var text = selectedText ?? string.Empty;
+			var stacktraceContentRect = new Rect(0, scrollAreaHeight, width, Screen.height - scrollAreaHeight);
+			var stackWithHyperlinks = ConsoleWindow.StacktraceWithHyperlinks(text);
+			var stacktraceHeight = ConsoleWindow.Constants.MessageStyle.CalcHeight(GUIContent.Temp(stackWithHyperlinks), width);
 			try
 			{
 				foreach (var drawer in customDrawers)
 				{
-					if (drawer.OnDrawStacktrace(selectedRowIndex, text))
+					if (drawer.OnDrawStacktrace(selectedRowIndex, text, stacktraceContentRect, stackWithHyperlinks, stacktraceHeight))
 					{
 						didDrawStacktrace = true;
 						break;
 					}
 				}
 			}
-			catch
+			catch(Exception e)
 			{
-				// ignored
+				Debug.LogException(e);
 			}
 
 			if (!didDrawStacktrace)
 			{
-				DrawDefaultStacktrace(text, position.width);
+				DrawDefaultStacktrace(stackWithHyperlinks, stacktraceHeight);
 			}
 
 			GUILayout.EndScrollView();
@@ -372,14 +375,19 @@ namespace Needle.Demystify
 			return false;
 		}
 
-		internal static void DrawDefaultStacktrace(string text, float width)
+		internal static void DrawDefaultStacktrace(string text, float height)
 		{
-			var stackWithHyperlinks = ConsoleWindow.StacktraceWithHyperlinks(text);
-			var height = ConsoleWindow.Constants.MessageStyle.CalcHeight(GUIContent.Temp(stackWithHyperlinks), width);
-			EditorGUILayout.SelectableLabel(stackWithHyperlinks, 
-				ConsoleWindow.Constants.MessageStyle, 
-				GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true), 
-				GUILayout.MinHeight(height + EditorGUIUtility.singleLineHeight * 2));
+			try
+			{
+				EditorGUILayout.SelectableLabel(text,
+					ConsoleWindow.Constants.MessageStyle,
+					GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true),
+					GUILayout.MinHeight(height + EditorGUIUtility.singleLineHeight * 2));
+			}
+			catch (ArgumentException ex)
+			{
+				Debug.LogException(ex);
+			}
 		}
 
 		internal static float DrawDefaultRow(int index, Rect rect)
