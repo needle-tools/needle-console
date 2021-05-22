@@ -51,6 +51,8 @@ namespace Needle.Demystify
 		{
 			if (_consoleWindow) _consoleWindow.Repaint();
 		}
+		
+		internal static bool IsCollapsed() => HasFlag(collapsedFlag);
 
 		internal static bool OnDrawList(ConsoleWindow console)
 		{
@@ -147,7 +149,7 @@ namespace Needle.Demystify
 			strRect.y -= 1;
 			strRect.height -= position.height * .15f;
 			var tempContent = new GUIContent();
-			var collapsed = HasFlag(collapsedFlag);
+			var collapsed = IsCollapsed();
 
 
 			var evt = Event.current;

@@ -389,7 +389,11 @@ namespace Needle.Demystify
 				builder.Clear();
 				var key = builder.Append(entry.file).Append("::").Append(entry.line).Append("::").ToString();
 				builder.Clear();
+				
+				
 				text = builder.Append(timestamp).Append(text).ToString();
+
+				entry.message += "\n" + UnityDemystify.DemystifyEndMarker;
 				var newEntry = new CachedConsoleInfo()
 				{
 					entry = new LogEntryInfo(entry),
@@ -397,11 +401,15 @@ namespace Needle.Demystify
 					str = text,
 					groupSize = 1
 				};
+				
 				if (groupedLogs.TryGetValue(key, out var val))
 				{
 					var ex = entries[val];
 					newEntry.row = ex.row;
 					newEntry.groupSize = ex.groupSize + 1;
+					var history = "\n" + ex.str;
+					newEntry.str += history;
+					newEntry.entry.message += history;
 					entries[val] = newEntry;
 				}
 				else

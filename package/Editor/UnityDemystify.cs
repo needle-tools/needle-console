@@ -52,6 +52,7 @@ namespace Needle.Demystify
 		}
 
 		private static readonly StringBuilder builder = new StringBuilder();
+		internal static string DemystifyEndMarker = "�";
 
 		public static void Apply(ref string stacktrace)
 		{
@@ -64,9 +65,22 @@ namespace Needle.Demystify
 						lines = stacktrace.Split('\n');
 					var settings = DemystifySettings.instance;
 					var foundPrefix = false;
+					var foundEnd = false;
 					foreach (var t in lines)
 					{
 						var line = t;
+						if (line == DemystifyEndMarker)
+						{
+							foundEnd = true;
+							builder.AppendLine();
+							continue;
+						}
+
+						if (foundEnd)
+						{
+							builder.AppendLine(line);
+							continue;
+						}
 
 						using (new ProfilerMarker("Remove Markers").Auto())
 						{
