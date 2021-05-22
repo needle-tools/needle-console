@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Runtime.CompilerServices;
 using UnityEditor;
 using UnityEngine;
 
@@ -14,6 +15,28 @@ namespace Needle.Demystify
 			set => DemystifySettings.instance.CustomList = value;
 		}
 
+		internal static IReadOnlyList<CachedConsoleInfo> CurrentEntries => currentEntries;
+
+		internal delegate void LogEntryContextMenuDelegate(GenericMenu menu, int itemIndex);
+
+		internal static event LogEntryContextMenuDelegate LogEntryContextMenu;
+
+		private static readonly List<ICustomLogDrawer> customDrawers = new List<ICustomLogDrawer>();
+
+		internal static void RegisterCustomDrawer(ICustomLogDrawer drawer)
+		{
+			if (drawer == null) return;
+			if (customDrawers.Contains(drawer)) return;
+			customDrawers.Add(drawer);
+		}
+
+		internal static void UnregisterCustomDrawer(ICustomLogDrawer drawer)
+		{
+			if (drawer == null) return;
+			if (!customDrawers.Contains(drawer)) return;
+			customDrawers.Remove(drawer);
+		}
+
 		private static Vector2 scroll
 		{
 			get => SessionState.GetVector3("ConsoleList-Scroll", Vector3.zero);
@@ -22,6 +45,7 @@ namespace Needle.Demystify
 
 		private static Vector2 scrollStacktrace;
 		private static readonly List<CachedConsoleInfo> currentEntries = new List<CachedConsoleInfo>();
+		private static readonly List<Rect> currentEntriesRects = new List<Rect>();
 		private static readonly SplitterState spl = SplitterState.FromRelative(new float[] {70, 30}, new float[] {32, 32}, null);
 
 		private static int selectedRowIndex = -1, previouslySelectedRow = -2, rowDoubleClicked = -1;
@@ -46,12 +70,17 @@ namespace Needle.Demystify
 
 		private static ConsoleWindow _consoleWindow;
 		private static bool shouldScrollToSelectedItem;
+		private static GUIContent tempContent;
+		private static Rect position, strRect;
+		private static ListViewElement element;
+		private static int xOffset;
+		private static float lineHeight;
 
 		internal static void RequestRepaint()
 		{
 			if (_consoleWindow) _consoleWindow.Repaint();
 		}
-		
+
 		internal static bool IsCollapsed() => HasFlag(collapsedFlag);
 
 		internal static bool OnDrawList(ConsoleWindow console)
@@ -109,9 +138,9 @@ namespace Needle.Demystify
 			SplitterGUILayout.BeginVerticalSplit(spl);
 
 			var lineCount = ConsoleWindow.Constants.LogStyleLineCount;
-			var xOffset = ConsoleWindow.Constants.LogStyleLineCount == 1 ? 2 : 14;
+			xOffset = ConsoleWindow.Constants.LogStyleLineCount == 1 ? 2 : 14;
 			var yTop = EditorGUIUtility.singleLineHeight + 3;
-			var lineHeight = EditorGUIUtility.singleLineHeight * lineCount + 3;
+			lineHeight = EditorGUIUtility.singleLineHeight * lineCount + 3;
 			count = currentEntries.Count;
 			var scrollAreaHeight = Screen.height - spl.realSizes[1] - 44;
 			var contentHeight = count * lineHeight;
@@ -134,23 +163,18 @@ namespace Needle.Demystify
 				}
 			}
 
-			scroll = GUI.BeginScrollView(scrollArea, scroll, contentSize);
+			scroll = UnityEngine.GUI.BeginScrollView(scrollArea, scroll, contentSize);
 
-			var position = new Rect(0, 0, width, lineHeight);
-			var element = new ListViewElement();
+			position = new Rect(0, 0, width, lineHeight);
+			element = new ListViewElement();
 			if (logStyle == null)
 			{
 				logStyle = new GUIStyle(ConsoleWindow.Constants.LogSmallStyle);
 				logStyle.alignment = TextAnchor.UpperLeft;
 			}
 
-			var strRect = position;
-			strRect.x += xOffset;
-			strRect.y -= 1;
-			strRect.height -= position.height * .15f;
-			var tempContent = new GUIContent();
+			tempContent = new GUIContent();
 			var collapsed = IsCollapsed();
-
 
 			var evt = Event.current;
 			if (evt.type == EventType.Repaint || evt.type == EventType.MouseUp)
@@ -158,129 +182,83 @@ namespace Needle.Demystify
 				try
 				{
 					LogEntries.StartGettingEntries();
+
+					if (evt.type == EventType.Repaint)
+						currentEntriesRects.Clear();
+
 					for (var k = 0; k < currentEntries.Count; k++)
 					{
-						if (position.y + position.height >= scroll.y && position.y <= scroll.y + scrollAreaHeight)
+						var isVisible = position.y + position.height >= scroll.y && position.y <= scroll.y + scrollAreaHeight;
+
+						if (Event.current.type == EventType.Repaint)
 						{
-							if (Event.current.type == EventType.Repaint)
+							currentEntriesRects.Add(position);
+
+							strRect = position;
+							strRect.x += xOffset;
+							strRect.y -= 1;
+							strRect.height -= position.height * .15f;
+
+							var handledByCustomDrawer = false;
+							foreach (var drawer in customDrawers)
 							{
-								var row = k;
-								var item = currentEntries[k];
-								var entryIsSelected = selectedRowNumber == item.row;
-								var entry = item.entry;
-								element.row = item.row;
-								element.position = position;
-
-
-								// draw background
-								void DrawBackground(Color col)
+								if (drawer.OnDrawEntry(k, selectedRowIndex == k, position, isVisible, out var res))
 								{
-									var prevCol = GUI.color;
-									GUI.color = col;
-									GUI.DrawTexture(position, Texture2D.whiteTexture);
-									GUI.color = prevCol;
-								}
-
-								bool IsOdd() => row % 2 != 0;
-								var allowColors = DemystifySettings.instance.RowColors;
-								if (entryIsSelected)
-								{
-									DrawBackground(new Color(.2f, .5f, .8f, .5f));
-								}
-								else if (allowColors && HasMode(entry.mode, ConsoleWindow.Mode.ScriptCompileError))
-								{
-									DrawBackground(IsOdd() ? new Color(1, 0, 0, .2f) : new Color(1, .2f, .25f, .25f));
-								}
-								else if (allowColors && HasMode(entry.mode,
-									ConsoleWindow.Mode.ScriptingError | ConsoleWindow.Mode.Error | ConsoleWindow.Mode.StickyError |
-									ConsoleWindow.Mode.AssetImportError))
-								{
-									DrawBackground(IsOdd() ? new Color(1, 0, 0, .1f) : new Color(1, .2f, .25f, .15f));
-								}
-								else if (allowColors && HasMode(entry.mode,
-									ConsoleWindow.Mode.ScriptingWarning | ConsoleWindow.Mode.AssetImportWarning | ConsoleWindow.Mode.ScriptCompileWarning))
-								{
-									DrawBackground(IsOdd() ? new Color(.5f, .5f, 0, .08f) : new Color(1, 1f, .1f, .04f));
-								}
-								else if (IsOdd())
-								{
-									DrawBackground(new Color(0, 0, 0, .1f));
-								}
-
-								// draw icon
-								GUIStyle iconStyle = ConsoleWindow.GetStyleForErrorMode(entry.mode, true, ConsoleWindow.Constants.LogStyleLineCount == 1);
-								Rect iconRect = position;
-								iconRect.y += 2;
-								iconStyle.Draw(iconRect, false, false, entryIsSelected, false);
-
-								// draw text
-								var preview = item.str; // + " - " + item.entry.mode;
-								strRect.x = xOffset;
-								ConsoleTextPrefix.ModifyText(element, ref preview);
-								// preview += item.entry.instanceID;
-								GUI.Label(strRect, preview, logStyle);
-
-								// draw badge
-								var isGrouped = item.groupSize > 0;
-								if (collapsed || isGrouped)
-								{
-									var badgeRect = element.position;
-									var entryCount = collapsed ? LogEntries.GetEntryCount(item.row) : 0;
-									entryCount += item.groupSize;
-									tempContent.text = entryCount.ToString(CultureInfo.InvariantCulture);
-									var badgeSize = ConsoleWindow.Constants.CountBadge.CalcSize(tempContent);
-									if (ConsoleWindow.Constants.CountBadge.fixedHeight > 0)
-										badgeSize.y = ConsoleWindow.Constants.CountBadge.fixedHeight;
-									badgeRect.xMin = badgeRect.xMax - badgeSize.x;
-									badgeRect.yMin += ((badgeRect.yMax - badgeRect.yMin) - badgeSize.y) * 0.5f;
-									badgeRect.x -= 5f;	
-									GUI.Label(badgeRect, tempContent, ConsoleWindow.Constants.CountBadge);
+									position.y += res;
+									handledByCustomDrawer = true;
+									break;
 								}
 							}
-							else if (Event.current.type == EventType.MouseUp)
+
+							if (handledByCustomDrawer) continue;
+							position.y += DrawDefaultRow(k);
+							continue;
+						}
+
+						var rect = currentEntriesRects[k];
+						if (isVisible && Event.current.type == EventType.MouseUp)
+						{
+							if (Event.current.button == 0)
 							{
-								if (Event.current.button == 0)
+								if (rect.Contains(Event.current.mousePosition))
 								{
-									if (position.Contains(Event.current.mousePosition))
+									var entry = currentEntries[k].entry;
+									isAutoScrolling = false;
+									SelectRow(k);
+
+									if (previouslySelectedRow == selectedRowIndex)
 									{
-										var entry = currentEntries[k].entry;
-										isAutoScrolling = false;
-										SelectRow(k);
-
-										if (previouslySelectedRow == selectedRowIndex)
-										{
-											var td = (DateTime.Now - lastClickTime).Seconds;
-											if (td < 1)
-												rowDoubleClicked = currentEntries[selectedRowIndex].row;
-										}
-										else
-										{
-											if (entry.instanceID != 0)
-												EditorGUIUtility.PingObject(entry.instanceID);
-										}
-
-										lastClickTime = DateTime.Now;
-										Event.current.Use();
-										console.Repaint();
-										break;
+										var td = (DateTime.Now - lastClickTime).Seconds;
+										if (td < 1)
+											rowDoubleClicked = currentEntries[selectedRowIndex].row;
 									}
+									else
+									{
+										if (entry.instanceID != 0)
+											EditorGUIUtility.PingObject(entry.instanceID);
+									}
+
+									lastClickTime = DateTime.Now;
+									Event.current.Use();
+									console.Repaint();
+									break;
 								}
-								else if (Event.current.button == 1)
+							}
+							else if (isVisible && Event.current.button == 1)
+							{
+								if (rect.Contains(Event.current.mousePosition))
 								{
-									if (position.Contains(Event.current.mousePosition))
+									var item = currentEntries[k];
+									var menu = new GenericMenu();
+									if (ConsoleFilter.RegisteredFilter.Count > 0)
 									{
-										var item = currentEntries[k];
-										var menu = new GenericMenu();
-										if (ConsoleFilter.RegisteredFilter.Count > 0)
-										{
-											ConsoleFilter.AddMenuItems(menu, item.entry, item.str);
-										}
-
-										AddConfigMenuItems(menu);
-										menu.ShowAsContext();
-										Event.current.Use();
-										break;
+										ConsoleFilter.AddMenuItems(menu, item.entry, item.str);
 									}
+
+									AddConfigMenuItems(menu, k);
+									menu.ShowAsContext();
+									Event.current.Use();
+									break;
 								}
 							}
 						}
@@ -288,21 +266,15 @@ namespace Needle.Demystify
 						if (shouldScrollToSelectedItem && selectedRowNumber == currentEntries[k].row)
 						{
 							shouldScrollToSelectedItem = false;
-							// if (!IsVisible(position.y, scroll.y, contentHeight))
+							var scrollTo = position.y;
+							if (contentHeight > scrollAreaHeight)
 							{
-								var scrollTo = position.y;
-								if (contentHeight > scrollAreaHeight)
-								{
-									scrollTo -= scrollAreaHeight * .5f - lineHeight;
-								}
-
-								SetScroll(scrollTo);
-								RequestRepaint();
+								scrollTo -= scrollAreaHeight * .5f - lineHeight;
 							}
-						}
 
-						position.y += lineHeight;
-						strRect.y += lineHeight;
+							SetScroll(scrollTo);
+							RequestRepaint();
+						}
 					}
 				}
 				finally
@@ -311,7 +283,7 @@ namespace Needle.Demystify
 					LogEntries.EndGettingEntries();
 				}
 			}
-			
+
 			if (Event.current.type == EventType.ScrollWheel)
 			{
 				isAutoScrolling = false;
@@ -325,7 +297,7 @@ namespace Needle.Demystify
 			if (Event.current.type == EventType.MouseUp && Event.current.button == 1)
 			{
 				var menu = new GenericMenu();
-				AddConfigMenuItems(menu);
+				AddConfigMenuItems(menu, selectedRowIndex);
 				menu.ShowAsContext();
 			}
 
@@ -336,7 +308,7 @@ namespace Needle.Demystify
 				previouslySelectedRow = -1;
 			}
 
-			GUI.EndScrollView();
+			UnityEngine.GUI.EndScrollView();
 
 			if (Event.current.type == EventType.Repaint && selectedRowIndex < 0)
 			{
@@ -352,7 +324,7 @@ namespace Needle.Demystify
 			var stackWithHyperlinks = ConsoleWindow.StacktraceWithHyperlinks(selectedText ?? string.Empty);
 			var height = ConsoleWindow.Constants.MessageStyle.CalcHeight(GUIContent.Temp(stackWithHyperlinks), position.width);
 			EditorGUILayout.SelectableLabel(stackWithHyperlinks, ConsoleWindow.Constants.MessageStyle, GUILayout.ExpandWidth(true),
-				GUILayout.ExpandHeight(true), GUILayout.MinHeight(height + EditorGUIUtility.singleLineHeight*2));
+				GUILayout.ExpandHeight(true), GUILayout.MinHeight(height + EditorGUIUtility.singleLineHeight * 2));
 
 			GUILayout.EndScrollView();
 
@@ -361,110 +333,188 @@ namespace Needle.Demystify
 			return false;
 		}
 
+		internal static float DrawDefaultRow(int index)
+		{
+			var row = index;
+			var item = currentEntries[index];
+			var entryIsSelected = selectedRowNumber == item.row;
+			var entry = item.entry;
+			element.row = item.row;
+			element.position = position;
+
+			// draw background
+			void DrawBackground(Color col)
+			{
+				var prevCol = UnityEngine.GUI.color;
+				UnityEngine.GUI.color = col;
+				UnityEngine.GUI.DrawTexture(position, Texture2D.whiteTexture);
+				UnityEngine.GUI.color = prevCol;
+			}
+
+			bool IsOdd() => row % 2 != 0;
+			var allowColors = DemystifySettings.instance.RowColors;
+			if (entryIsSelected)
+			{
+				DrawBackground(new Color(.2f, .5f, .8f, .5f));
+			}
+			else if (allowColors && HasMode(entry.mode, ConsoleWindow.Mode.ScriptCompileError))
+			{
+				DrawBackground(IsOdd() ? new Color(1, 0, 0, .2f) : new Color(1, .2f, .25f, .25f));
+			}
+			else if (allowColors && HasMode(entry.mode,
+				ConsoleWindow.Mode.ScriptingError | ConsoleWindow.Mode.Error | ConsoleWindow.Mode.StickyError |
+				ConsoleWindow.Mode.AssetImportError))
+			{
+				DrawBackground(IsOdd() ? new Color(1, 0, 0, .1f) : new Color(1, .2f, .25f, .15f));
+			}
+			else if (allowColors && HasMode(entry.mode,
+				ConsoleWindow.Mode.ScriptingWarning | ConsoleWindow.Mode.AssetImportWarning | ConsoleWindow.Mode.ScriptCompileWarning))
+			{
+				DrawBackground(IsOdd() ? new Color(.5f, .5f, 0, .08f) : new Color(1, 1f, .1f, .04f));
+			}
+			else if (IsOdd())
+			{
+				DrawBackground(new Color(0, 0, 0, .1f));
+			}
+
+			// draw icon
+			GUIStyle iconStyle = ConsoleWindow.GetStyleForErrorMode(entry.mode, true, ConsoleWindow.Constants.LogStyleLineCount == 1);
+			Rect iconRect = position;
+			iconRect.y += 2;
+			iconStyle.Draw(iconRect, false, false, entryIsSelected, false);
+
+			// draw text
+			var preview = item.str; // + " - " + item.entry.mode;
+			strRect.x = xOffset;
+			ConsoleTextPrefix.ModifyText(element, ref preview);
+			// preview += item.entry.instanceID;
+			UnityEngine.GUI.Label(strRect, preview, logStyle);
+
+			// draw badge
+			var collapsed = IsCollapsed();
+			var isGrouped = item.groupSize > 0;
+			if (collapsed || isGrouped)
+			{
+				var badgeRect = element.position;
+				var entryCount = collapsed ? LogEntries.GetEntryCount(item.row) : 0;
+				entryCount += item.groupSize;
+				tempContent.text = entryCount.ToString(CultureInfo.InvariantCulture);
+				var badgeSize = ConsoleWindow.Constants.CountBadge.CalcSize(tempContent);
+				if (ConsoleWindow.Constants.CountBadge.fixedHeight > 0)
+					badgeSize.y = ConsoleWindow.Constants.CountBadge.fixedHeight;
+				badgeRect.xMin = badgeRect.xMax - badgeSize.x;
+				badgeRect.yMin += ((badgeRect.yMax - badgeRect.yMin) - badgeSize.y) * 0.5f;
+				badgeRect.x -= 5f;
+				UnityEngine.GUI.Label(badgeRect, tempContent, ConsoleWindow.Constants.CountBadge);
+			}
+
+			return lineHeight;
+		}
+
 		private static void HandleKeyboardInput(Rect position, ConsoleWindow console, float scrollAreaHeight, float lineHeight)
 		{
-				switch (Event.current.keyCode)
-				{
-					case KeyCode.Escape:
-						selectedRowIndex = -1;
-						selectedRowNumber = -1;
-						selectedText = null;
-						isAutoScrolling = false;
-						break;
+			switch (Event.current.keyCode)
+			{
+				case KeyCode.Escape:
+					selectedRowIndex = -1;
+					selectedRowNumber = -1;
+					selectedText = null;
+					isAutoScrolling = false;
+					break;
 
-					// auto-scroll
-					case KeyCode.B:
-						isAutoScrolling = true;
-						break;
+				// auto-scroll
+				case KeyCode.B:
+					isAutoScrolling = true;
+					break;
 
-					case KeyCode.F:
-						shouldScrollToSelectedItem = true;
-						isAutoScrolling = false;
-						RequestRepaint();
-						break;
+				case KeyCode.F:
+					shouldScrollToSelectedItem = true;
+					isAutoScrolling = false;
+					RequestRepaint();
+					break;
 
-					case KeyCode.PageDown:
-					case KeyCode.D:
-					case KeyCode.RightArrow:
-						if (selectedRowIndex >= 0)
+				case KeyCode.PageDown:
+				case KeyCode.D:
+				case KeyCode.RightArrow:
+					if (selectedRowIndex >= 0)
+					{
+						var newIndex = selectedRowIndex + (int) (scrollAreaHeight / lineHeight);
+						newIndex = Mathf.Clamp(newIndex, 0, currentEntries.Count);
+						if (newIndex >= 0 && (newIndex) < currentEntries.Count)
 						{
-							var newIndex = selectedRowIndex + (int) (scrollAreaHeight / lineHeight);
-							newIndex = Mathf.Clamp(newIndex, 0, currentEntries.Count);
-							if (newIndex >= 0 && (newIndex) < currentEntries.Count)
-							{
-								SetScroll(scroll.y + (newIndex - selectedRowIndex) * lineHeight);
-								SelectRow(newIndex);
-								console.Repaint();
-							}
-						}
-
-						break;
-
-					case KeyCode.PageUp:
-					case KeyCode.A:
-					case KeyCode.LeftArrow:
-						if (selectedRowIndex >= 0)
-						{
-							var newIndex = selectedRowIndex - (int) (scrollAreaHeight / lineHeight);
-							newIndex = Mathf.Clamp(newIndex, 0, currentEntries.Count);
-							if (newIndex >= 0 && (newIndex) < currentEntries.Count)
-							{
-								SetScroll(scroll.y + (newIndex - selectedRowIndex) * lineHeight);
-								SelectRow(newIndex);
-								console.Repaint();
-							}
-						}
-
-						break;
-
-					case KeyCode.S:
-					case KeyCode.DownArrow:
-						if (selectedRowIndex >= 0 && (selectedRowIndex + 1) < currentEntries.Count)
-						{
-							SetScroll(scroll.y + lineHeight);
-							SelectRow(selectedRowIndex + 1);
-							// if(selectedRow * lineHeight > scroll.y + (contentHeight - scrollAreaHeight))
-							// 	scrollArea
+							SetScroll(scroll.y + (newIndex - selectedRowIndex) * lineHeight);
+							SelectRow(newIndex);
 							console.Repaint();
 						}
+					}
 
-						break;
-					case KeyCode.W:
-					case KeyCode.UpArrow:
-						if (currentEntries.Count > 0 && selectedRowIndex > 0 && selectedRowIndex < currentEntries.Count)
+					break;
+
+				case KeyCode.PageUp:
+				case KeyCode.A:
+				case KeyCode.LeftArrow:
+					if (selectedRowIndex >= 0)
+					{
+						var newIndex = selectedRowIndex - (int) (scrollAreaHeight / lineHeight);
+						newIndex = Mathf.Clamp(newIndex, 0, currentEntries.Count);
+						if (newIndex >= 0 && (newIndex) < currentEntries.Count)
 						{
-							SelectRow(selectedRowIndex - 1);
-							SetScroll(scroll.y - lineHeight);
-							if (scroll.y < 0) SetScroll(0);
+							SetScroll(scroll.y + (newIndex - selectedRowIndex) * lineHeight);
+							SelectRow(newIndex);
 							console.Repaint();
 						}
+					}
 
-						break;
-					case KeyCode.Space:
-						if (selectedRowIndex >= 0 && currentEntries.Count > 0)
+					break;
+
+				case KeyCode.S:
+				case KeyCode.DownArrow:
+					if (selectedRowIndex >= 0 && (selectedRowIndex + 1) < currentEntries.Count)
+					{
+						SetScroll(scroll.y + lineHeight);
+						SelectRow(selectedRowIndex + 1);
+						// if(selectedRow * lineHeight > scroll.y + (contentHeight - scrollAreaHeight))
+						// 	scrollArea
+						console.Repaint();
+					}
+
+					break;
+				case KeyCode.W:
+				case KeyCode.UpArrow:
+					if (currentEntries.Count > 0 && selectedRowIndex > 0 && selectedRowIndex < currentEntries.Count)
+					{
+						SelectRow(selectedRowIndex - 1);
+						SetScroll(scroll.y - lineHeight);
+						if (scroll.y < 0) SetScroll(0);
+						console.Repaint();
+					}
+
+					break;
+				case KeyCode.Space:
+					if (selectedRowIndex >= 0 && currentEntries.Count > 0)
+					{
+						var menu = new GenericMenu();
+						if (ConsoleFilter.RegisteredFilter.Count > 0)
 						{
-							var menu = new GenericMenu();
-							if (ConsoleFilter.RegisteredFilter.Count > 0)
-							{
-								var info = currentEntries[selectedRowIndex];
-								ConsoleFilter.AddMenuItems(menu, info.entry, info.str);
-							}
-
-							AddConfigMenuItems(menu);
-							var rect = position;
-							rect.y = selectedRowIndex * lineHeight;
-							menu.DropDown(rect);
+							var info = currentEntries[selectedRowIndex];
+							ConsoleFilter.AddMenuItems(menu, info.entry, info.str);
 						}
 
-						break;
-					case KeyCode.Return:
-						if (selectedRowIndex > 0)
-						{
-							rowDoubleClicked = currentEntries[selectedRowIndex].row;
-						}
+						AddConfigMenuItems(menu, selectedRowIndex);
+						var rect = position;
+						rect.y = selectedRowIndex * lineHeight;
+						menu.DropDown(rect);
+					}
 
-						break;
-				}
+					break;
+				case KeyCode.Return:
+					if (selectedRowIndex > 0)
+					{
+						rowDoubleClicked = currentEntries[selectedRowIndex].row;
+					}
+
+					break;
+			}
 		}
 
 		private static void SelectRow(int index)
@@ -490,8 +540,16 @@ namespace Needle.Demystify
 			return y >= scrollPos && y <= scrollPos + contentHeight;
 		}
 
-		private static void AddConfigMenuItems(GenericMenu menu)
+		private static void AddConfigMenuItems(GenericMenu menu, int itemIndex)
 		{
+			try
+			{
+				LogEntryContextMenu?.Invoke(menu, itemIndex);
+			}
+			catch (Exception e)
+			{
+				Debug.LogException(e);
+			}
 			// var content = new GUIContent("Console Filter");
 			// menu.AddItem(content, ConsoleFilter.enabled, () => ConsoleFilter.enabled = !ConsoleFilter.enabled);
 			// menu.AddSeparator(string.Empty);

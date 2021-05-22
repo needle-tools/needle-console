@@ -281,12 +281,12 @@ namespace Needle.Demystify
 				
 				for (var index = 0; index < Count; index++)
 				{
-					var prevColor = GUI.color;
+					var prevColor = UnityEngine.GUI.color;
 					var isSolo = IsSoloAtIndex(index);
 					var isActive = IsActiveAtIndex(index);
 					if (anySolo && !isSolo)
 					{
-						GUI.color = ConsoleFilterExtensions.DisabledColor;
+						UnityEngine.GUI.color = ConsoleFilterExtensions.DisabledColor;
 					}
 
 					var file = this[index];
@@ -310,7 +310,7 @@ namespace Needle.Demystify
 						}
 						GUILayout.Space(3);
 
-						using (new GUIColorScope(isSolo ? new Color(1, .5f, .5f) : GUI.color))
+						using (new GUIColorScope(isSolo ? new Color(1, .5f, .5f) : UnityEngine.GUI.color))
 						{
 							var res = GUILayout.Toggle(isSolo, new GUIContent(Textures.Solo, "Toggle solo"), Styles.FilterToggleButton(), iconWidth);
 							if (res != isSolo)
@@ -342,7 +342,7 @@ namespace Needle.Demystify
 						GUILayout.Space(7f);
 					}
 
-					GUI.color = prevColor;
+					UnityEngine.GUI.color = prevColor;
 				}
 
 				EditorGUI.indentLevel--;

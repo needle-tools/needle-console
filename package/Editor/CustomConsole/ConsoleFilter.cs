@@ -83,6 +83,11 @@ namespace Needle.Demystify
 
 	public static class ConsoleFilter
 	{
+		internal static event Action ClearingCachedData;
+		internal delegate bool AddEntryData(LogEntry entry, int row, string preview, List<CachedConsoleInfo> entries);
+		internal static AddEntryData CustomAddEntry;
+		
+		
 		[InitializeOnLoadMethod]
 		private static void Init()
 		{
@@ -211,12 +216,12 @@ namespace Needle.Demystify
 				var flagsChanged = LogEntries.consoleFlags != _lastFlags;
 				if (isDirty || cleared || flagsChanged)
 				{
+					ClearingCachedData?.Invoke();
 					start = 0;
 					entries.Clear();
 					cachedLogResultForMask.Clear();
 					logEntries.Clear();
 					Global = new Stats();
-					ClearGrouping();
 				}
 
 				isDirty = false;
@@ -332,7 +337,7 @@ namespace Needle.Demystify
 						cachedLogResultForMask.Add(key, skip);
 					if (enabled && skip) continue;
 
-					if (!HandleGrouping(useDynamicGrouping, entry, i, preview, entries))
+					if (CustomAddEntry == null || CustomAddEntry.Invoke(entry, i, preview, entries))
 					{
 						entries.Add(new CachedConsoleInfo()
 						{
@@ -352,78 +357,7 @@ namespace Needle.Demystify
 			Global = glob;
 		}
 
-		private static readonly Dictionary<string, int> groupedLogs = new Dictionary<string, int>();
-		private static void ClearGrouping() => groupedLogs.Clear();
 
-		private static readonly StringBuilder builder = new StringBuilder();
-
-		// number matcher https://regex101.com/r/D0dFIj/1/
-		// non number matcher https://regex101.com/r/VRXwpC/1/
-		private static readonly Regex noNumberMatcher = new Regex(@"[^-\d.]+", RegexOptions.Compiled | RegexOptions.Multiline);
-
-		private static bool HandleGrouping(bool isEnabled, LogEntry entry, int row, string preview, List<CachedConsoleInfo> entries)
-		{
-			if (!isEnabled)
-			{
-				return false;
-			}
-			
-			using (new ProfilerMarker("Console Log Grouping").Auto())
-			{
-				var text = preview;
-				const string marker = "<group>";
-				var start = text.IndexOf(marker, StringComparison.InvariantCulture);
-				if (start <= 0) return false;
-				const string timestampEnd = "] ";
-				var timestampIndex = text.IndexOf(timestampEnd, StringComparison.Ordinal);
-				var timestamp = string.Empty;
-				if (timestampIndex < start)
-				{
-					timestamp = text.Substring(0, timestampIndex + timestampEnd.Length);
-				}
-
-
-				// var match = noNumberMatcher.Match(text);
-				text = text.Substring(start + marker.Length).TrimStart();
-				
-				builder.Clear();
-				var key = builder.Append(entry.file).Append("::").Append(entry.line).Append("::").ToString();
-				builder.Clear();
-				
-				
-				text = builder.Append(timestamp).Append(text).ToString();
-
-				entry.message += "\n" + UnityDemystify.DemystifyEndMarker;
-				var newEntry = new CachedConsoleInfo()
-				{
-					entry = new LogEntryInfo(entry),
-					row = row,
-					str = text,
-					groupSize = 1
-				};
-				
-				if (groupedLogs.TryGetValue(key, out var val))
-				{
-					var ex = entries[val];
-					newEntry.row = ex.row;
-					newEntry.groupSize = ex.groupSize + 1;
-					var history = "\n" + ex.str;
-					newEntry.str += history;
-					newEntry.entry.message += history;
-					entries[val] = newEntry;
-				}
-				else
-				{
-					groupedLogs.Add(key, entries.Count);
-					entries.Add(newEntry);
-				}
-
-				return true;
-				// if (match.Success)
-				// {
-				// }
-				// return false;
-			}
-		}
+		
 	}
 }

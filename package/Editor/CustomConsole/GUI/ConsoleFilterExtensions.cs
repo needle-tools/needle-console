@@ -8,14 +8,14 @@ namespace Needle.Demystify
 
 		public static Color BeforeOnGUI(this IConsoleFilter fil, bool anySolo)
 		{
-			var prevColor = GUI.color;
-			if (anySolo && !fil.HasAnySolo()) GUI.color = DisabledColor;
+			var prevColor = UnityEngine.GUI.color;
+			if (anySolo && !fil.HasAnySolo()) UnityEngine.GUI.color = DisabledColor;
 			return prevColor;
 		}
 		
 		public static void AfterOnGUI(this IConsoleFilter fil, Color prevColor)
 		{
-			GUI.color = prevColor;
+			UnityEngine.GUI.color = prevColor;
 		}
 	}
 }
