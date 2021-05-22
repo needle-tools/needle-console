@@ -4,6 +4,13 @@ All notable changes to this package will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## [1.5.1-exp] - 2021-05-18
+- Cleanup context menu
+- Fix issue with presets not being found on startup and applied presets were not saved to UserSettings
+- Improve regex performance of log prefixes
+- Better first install log with clickable preferences link
+- Added generic hyperlink type
+
 ## [1.5.0-exp] - 2021-05-14
 - Refactor to save filters in UserSettings by default. Created filter group objects behave like presets and can only be applied or saved to.
 - Improve console list scrolling (auto-scrolling, selection and focus of previously selected row if filters change)
