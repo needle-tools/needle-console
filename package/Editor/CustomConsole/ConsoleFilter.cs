@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
+using System.Text.RegularExpressions;
 using Unity.Profiling;
 using UnityEditor;
 using UnityEngine;
@@ -206,6 +208,7 @@ namespace Needle.Demystify
 					cachedLogResultForMask.Clear();
 					logEntries.Clear();
 					Global = new Stats();
+					ClearGrouping();
 				}
 
 				isDirty = false;
@@ -320,12 +323,15 @@ namespace Needle.Demystify
 						cachedLogResultForMask.Add(key, skip);
 					if (enabled && skip) continue;
 
-					entries.Add(new CachedConsoleInfo()
+					if (!HandleGrouping(entry, i, preview, entries))
 					{
-						entry = new LogEntryInfo(entry),
-						row = i,
-						str = preview
-					});
+						entries.Add(new CachedConsoleInfo()
+						{
+							entry = new LogEntryInfo(entry),
+							row = i,
+							str = preview
+						});
+					}
 				}
 			}
 		}
@@ -335,6 +341,72 @@ namespace Needle.Demystify
 			var glob = Global;
 			glob.Add(fr);
 			Global = glob;
+		}
+
+		private static readonly Dictionary<string, int> groupedLogs = new Dictionary<string, int>();
+		private static void ClearGrouping() => groupedLogs.Clear();
+		private static StringBuilder builder = new StringBuilder();
+		// number matcher https://regex101.com/r/D0dFIj/1/
+		// non number matcher https://regex101.com/r/VRXwpC/1/
+		private static Regex noNumberMatcher = new Regex(@"[^-\d.]+", RegexOptions.Compiled | RegexOptions.Multiline);
+		private static bool HandleGrouping(LogEntry entry, int row, string preview, List<CachedConsoleInfo> entries)
+		{
+			var text = preview;
+			const string marker = "<group>";
+			var start = text.IndexOf(marker, StringComparison.InvariantCulture);
+			if (start <= 0) return false;
+			const string timestampEnd = "] ";
+			var timestampIndex = text.IndexOf(timestampEnd, StringComparison.Ordinal);
+			var timestamp = string.Empty;
+			if (timestampIndex < start)
+			{
+				timestamp = text.Substring(0, timestampIndex + timestampEnd.Length);
+			}
+			var match = noNumberMatcher.Match(text);
+			text = text.Substring(start + marker.Length).TrimStart();
+			if (match.Success)
+			{
+				builder.Clear();
+				var key = builder.Append(entry.file).Append("::").Append(entry.line).Append("::").Append(match.Value).ToString();
+				builder.Clear();
+				text = builder.Append(timestamp).Append(text).ToString();
+				var newEntry = new CachedConsoleInfo()
+				{
+					entry = new LogEntryInfo(entry),
+					row = row,
+					str = text
+				};
+				if (groupedLogs.TryGetValue(key, out var val))
+				{
+					var ex = entries[val];
+					newEntry.row = ex.row;
+					entries[val] = newEntry;
+				}
+				else
+				{
+					groupedLogs.Add(key, entries.Count);
+					entries.Add(newEntry);
+				}
+
+				return true;
+			}
+
+
+			// https://regex101.com/r/D0dFIj/1
+			// bool isInNumberSequence;
+			// for (var index = 0; index < text.Length; index++)
+			// {
+			// 	var c = text[index];
+			// 	// if(int.TryParse(c, out _
+			// }
+
+			// if (float.TryParse(text, out var res))  
+			// {
+			// 	
+			// 	return true; 
+			// }
+
+			return false;
 		}
 	}
 }
