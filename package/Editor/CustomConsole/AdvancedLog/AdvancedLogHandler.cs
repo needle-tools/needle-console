@@ -57,9 +57,17 @@ namespace Needle.Demystify
 		{
 			if (!logsData.ContainsKey(index)) return;
 			var data = logsData[index];
+			
+			GraphUtils.DrawRect(rect, new Color(0,0,0,.1f));
+			GraphUtils.DrawOutline(rect, new Color(.7f,.7f,.7f,.3f));
+			
 			floatValues.Clear();
-			data.GetFloatData(floatValues, out float min, out float max);
-			GraphUtils.DrawGraph(rect, floatValues, min, max);
+			data.GetFloatData(floatValues, out float min, out float max, 0);
+			GraphUtils.DrawGraph(rect, floatValues, min, max, Color.white);
+			
+			floatValues.Clear();
+			data.GetFloatData(floatValues, out min, out max, 1);
+			GraphUtils.DrawGraph(rect, floatValues, min, max, Color.gray);
 		}
 
 

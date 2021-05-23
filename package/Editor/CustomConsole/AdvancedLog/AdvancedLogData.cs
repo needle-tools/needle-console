@@ -15,20 +15,29 @@ namespace Needle.Demystify
 		public float MinValue { get; private set; } = float.MaxValue;
 		public float MaxValue { get; private set; } = float.MinValue;
 		
-		public void GetFloatData(List<float> floats, out float min, out float max)
+		public void GetFloatData(List<float> floats, out float min, out float max, int index = 0)
 		{
 			min = float.MaxValue;
 			max = float.MinValue;
 			if (Data == null) return;
+			var lastFrame = -1;
+			var currentIndex = 0;
 			for (var i = 0; i < Data.Count; i++)
 			{
 				var entry = Data[i];
-				if (entry is LogData<float> vl)
+				if (lastFrame < 0 || currentIndex == index)
 				{
-					min = Mathf.Min(vl.Value, min);
-					max = Mathf.Max(vl.Value, max);
-					floats.Add(vl.Value);
+					if (entry is LogData<float> vl)
+					{
+						min = Mathf.Min(vl.Value, min);
+						max = Mathf.Max(vl.Value, max);
+						floats.Add(vl.Value);
+					}
 				}
+
+				if (entry.Frame == lastFrame) currentIndex += 1;
+				else currentIndex = 0;
+				lastFrame = entry.Frame;
 			}
 		}
 

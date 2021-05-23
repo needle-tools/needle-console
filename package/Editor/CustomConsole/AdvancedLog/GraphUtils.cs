@@ -5,15 +5,13 @@ namespace Needle.Demystify
 {
 	internal static class GraphUtils
 	{
-		public static void DrawGraph(Rect rect, List<float> floats, float min, float max)
+		public static void DrawGraph(Rect rect, List<float> floats, float min, float max, Color color)
 		{
-			DrawRect(rect, new Color(0,0,0,.1f));
-			DrawOutline(rect, new Color(.7f,.7f,.7f,.3f));
-			
+			if (floats == null || floats.Count <= 0) return;
 			GUIUtils.SimpleColored.SetPass(0);
 			GL.PushMatrix();
 			GL.Begin(GL.LINE_STRIP);
-			GL.Color(Color.white);
+			GL.Color(color);
 			for (var i = 0; i < floats.Count; i++)
 			{
 				var val = floats[i];
