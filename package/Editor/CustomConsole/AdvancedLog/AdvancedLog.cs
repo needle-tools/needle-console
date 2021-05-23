@@ -17,7 +17,8 @@ namespace Needle.Demystify
 			ConsoleFilter.CustomAddEntry += CustomAdd;
 			ConsoleList.LogEntryContextMenu += OnLogEntryContext;
 
-			handler = new AdvancedLogHandler(ConsoleLogAdvancedUserSettings.instance.selections);
+			var list = AdvancedLogUserSettings.instance.selections;  
+			handler = new AdvancedLogHandler(list);
 			ConsoleList.RegisterCustomDrawer(handler);
 		}
 
@@ -68,8 +69,8 @@ namespace Needle.Demystify
 			}
 		}
 
-		private static List<AdvancedLogEntry> Entries => ConsoleLogAdvancedUserSettings.instance.selections;
-		private static void SaveEntries() => ConsoleLogAdvancedUserSettings.instance.Save();
+		private static void SaveEntries() => AdvancedLogUserSettings.instance.Save();
+		private static List<AdvancedLogEntry> Entries => AdvancedLogUserSettings.instance.selections;
 
 		private static bool TryGetIndex(LogEntryInfo entry, out int index)
 		{

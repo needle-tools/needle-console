@@ -3,8 +3,8 @@ using UnityEditor;
 
 namespace Needle.Demystify
 {
-	[FilePath("UserSettings/ConsoleLogAdvancedUserSettings.asset", FilePathAttribute.Location.ProjectFolder)]
-	internal class ConsoleLogAdvancedUserSettings : ScriptableSingleton<ConsoleLogAdvancedUserSettings>
+	[FilePath("UserSettings/ConsoleAdvancedUserSettings.asset", FilePathAttribute.Location.ProjectFolder)]
+	internal class AdvancedLogUserSettings : ScriptableSingleton<AdvancedLogUserSettings>
 	{
 		public void Save() => Save(true);
 
