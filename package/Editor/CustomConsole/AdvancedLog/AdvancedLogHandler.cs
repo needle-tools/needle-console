@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using UnityEditor;
+using UnityEditorInternal;
 using UnityEngine;
 
 namespace Needle.Demystify
@@ -59,6 +60,8 @@ namespace Needle.Demystify
 		private static readonly List<ILogData<float>> floatValues = new List<ILogData<float>>(300);
 		private static readonly List<ILogData<Vector3>> vecValues = new List<ILogData<Vector3>>(300);
 		private static readonly List<ILogData<string>> values = new List<ILogData<string>>(300);
+		private static readonly StringBuilder plain = new StringBuilder();
+		private static GUIStyle labelStyle;
 
 		private void DrawGraph(int index, Rect rect, out float height)
 		{
@@ -66,22 +69,30 @@ namespace Needle.Demystify
 			if (!logsData.ContainsKey(index)) return;
 			var data = logsData[index];
 
+			if (labelStyle == null)
+			{
+				labelStyle = new GUIStyle(EditorStyles.label);
+			}
+
 			// GraphUtils.DrawRect(rect, new Color(0,0,0,.1f));
 			// GraphUtils.DrawOutline(rect, new Color(.7f,.7f,.7f,.3f));
 
 			var list = values;
 			data.TryGetData(list, 0);
 
-			var str = string.Empty;
-			var line = new Rect(0, 0, rect.width, EditorGUIUtility.singleLineHeight);
+			var plainTextRect = new Rect(0, 0, rect.width, EditorGUIUtility.singleLineHeight);
+			plain.Clear();
 			for (var i = list.Count - 1; i >= 0; i--)
 			{
 				var e = list[i];
-				GUI.Label(line, e.Value);
-				line.y += line.height;
+				plain.AppendLine(e.Value);
 			}
 
-			height = line.y;
+			var content = new GUIContent(plain.ToString());
+			plainTextRect.height = labelStyle.CalcHeight(content, plainTextRect.width);
+			GUI.Label(plainTextRect, content, labelStyle);
+			height = plainTextRect.height;
+			plain.Clear();
 
 			// GraphUtils.DrawGraph(rect, floatValues, -1, 1, Color.white);
 

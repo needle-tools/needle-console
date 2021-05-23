@@ -152,11 +152,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 89f29f038f5a1a64bb1343ee6cc8867d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  TimeInterval: 0.02
+  EveryFrame: 0
+  TimeInterval: 0.5
   TimeScale: 3
   LogSimple: 1
-  LogSimple2: 1
-  LogComplex: 0
+  LogSimple2: 0
+  LogComplex: 1
   LogComplex2: 0
   LogStrings: 0
   LogVector3: 0
