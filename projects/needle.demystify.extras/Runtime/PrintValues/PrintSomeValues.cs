@@ -2,24 +2,43 @@ using UnityEngine;
 
 public class PrintSomeValues : MonoBehaviour
 {
-	public bool LogUngroupedMessage;
 	public float TimeInterval;
+	public float TimeScale = 1;
 
+
+	[Header("What")] 
+	public bool LogSimple;
+	public bool LogSimple2;
+	public bool LogComplex;
+	public bool LogComplex2;
+	public bool LogStrings;
+	public bool LogVector3;
+	
 	private float lastTime = -10000;
+
 	private int index;
 	private string[] someStrings = new[] {"one", "two", "three"};
-	
+
 	private void Update()
 	{
-		if (TimeInterval > 0 && Time.time - lastTime < TimeInterval) return;
+		var time = Time.time * TimeScale;
+		var lt = lastTime * TimeScale;
+		if (TimeInterval > 0 && time - lt < TimeInterval * TimeScale) return;
 		lastTime = Time.time;
+
+		if (LogSimple)
+			Debug.Log("Sine Wave: " + Mathf.Sin(time));
+		if (LogSimple2)
+			Debug.Log("Sine Wave: " + Mathf.Sin(time) + "; Cos Wave: " + Mathf.Cos(time));
+		if (LogComplex)
+			Debug.Log("Bit more complex: " + Random.value.ToString("0.00") + ", " + Random.insideUnitSphere);
+		if (LogComplex2)
+			Debug.Log("Frame: " + Time.frameCount + ", " + time + ", " + Random.rotation);
+		if (LogStrings)
+			Debug.Log("Group without value " + someStrings[index % someStrings.Length]);
+		if (LogVector3)
+			Debug.Log("Vector3 log: " + new Vector3(Mathf.Sin(time), Mathf.Cos(time), Random.value));
 		
-		if (LogUngroupedMessage)
-			Debug.Log("This is not grouped " + Time.time);
-		Debug.Log("Random Value: " + Random.value.ToString("0.00")); // + ", " + Random.insideUnitSphere);
-		Debug.Log("Bit more complex: " + Random.value.ToString("0.00") + ", " + Random.insideUnitSphere);
-		Debug.Log("Frame: " + Time.frameCount + ", " + Time.time + ", " + Random.rotation);
-		Debug.Log("Group without value " + someStrings[index % someStrings.Length]);
 		index += 1;
 	}
 }

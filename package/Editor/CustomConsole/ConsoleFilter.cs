@@ -56,7 +56,7 @@ namespace Needle.Demystify
 		public LogEntryInfo entry;
 		public string str;
 		public int row;
-		public int groupSize;
+		public int collapseCount;
 	}
 
 	public struct LogEntryInfo
@@ -333,7 +333,7 @@ namespace Needle.Demystify
 						cachedLogResultForMask.Add(key, skip);
 					if (enabled && skip) continue;
 
-					if (CustomAddEntry == null || CustomAddEntry.Invoke(entry, i, preview, entries))
+					if (CustomAddEntry == null || !CustomAddEntry.Invoke(entry, i, preview, entries))
 					{
 						entries.Add(new CachedConsoleInfo()
 						{

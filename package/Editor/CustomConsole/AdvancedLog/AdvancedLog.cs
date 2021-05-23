@@ -60,7 +60,7 @@ namespace Needle.Demystify
 		{
 			if (!DemystifySettings.instance.DynamicGrouping)
 			{
-				return true;
+				return false;
 			}
 
 			using (new ProfilerMarker("Console Log Grouping").Auto())

@@ -347,14 +347,13 @@ namespace Needle.Demystify
 
 			var didDrawStacktrace = false;
 			var text = selectedText ?? string.Empty;
+			scrollAreaHeight += 1;
 			var stacktraceContentRect = new Rect(0, scrollAreaHeight, width, Screen.height - scrollAreaHeight);
-			var stackWithHyperlinks = ConsoleWindow.StacktraceWithHyperlinks(text);
-			var stacktraceHeight = ConsoleWindow.Constants.MessageStyle.CalcHeight(GUIContent.Temp(stackWithHyperlinks), width);
 			try
 			{
 				foreach (var drawer in customDrawers)
 				{
-					if (drawer.OnDrawStacktrace(selectedRowIndex, text, stacktraceContentRect, stackWithHyperlinks, stacktraceHeight))
+					if (drawer.OnDrawStacktrace(selectedRowIndex, text, stacktraceContentRect))
 					{
 						didDrawStacktrace = true;
 						break;
@@ -368,7 +367,7 @@ namespace Needle.Demystify
 
 			if (!didDrawStacktrace)
 			{
-				DrawDefaultStacktrace(stackWithHyperlinks, stacktraceHeight);
+				DrawDefaultStacktrace(text);
 			}
 
 			GUILayout.EndScrollView();
@@ -376,11 +375,18 @@ namespace Needle.Demystify
 			return false;
 		}
 
-		internal static void DrawDefaultStacktrace(string text, float height)
+		internal static void DrawDefaultStacktrace(string message)
+		{
+			var stackWithHyperlinks = ConsoleWindow.StacktraceWithHyperlinks(message);
+			var stacktraceHeight = ConsoleWindow.Constants.MessageStyle.CalcHeight(GUIContent.Temp(stackWithHyperlinks), Screen.width);
+			DrawDefaultStacktrace(stackWithHyperlinks, stacktraceHeight);
+		}
+
+		internal static void DrawDefaultStacktrace(string stacktraceWithHyperlinks, float height)
 		{
 			try
 			{
-				EditorGUILayout.SelectableLabel(text,
+				EditorGUILayout.SelectableLabel(stacktraceWithHyperlinks,
 					ConsoleWindow.Constants.MessageStyle,
 					GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true),
 					GUILayout.MinHeight(height + EditorGUIUtility.singleLineHeight * 2));
@@ -451,13 +457,13 @@ namespace Needle.Demystify
 
 			// draw badge
 			var collapsed = IsCollapsed();
-			var isGrouped = item.groupSize > 0;
+			var isGrouped = item.collapseCount > 0;
 			if (collapsed || isGrouped)
 			{
 				var badgeRect = element.position;
 				badgeRect.height = lineHeight;
 				var entryCount = collapsed ? LogEntries.GetEntryCount(item.row) : 0;
-				entryCount += item.groupSize;
+				entryCount += item.collapseCount;
 				// if (collapsed && item.groupSize > 0) entryCount -= 1;
 				
 				tempContent.text = entryCount.ToString(CultureInfo.InvariantCulture);
