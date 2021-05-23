@@ -74,8 +74,9 @@ namespace Needle.Demystify
 
 			var str = string.Empty;
 			var line = new Rect(0, 0, rect.width, EditorGUIUtility.singleLineHeight);
-			foreach (var e in list)
+			for (var i = list.Count - 1; i >= 0; i--)
 			{
+				var e = list[i];
 				GUI.Label(line, e.Value);
 				line.y += line.height;
 			}

@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using UnityEditor;
 using UnityEngine;
 
@@ -19,9 +18,8 @@ namespace Needle.Demystify
 		internal static IReadOnlyList<CachedConsoleInfo> CurrentEntries => currentEntries;
 
 		internal delegate void LogEntryContextMenuDelegate(GenericMenu menu, int itemIndex);
-
 		internal static event LogEntryContextMenuDelegate LogEntryContextMenu;
-
+		
 		private static readonly List<ICustomLogDrawer> customDrawers = new List<ICustomLogDrawer>();
 
 		internal static void RegisterCustomDrawer(ICustomLogDrawer drawer)
@@ -47,12 +45,30 @@ namespace Needle.Demystify
 		private static Vector2 scrollStacktrace;
 		private static readonly List<CachedConsoleInfo> currentEntries = new List<CachedConsoleInfo>();
 		private static readonly List<Rect> currentEntriesRects = new List<Rect>();
-		private static readonly SplitterState spl = SplitterState.FromRelative(new float[] {70, 30}, new float[] {32, 32}, null);
 
-		private static int selectedRowIndex = -1, previouslySelectedRowIndex = -2, rowDoubleClicked = -1;
+		private static Vector2 SplitterSize
+		{
+			get => SessionState.GetVector3("CustomConsoleSplitter", new Vector2(70, 30));
+			set => SessionState.SetVector3("CustomConsoleSplitter", value);
+		}
+
+		private static SplitterState spl;
+
+		private static int SelectedRowIndex
+		{
+			get => SessionState.GetInt("ConsoleList-SelectedRow", -1);
+			set => SessionState.SetInt("ConsoleList-SelectedRow", value);
+		}
+
+		private static int selectedRowIndex
+		{
+			get => SelectedRowIndex;
+			set => SelectedRowIndex = value;
+		}
+
+		private static int previouslySelectedRowIndex = -2, rowDoubleClicked = -1;
 		private static int selectedRowNumber = -1;
 		private static string selectedText;
-
 		private static int collapsedFlag = 1 << 0;
 
 		/// <summary>
@@ -136,7 +152,14 @@ namespace Needle.Demystify
 			}
 
 
+			if (spl == null)
+			{
+				var size = SplitterSize;
+				spl = SplitterState.FromRelative(new[] {size.x, size.y}, new float[] {32, 32}, null);
+			}
+
 			SplitterGUILayout.BeginVerticalSplit(spl);
+			SplitterSize = new Vector2(spl.relativeSizes[0], spl.relativeSizes[1]);
 
 			var lineCount = ConsoleWindow.Constants.LogStyleLineCount;
 			xOffset = ConsoleWindow.Constants.LogStyleLineCount == 1 ? 2 : 14;
@@ -194,6 +217,7 @@ namespace Needle.Demystify
 
 			tempContent = new GUIContent();
 			var evt = Event.current;
+			var leftClickedLog = false;
 			if (evt.type == EventType.Repaint || evt.type == EventType.MouseUp)
 			{
 				try
@@ -207,6 +231,11 @@ namespace Needle.Demystify
 					{
 						var isVisible = IsVisible(position);
 						bool IsVisible(Rect r) => r.y + r.height >= scroll.y && r.y <= scroll.y + scrollAreaHeight;
+
+						if (selectedRowIndex == k)
+						{
+							SelectRow(k);
+						}
 
 						if (Event.current.type == EventType.Repaint)
 						{
@@ -244,8 +273,10 @@ namespace Needle.Demystify
 						{
 							if (Event.current.button == 0)
 							{
-								if (rect.Contains(Event.current.mousePosition))
+								if (!leftClickedLog && rect.Contains(Event.current.mousePosition))
 								{
+									leftClickedLog = true;
+
 									var entry = currentEntries[k].entry;
 									isAutoScrolling = false;
 									SelectRow(k);
@@ -307,21 +338,32 @@ namespace Needle.Demystify
 				}
 			}
 
-			if (Event.current.type == EventType.ScrollWheel)
+			switch (Event.current.type)
 			{
-				isAutoScrolling = false;
-			}
+				case EventType.ScrollWheel:
+					isAutoScrolling = false;
+					break;
+				case EventType.MouseUp when Event.current.button == 0:
+					if (!leftClickedLog && new Rect(0,0, Screen.width, Screen.height).Contains(Event.current.mousePosition))
+					{ 
+						SelectRow(-1); 
+						console.Repaint(); 
+					}
 
-			if (selectedRowIndex >= 0 && Event.current.type == EventType.KeyDown)
-			{
-				HandleKeyboardInput(position, console, scrollAreaHeight, lineHeight);
-			}
-
-			if (Event.current.type == EventType.MouseUp && Event.current.button == 1)
-			{
-				var menu = new GenericMenu();
-				AddConfigMenuItems(menu, selectedRowIndex);
-				menu.ShowAsContext();
+					break;
+				case EventType.MouseUp when Event.current.button == 1:
+				{
+					var menu = new GenericMenu();
+					AddConfigMenuItems(menu, selectedRowIndex);
+					menu.ShowAsContext();
+					break;
+				}
+				case EventType.KeyDown:
+				{
+					if (selectedRowIndex >= 0)
+						HandleKeyboardInput(position, console, scrollAreaHeight, lineHeight);
+					break;
+				}
 			}
 
 			if (rowDoubleClicked >= 0)
@@ -392,7 +434,7 @@ namespace Needle.Demystify
 					GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true),
 					GUILayout.MinHeight(height + EditorGUIUtility.singleLineHeight * 2));
 			}
-			catch 
+			catch
 				// (ArgumentException ex)
 			{
 				// Debug.LogException(ex);
@@ -466,7 +508,7 @@ namespace Needle.Demystify
 				var entryCount = collapsed ? LogEntries.GetEntryCount(item.row) : 0;
 				entryCount += item.collapseCount;
 				// if (collapsed && item.groupSize > 0) entryCount -= 1;
-				
+
 				tempContent.text = entryCount.ToString(CultureInfo.InvariantCulture);
 				var badgeSize = ConsoleWindow.Constants.CountBadge.CalcSize(tempContent);
 				if (ConsoleWindow.Constants.CountBadge.fixedHeight > 0)
@@ -594,6 +636,12 @@ namespace Needle.Demystify
 				var i = currentEntries[index];
 				selectedRowNumber = i.row;
 				selectedText = i.entry.message;
+			}
+			else if (index == -1)
+			{
+				selectedRowIndex = -1;
+				selectedText = null;
+				selectedRowNumber = -1;
 			}
 		}
 
