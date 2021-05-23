@@ -342,8 +342,8 @@ namespace Needle.Demystify
 			// Display active text (We want word wrapped text with a vertical scrollbar)
 			scrollAreaHeight += 2;
 			GUILayout.Space(scrollAreaHeight);
+			SeparatorLine.Draw(scrollAreaHeight + EditorGUIUtility.singleLineHeight);
 			scrollStacktrace = GUILayout.BeginScrollView(scrollStacktrace, ConsoleWindow.Constants.Box);
-			SeparatorLine.Draw(scrollStacktrace.y);
 
 			var didDrawStacktrace = false;
 			var text = selectedText ?? string.Empty;
@@ -375,11 +375,12 @@ namespace Needle.Demystify
 			return false;
 		}
 
-		internal static void DrawDefaultStacktrace(string message)
+		internal static float DrawDefaultStacktrace(string message)
 		{
 			var stackWithHyperlinks = ConsoleWindow.StacktraceWithHyperlinks(message);
 			var stacktraceHeight = ConsoleWindow.Constants.MessageStyle.CalcHeight(GUIContent.Temp(stackWithHyperlinks), Screen.width);
 			DrawDefaultStacktrace(stackWithHyperlinks, stacktraceHeight);
+			return stacktraceHeight;
 		}
 
 		internal static void DrawDefaultStacktrace(string stacktraceWithHyperlinks, float height)

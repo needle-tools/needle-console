@@ -2,18 +2,18 @@ using UnityEngine;
 
 public class PrintSomeValues : MonoBehaviour
 {
+	public bool EveryFrame;
 	public float TimeInterval;
 	public float TimeScale = 1;
 
 
-	[Header("What")] 
-	public bool LogSimple;
+	[Header("What")] public bool LogSimple;
 	public bool LogSimple2;
 	public bool LogComplex;
 	public bool LogComplex2;
 	public bool LogStrings;
 	public bool LogVector3;
-	
+
 	private float lastTime = -10000;
 
 	private int index;
@@ -23,7 +23,12 @@ public class PrintSomeValues : MonoBehaviour
 	{
 		var time = Time.time * TimeScale;
 		var lt = lastTime * TimeScale;
-		if (TimeInterval > 0 && time - lt < TimeInterval * TimeScale) return;
+		if (!EveryFrame)
+		{
+			if (TimeInterval > 0 && time - lt < TimeInterval * TimeScale)
+				return;
+		}
+
 		lastTime = Time.time;
 
 		if (LogSimple)
@@ -38,7 +43,9 @@ public class PrintSomeValues : MonoBehaviour
 			Debug.Log("Group without value " + someStrings[index % someStrings.Length]);
 		if (LogVector3)
 			Debug.Log("Vector3 log: " + new Vector3(Mathf.Sin(time), Mathf.Cos(time), Random.value));
-		
+
+		Debug.Log(Time.frameCount);
+
 		index += 1;
 	}
 }

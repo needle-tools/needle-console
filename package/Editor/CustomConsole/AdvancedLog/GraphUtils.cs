@@ -5,7 +5,7 @@ namespace Needle.Demystify
 {
 	internal static class GraphUtils
 	{
-		public static void DrawGraph(Rect rect, List<float> floats, float min, float max, Color color)
+		public static void DrawGraph(Rect rect, List<ILogData<float>> floats, float min, float max, Color color)
 		{
 			if (floats == null || floats.Count <= 0) return;
 			GUIUtils.SimpleColored.SetPass(0);
@@ -14,12 +14,11 @@ namespace Needle.Demystify
 			GL.Color(color);
 			for (var i = 0; i < floats.Count; i++)
 			{
-				var val = floats[i];
+				var entry = floats[i];
 				var t = (i / (float)floats.Count);
 				var x = rect.x + t * rect.width;
-				// GL.Vertex3(x, rect.y + rect.height, 0);
 				var y = rect.y + rect.height;
-				y -= Mathf.InverseLerp(min,max, val) * rect.height;
+				y -= Mathf.InverseLerp(min,max, entry.Value) * rect.height;
 				GL.Vertex3(x, y, 0);
 			}
 

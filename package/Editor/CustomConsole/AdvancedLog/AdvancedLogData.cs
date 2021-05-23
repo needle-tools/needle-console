@@ -1,83 +1,77 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text;
 using UnityEngine;
 
 namespace Needle.Demystify
 {
 	public class AdvancedLogData
 	{
-		public int MaxSize;
-		public int Length => Data?.Count ?? 0;
-
-		public ILogData this[int index] => Data[index];
-		public List<ILogData> Data;
-
-		public float MinValue { get; private set; } = float.MaxValue;
-		public float MaxValue { get; private set; } = float.MinValue;
+		public readonly int MaxSize;
+		public readonly List<ILogData> Data;
+		public int MaxId { get; private set; }
 		
-		public void GetFloatData(List<float> floats, out float min, out float max, int index = 0)
+		public bool TryGetData<T>(List<ILogData<T>> data, int id)
 		{
-			min = float.MaxValue;
-			max = float.MinValue;
-			if (Data == null) return;
-			var lastFrame = -1;
-			var currentIndex = 0;
+			if (Data == null) return false;
+			data.Clear();
 			for (var i = 0; i < Data.Count; i++)
 			{
 				var entry = Data[i];
-				if (lastFrame < 0 || currentIndex == index)
+				if (entry.Id == id)
 				{
-					if (entry is LogData<float> vl)
+					if (entry is LogData<T> vl)
 					{
-						min = Mathf.Min(vl.Value, min);
-						max = Mathf.Max(vl.Value, max);
-						floats.Add(vl.Value);
+						data.Add(vl);
 					}
 				}
-
-				if (entry.Frame == lastFrame) currentIndex += 1;
-				else currentIndex = 0;
-				lastFrame = entry.Frame;
 			}
+			return data.Count > 0;
 		}
 
-		public AdvancedLogData() : this(300)
-		{
-		}
-
+		public AdvancedLogData() : this(300) {}
 		public AdvancedLogData(int maxSize)
 		{
 			this.MaxSize = maxSize;
 			this.Data = new List<ILogData>(maxSize);
 		}
 
-		public void AddData(float vl)
+		public void AddData<T>(T entry, int id)
 		{
-			MinValue = Mathf.Min(vl, MinValue);
-			MaxValue = Mathf.Max(vl, MaxValue);
-			if (Data.Count + 1 > MaxSize) Data.RemoveAt(0);
-			Data.Add(new LogData<float>
+			if (Data.Count + 1 > MaxSize)
 			{
-				Value = vl,
-				Frame = Time.frameCount
+				Data.RemoveAt(0);
+			}
+
+			MaxId = Mathf.Max(MaxId, id);
+			
+			Data.Add(new LogData<T>
+			{
+				Id = id,
+				Value = entry,
+				Frame = -1, // todo: we can access time or frame here because it happens not immediately
+				Time = -1,
 			});
 		}
 	}
 
 	public interface ILogData
 	{
-		int Frame { get; set; }
-		Type ValueType();
+		public int Id { get; set; }
+		public float Time { get; set; }
+		public int Frame { get; set; }
 	}
 
-	public struct LogData<T> : ILogData
+	public interface ILogData<T> : ILogData
 	{
-		public T Value;
+		T Value { get; set; }
+	}
+
+	public struct LogData<T> : ILogData<T>
+	{
+		public int Id { get; set; }
+		public float Time { get; set; }
 		public int Frame { get; set; }
-		
-		public Type ValueType()
-		{
-			return typeof(T);
-		}
+		public T Value { get; set; }
 	}
 }

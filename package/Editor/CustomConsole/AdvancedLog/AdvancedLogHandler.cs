@@ -26,9 +26,9 @@ namespace Needle.Demystify
 			// return linesHandled * graphHeight;
 		}
 
-		public bool OnDrawStacktrace(int index,
-			string rawText,
-			Rect rect)
+		private float height;
+
+		public bool OnDrawStacktrace(int index, string rawText, Rect rect)
 		{
 			if (index < 0 || index >= ConsoleList.CurrentEntries.Count) return false;
 			var log = ConsoleList.CurrentEntries[index];
@@ -37,11 +37,15 @@ namespace Needle.Demystify
 			var graphRect = new Rect(1, 1, Screen.width, graphHeight);
 			// var totalHeight = graphRect.height * 2 + stacktraceHeight;
 			// if (totalHeight > rect.height)
-				graphRect.width -= 13; // scrollbar
-			if (Event.current.type == EventType.Repaint) DrawGraph(index, graphRect);
-			
-			
-			GUILayout.Space(graphHeight + EditorGUIUtility.singleLineHeight);
+			graphRect.width -= 13; // scrollbar
+			if (Event.current.type == EventType.Repaint)
+			{
+				DrawGraph(index, rect, out height);
+			}
+
+			GUILayout.Space(height);
+
+			// GUILayout.Space(graphHeight + EditorGUIUtility.singleLineHeight);
 			ConsoleList.DrawDefaultStacktrace(log.entry.message);
 			return true;
 		}
@@ -52,22 +56,37 @@ namespace Needle.Demystify
 			return false;
 		}
 
-		private static readonly List<float> floatValues = new List<float>(300);
-		private void DrawGraph(int index, Rect rect)
+		private static readonly List<ILogData<float>> floatValues = new List<ILogData<float>>(300);
+		private static readonly List<ILogData<Vector3>> vecValues = new List<ILogData<Vector3>>(300);
+		private static readonly List<ILogData<string>> values = new List<ILogData<string>>(300);
+
+		private void DrawGraph(int index, Rect rect, out float height)
 		{
+			height = 0;
 			if (!logsData.ContainsKey(index)) return;
 			var data = logsData[index];
-			
-			GraphUtils.DrawRect(rect, new Color(0,0,0,.1f));
-			GraphUtils.DrawOutline(rect, new Color(.7f,.7f,.7f,.3f));
-			
-			floatValues.Clear();
-			data.GetFloatData(floatValues, out float min, out float max, 0);
-			GraphUtils.DrawGraph(rect, floatValues, min, max, Color.white);
-			
-			floatValues.Clear();
-			data.GetFloatData(floatValues, out min, out max, 1);
-			GraphUtils.DrawGraph(rect, floatValues, min, max, Color.gray);
+
+			// GraphUtils.DrawRect(rect, new Color(0,0,0,.1f));
+			// GraphUtils.DrawOutline(rect, new Color(.7f,.7f,.7f,.3f));
+
+			var list = values;
+			data.TryGetData(list, 0);
+
+			var str = string.Empty;
+			var line = new Rect(0, 0, rect.width, EditorGUIUtility.singleLineHeight);
+			foreach (var e in list)
+			{
+				GUI.Label(line, e.Value);
+				line.y += line.height;
+			}
+
+			height = line.y;
+
+			// GraphUtils.DrawGraph(rect, floatValues, -1, 1, Color.white);
+
+			// floatValues.Clear();
+			// data.GetData(floatValues, 1);
+			// GraphUtils.DrawGraph(rect, floatValues, -1, 1, Color.gray);
 		}
 
 
@@ -123,13 +142,14 @@ namespace Needle.Demystify
 						var newIndex = entries.Count;
 						logs.Add(key, newIndex);
 						entries.Add(newEntry);
-						
+
 						data = new AdvancedLogData();
 						logsData.Add(newIndex, data);
 					}
-					
-					
+
+
 					// parse data
+					// const string timestampStart = "[";
 					const string timestampEnd = "] ";
 					var timestampIndex = preview.IndexOf(timestampEnd, StringComparison.Ordinal);
 					var messageStart = timestampIndex > 0 ? (timestampIndex + timestampEnd.Length) : 0;
@@ -145,17 +165,25 @@ namespace Needle.Demystify
 		// non number matcher https://regex101.com/r/VRXwpC/1/
 		// grouped numbers, separated by ,s https://regex101.com/r/GJVz7t/1 -> [,-.\d ]+
 		//TODO: capture arrays
-		
+
 		private static readonly Regex numberMatcher = new Regex(@"[,-.\d ]+", RegexOptions.Compiled | RegexOptions.Multiline);
 		private static readonly StringBuilder valueBuilder = new StringBuilder();
 		private static readonly List<float> vectorValues = new List<float>(4);
-		
+
 		private void ParseLogData(AdvancedLogData data, string text, int startIndex)
 		{
 			var numbers = numberMatcher.Matches(text, startIndex);
+			// id marks the # of value fields in a log message
+			var id = 0;
+
+			data.AddData(text, id);
+			id += 1;
+
 			foreach (Match match in numbers)
 			{
 				var str = match.Value;
+
+				if (str.Length == 0) continue;
 				// ignore empty spaces
 				if (str.Length == 1 && str == " ") continue;
 
@@ -166,53 +194,71 @@ namespace Needle.Demystify
 					// TODO: test format of matrices if we want to support that at some point 
 					valueBuilder.Clear();
 					vectorValues.Clear();
+
 					void TryParseCollectedValue()
 					{
 						if (valueBuilder.Length <= 0) return;
 						var parsed = valueBuilder.ToString();
 						valueBuilder.Clear();
-						if (float.TryParse(parsed, out var val)) 
+						if (float.TryParse(parsed, out var val))
 							vectorValues.Add(val);
 					}
+
 					for (var i = 0; i < str.Length; i++)
 					{
 						var c = str[i];
-						if (c == vectorSeparator)
-							TryParseCollectedValue();
-						else if (c == ' ')
+						switch (c)
 						{
-							continue;
-						}
-						else
-						{
-							valueBuilder.Append(c);
+							case vectorSeparator:
+								TryParseCollectedValue();
+								break;
+							case ' ':
+								continue;
+							default:
+								valueBuilder.Append(c);
+								break;
 						}
 					}
+
 					TryParseCollectedValue();
 					switch (vectorValues.Count)
 					{
 						case 1:
+							data.AddData(vectorValues[0], id);
 							break;
 						case 2:
+							data.AddData(new Vector2(vectorValues[0], vectorValues[1]), id);
 							break;
 						case 3:
+							data.AddData(new Vector3(vectorValues[0], vectorValues[1], vectorValues[2]), id);
 							break;
 						case 4:
+							data.AddData(new Vector4(vectorValues[0], vectorValues[1], vectorValues[2], vectorValues[3]), id);
 							break;
 					}
 				}
 				// float types:
-				else if(str.Contains("."))
+				else if (str.Contains("."))
 				{
 					if (float.TryParse(str, out var fl))
 					{
-						data.AddData(fl);
+						data.AddData(fl, id);
 					}
 				}
-				
+
 				// TODO integer or string types
-				
+
+
+				id += 1;
 			}
+		}
+
+		private static DateTime playmodeStartTime;
+
+		[RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
+		private static void EnterPlaymode()
+		{
+			playmodeStartTime = DateTime.Now;
 		}
 	}
 }
