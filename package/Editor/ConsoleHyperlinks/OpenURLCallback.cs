@@ -46,9 +46,17 @@ namespace Needle
 				else if (Directory.Exists(path))
 				{
 					var absolute = Path.GetFullPath(path);
-					// any files in here? we want to go directly into the directory
-					var firstFile = Directory.GetFiles(path).FirstOrDefault();
-					EditorUtility.RevealInFinder(firstFile != null ? firstFile : path);
+					try
+					{
+						// any files in here? we want to go directly into the directory
+						var firstFile = Directory.GetFiles(path).FirstOrDefault();
+						EditorUtility.RevealInFinder(firstFile != null ? firstFile : path);
+						return true;
+					}
+					catch // GetFiles can throw
+					{
+						// ignored
+					}
 				}
 			}
 			
