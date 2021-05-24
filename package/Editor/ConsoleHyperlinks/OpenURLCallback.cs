@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
+using UnityEditor;
 using UnityEngine;
 
 namespace Needle
@@ -40,6 +42,13 @@ namespace Needle
 						OpenWithDefaultProgram(absolute);
 						return true;
 					}
+				}
+				else if (Directory.Exists(path))
+				{
+					var absolute = Path.GetFullPath(path);
+					// any files in here? we want to go directly into the directory
+					var firstFile = Directory.GetFiles(path).FirstOrDefault();
+					EditorUtility.RevealInFinder(firstFile != null ? firstFile : path);
 				}
 			}
 			
