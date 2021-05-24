@@ -13,7 +13,7 @@ namespace Needle
 		// ReSharper disable once UnusedMember.Local
 		private static bool OnHyperlinkClicked(string path)
 		{
-			if (path.StartsWith("www."))
+			if (path.StartsWith("www.") || path.StartsWith("http://") || path.StartsWith("https://"))
 			{
 				Application.OpenURL(path);
 				return true;
