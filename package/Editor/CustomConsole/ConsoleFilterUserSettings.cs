@@ -44,12 +44,12 @@ namespace Needle.Demystify
 		
 		public IEnumerable<IConsoleFilter> EnumerateFilter()
 		{
-			yield return timeFilter;
 			yield return messageFilter;
 			yield return lineFilter;
 			yield return fileFilter;
 			yield return idFilter;
 			yield return packageFilter;
+			yield return timeFilter;
 		}
 		
 		[SerializeField]

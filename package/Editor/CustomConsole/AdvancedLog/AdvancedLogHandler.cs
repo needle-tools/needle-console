@@ -159,13 +159,15 @@ namespace Needle.Demystify
 						logsData.Add(newIndex, data);
 					}
 
+					var id = 0;
+					data.AddData(preview, id++);
 
 					// parse data
 					// const string timestampStart = "[";
-					const string timestampEnd = "] ";
-					var timestampIndex = preview.IndexOf(timestampEnd, StringComparison.Ordinal);
-					var messageStart = timestampIndex > 0 ? (timestampIndex + timestampEnd.Length) : 0;
-					ParseLogData(data, preview, messageStart);
+					// const string timestampEnd = "] ";
+					// var timestampIndex = preview.IndexOf(timestampEnd, StringComparison.Ordinal);
+					// var messageStart = timestampIndex > 0 ? (timestampIndex + timestampEnd.Length) : 0;
+					// ParseLogData(data, preview, messageStart, id);
 					return true;
 				}
 			}
@@ -182,14 +184,10 @@ namespace Needle.Demystify
 		private static readonly StringBuilder valueBuilder = new StringBuilder();
 		private static readonly List<float> vectorValues = new List<float>(4);
 
-		private void ParseLogData(AdvancedLogData data, string text, int startIndex)
+		private void ParseLogData(AdvancedLogData data, string text, int startIndex, int id)
 		{
 			var numbers = numberMatcher.Matches(text, startIndex);
 			// id marks the # of value fields in a log message
-			var id = 0;
-
-			data.AddData(text, id);
-			id += 1;
 
 			foreach (Match match in numbers)
 			{

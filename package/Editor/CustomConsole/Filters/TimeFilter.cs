@@ -64,8 +64,8 @@ namespace Needle.Demystify
 			if (TryGetTime(preview, out _, out var timeString))
 			{
 				var lt = new LogTime {TimeString = timeString};
-				AddContextMenuItem_Hide(menu, HideMenuItemPrefix + "Hide logs until " + timeString, lt);
-				AddContextMenuItem_Solo(menu, SoloMenuItemPrefix + "Only logs at " + timeString, lt);
+				AddContextMenuItem_Hide(menu, HideMenuItemPrefix + "Until " + timeString, lt);
+				AddContextMenuItem_Solo(menu, SoloMenuItemPrefix + "From " + timeString, lt);
 			}
 		}
 
