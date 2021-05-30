@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Needle.Demystify
+namespace Needle.Console
 {
 	internal static class Utils
 	{

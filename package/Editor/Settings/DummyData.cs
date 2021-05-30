@@ -1,4 +1,4 @@
-﻿namespace Needle.Demystify
+﻿namespace Needle.Console
 {
 	internal static class DummyData
 	{

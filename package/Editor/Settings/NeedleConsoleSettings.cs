@@ -3,10 +3,10 @@ using UnityEditor;
 using UnityEditorInternal;
 using UnityEngine;
 
-namespace Needle.Demystify
+namespace Needle.Console
 {
-	[FilePath("Preferences/DemystifySettings.asset", FilePathAttribute.Location.PreferencesFolder)]
-	internal class DemystifySettings : ScriptableSingleton<DemystifySettings>
+	[FilePath("Preferences/NeedleConsoleSettings.asset", FilePathAttribute.Location.PreferencesFolder)]
+	internal class NeedleConsoleSettings : ScriptableSingleton<NeedleConsoleSettings>
 	{
 		internal bool Enabled = true;
 		

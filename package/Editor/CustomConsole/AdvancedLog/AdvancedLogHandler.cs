@@ -7,7 +7,7 @@ using UnityEditor;
 using UnityEditorInternal;
 using UnityEngine;
 
-namespace Needle.Demystify
+namespace Needle.Console
 {
 	internal class AdvancedLogHandler : ICustomLogDrawer, ICustomLogCollapser
 	{

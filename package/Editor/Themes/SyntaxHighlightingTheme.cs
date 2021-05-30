@@ -6,7 +6,7 @@ using UnityEditor;
 using UnityEditor.Graphs;
 using UnityEngine;
 
-namespace Needle.Demystify
+namespace Needle.Console
 {
 	[CreateAssetMenu(menuName = "Needle/Demystify/Syntax Highlighting Theme")]
 	public class SyntaxHighlightingTheme : ScriptableObject
@@ -27,7 +27,7 @@ namespace Needle.Demystify
 
 		private void OnEnable()
 		{
-			previewHighlightingStyle = DemystifySettings.instance.SyntaxHighlighting;
+			previewHighlightingStyle = NeedleConsoleSettings.instance.SyntaxHighlighting;
 			if (target is SyntaxHighlightingTheme sh && sh.theme != null)
 				sh.theme.Name = target.name;
 		}
@@ -63,25 +63,25 @@ namespace Needle.Demystify
 			}
 
 			EditorGUILayout.LabelField("Theme Colors", EditorStyles.boldLabel);
-			DemystifySettingsProvider.DrawThemeColorOptions(theme, false);
+			NeedleConsoleSettingsProvider.DrawThemeColorOptions(theme, false);
 
 			EditorGUILayout.Space();
 			if (GUILayout.Button("Copy from Active"))
 			{
-				var currentTheme = DemystifySettings.instance.CurrentTheme;
+				var currentTheme = NeedleConsoleSettings.instance.CurrentTheme;
 				targetTheme.theme = currentTheme; 
 			}
 
 			if (GUILayout.Button("Activate"))
 			{
-				DemystifySettings.instance.CurrentTheme = theme;
+				NeedleConsoleSettings.instance.CurrentTheme = theme;
 			}
 
 			if (EditorGUI.EndChangeCheck())
 			{
 				Undo.RegisterCompleteObjectUndo(target, "Edited " + name);
-				if (theme == DemystifySettings.instance.CurrentTheme)
-					DemystifySettings.instance.UpdateCurrentTheme();
+				if (theme == NeedleConsoleSettings.instance.CurrentTheme)
+					NeedleConsoleSettings.instance.UpdateCurrentTheme();
 				serializedObject.ApplyModifiedProperties();
 				EditorUtility.SetDirty(target);
 			}
@@ -111,12 +111,12 @@ namespace Needle.Demystify
 				previewStyle = new GUIStyle(EditorStyles.label) {richText = true, wordWrap = false};
 			using (new EditorGUI.DisabledScope(true))
 			{
-				var settings = DemystifySettings.instance;
+				var settings = NeedleConsoleSettings.instance;
 				// var currentStyle = settings.SyntaxHighlighting;
 				// settings.SyntaxHighlighting = style;
 				theme.SetActive(previewColorDict);
 				var str = DummyData.SyntaxHighlightVisualization;
-				DemystifySettingsProvider.ApplySyntaxHighlightingMultiline(ref str, previewColorDict);;
+				NeedleConsoleSettingsProvider.ApplySyntaxHighlightingMultiline(ref str, previewColorDict);;
 				// settings.SyntaxHighlighting = currentStyle;
 				GUILayout.TextArea(str, previewStyle);
 			}

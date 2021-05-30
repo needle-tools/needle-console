@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using UnityEditor;
 using UnityEngine;
 
-namespace Needle.Demystify
+namespace Needle.Console
 {
 	internal static class CodePreview
 	{
@@ -32,7 +32,7 @@ namespace Needle.Demystify
 			{
 				var patterns = SyntaxHighlighting.GetCodeSyntaxHighlightingPatterns();
 				TypesPatterns = string.Join("|", patterns);
-				if(DemystifySettings.DevelopmentMode)
+				if(NeedleConsoleSettings.DevelopmentMode)
 					Debug.Log("Code Preview Patterns: " + TypesPatterns);
 			}
 				

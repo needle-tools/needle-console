@@ -1,4 +1,4 @@
-﻿namespace Needle.Demystify
+﻿namespace Needle.Console
 {
 	/// <summary>
 	/// Add a marker to stacktraces for highlighting in console ignoring everything before

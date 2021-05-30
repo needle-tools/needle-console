@@ -6,7 +6,7 @@ using Unity.Profiling;
 using UnityEditor;
 using UnityEngine;
 
-namespace Needle.Demystify
+namespace Needle.Console
 {
 	internal static class AdvancedLog
 	{
@@ -58,7 +58,7 @@ namespace Needle.Demystify
 		
 		private static bool CustomAdd(LogEntry entry, int row, string preview, List<CachedConsoleInfo> entries)
 		{
-			if (!DemystifySettings.instance.DynamicGrouping)
+			if (!NeedleConsoleSettings.instance.DynamicGrouping)
 			{
 				return false;
 			}

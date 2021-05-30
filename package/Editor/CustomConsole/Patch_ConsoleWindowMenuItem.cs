@@ -3,7 +3,7 @@ using System.Reflection;
 using UnityEditor;
 using UnityEngine;
 
-namespace Needle.Demystify
+namespace Needle.Console
 {	
 	internal class Patch_ConsoleWindowMenuItem : PatchBase
 	{
@@ -16,18 +16,18 @@ namespace Needle.Demystify
 		private static void Postfix(GenericMenu menu)
 		{
 			const string prefix = "Demystify/";
-			menu.AddItem(new GUIContent(prefix + "Code Preview"), DemystifySettings.instance.AllowCodePreview,
-				data => { DemystifySettings.instance.AllowCodePreview = !DemystifySettings.instance.AllowCodePreview; }, null);
-			menu.AddItem(new GUIContent(prefix + "Short Hyperlinks"), DemystifySettings.instance.ShortenFilePaths,
-				data => { DemystifySettings.instance.ShortenFilePaths = !DemystifySettings.instance.ShortenFilePaths; }, null);
-			menu.AddItem(new GUIContent(prefix + "Show Filename"), DemystifySettings.instance.ShowFileName,
-				data => { DemystifySettings.instance.ShowFileName = !DemystifySettings.instance.ShowFileName; }, null);
-			menu.AddItem(new GUIContent(prefix + "Custom List"), DemystifySettings.instance.CustomList,
-				data => { DemystifySettings.instance.CustomList = !DemystifySettings.instance.CustomList; }, null);
-			menu.AddItem(new GUIContent(prefix + "Dynamic Grouping"), DemystifySettings.instance.DynamicGrouping,
+			menu.AddItem(new GUIContent(prefix + "Code Preview"), NeedleConsoleSettings.instance.AllowCodePreview,
+				data => { NeedleConsoleSettings.instance.AllowCodePreview = !NeedleConsoleSettings.instance.AllowCodePreview; }, null);
+			menu.AddItem(new GUIContent(prefix + "Short Hyperlinks"), NeedleConsoleSettings.instance.ShortenFilePaths,
+				data => { NeedleConsoleSettings.instance.ShortenFilePaths = !NeedleConsoleSettings.instance.ShortenFilePaths; }, null);
+			menu.AddItem(new GUIContent(prefix + "Show Filename"), NeedleConsoleSettings.instance.ShowFileName,
+				data => { NeedleConsoleSettings.instance.ShowFileName = !NeedleConsoleSettings.instance.ShowFileName; }, null);
+			menu.AddItem(new GUIContent(prefix + "Custom List"), NeedleConsoleSettings.instance.CustomList,
+				data => { NeedleConsoleSettings.instance.CustomList = !NeedleConsoleSettings.instance.CustomList; }, null);
+			menu.AddItem(new GUIContent(prefix + "Dynamic Grouping"), NeedleConsoleSettings.instance.DynamicGrouping,
 				data =>
 				{
-					DemystifySettings.instance.DynamicGrouping = !DemystifySettings.instance.DynamicGrouping;
+					NeedleConsoleSettings.instance.DynamicGrouping = !NeedleConsoleSettings.instance.DynamicGrouping;
 					ConsoleFilter.MarkDirty();
 				}, null);
 		}

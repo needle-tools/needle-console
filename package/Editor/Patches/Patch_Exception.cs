@@ -8,7 +8,7 @@ using System.Reflection;
 using HarmonyLib;
 using Debug = UnityEngine.Debug;
 
-namespace Needle.Demystify
+namespace Needle.Console
 {
 	// ReSharper disable once UnusedType.Global
 	public class Patch_Exception : PatchBase
@@ -33,7 +33,7 @@ namespace Needle.Demystify
 				}
 				catch (TypeLoadException tl)
 				{
-					if (DemystifySettings.DevelopmentMode)
+					if (NeedleConsoleSettings.DevelopmentMode)
 						Debug.LogException(tl);
 				}
 			}

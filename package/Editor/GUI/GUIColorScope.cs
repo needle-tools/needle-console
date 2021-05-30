@@ -1,7 +1,7 @@
 ﻿using System;
 using UnityEngine;
 
-namespace Needle.Demystify
+namespace Needle.Console
 {
 	internal readonly struct GUIColorScope : IDisposable
 	{

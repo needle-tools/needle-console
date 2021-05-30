@@ -4,7 +4,7 @@ using System.Linq;
 using UnityEditor;
 using UnityEngine;
 
-namespace Needle.Demystify
+namespace Needle.Console
 {
 	[CreateAssetMenu(fileName = nameof(ConsoleFilterPreset), menuName = "Demystify/" + nameof(ConsoleFilterPreset))]
 	public class ConsoleFilterPreset : ScriptableObject

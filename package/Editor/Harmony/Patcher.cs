@@ -4,14 +4,14 @@ using HarmonyLib;
 using UnityEditor;
 using UnityEngine;
 
-namespace Needle.Demystify
+namespace Needle.Console
 {
 	public static class Patcher
 	{
 		[InitializeOnLoadMethod]
 		private static void Init()
 		{
-			if (DemystifySettings.instance.Enabled) 
+			if (NeedleConsoleSettings.instance.Enabled) 
 				ApplyPatches();
 		}
 

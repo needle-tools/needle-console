@@ -4,15 +4,15 @@ using Unity.Profiling;
 using UnityEditor;
 using UnityEngine;
 
-namespace Needle.Demystify
+namespace Needle.Console
 {
-	public static class UnityDemystify
+	public static class NeedleConsole
 	{
 		[InitializeOnLoadMethod]
 		private static void Init()
 		{
-			var settings = DemystifySettings.instance;
-			var projectSettings = DemystifyProjectSettings.instance;
+			var settings = NeedleConsoleSettings.instance;
+			var projectSettings = NeedleConsoleProjectSettings.instance;
 			var link = new GenericHyperlink("OpenDemystifySettings", "Edit/Preferences/Needle/Demystify",
 				() => SettingsService.OpenUserPreferences("Preferences/Needle/Demystify"));
 			if (projectSettings.FirstInstall)
@@ -41,13 +41,13 @@ namespace Needle.Demystify
 
 		public static void Enable()
 		{
-			DemystifySettings.instance.Enabled = true;
+			NeedleConsoleSettings.instance.Enabled = true;
 			Patcher.ApplyPatches();
 		}
 
 		public static void Disable()
 		{
-			DemystifySettings.instance.Enabled = false;
+			NeedleConsoleSettings.instance.Enabled = false;
 			Patcher.RemovePatches();
 		}
 
@@ -63,7 +63,7 @@ namespace Needle.Demystify
 					string[] lines = null;
 					using (new ProfilerMarker("Split Lines").Auto())
 						lines = stacktrace.Split('\n');
-					var settings = DemystifySettings.instance;
+					var settings = NeedleConsoleSettings.instance;
 					var foundPrefix = false;
 					var foundEnd = false;
 					foreach (var t in lines)

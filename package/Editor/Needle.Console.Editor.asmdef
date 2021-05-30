@@ -1,6 +1,6 @@
 {
-    "name": "Needle.Demystify.Editor",
-    "rootNamespace": "Needle.Demystify",
+    "name": "Needle.Console.Editor",
+    "rootNamespace": "Needle.Console",
     "references": [],
     "includePlatforms": [
         "Editor"

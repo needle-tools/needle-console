@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using UnityEditor;
 
-namespace Needle.Demystify
+namespace Needle.Console
 {
 	[FilePath("UserSettings/ConsoleAdvancedUserSettings.asset", FilePathAttribute.Location.ProjectFolder)]
 	internal class AdvancedLogUserSettings : ScriptableSingleton<AdvancedLogUserSettings>

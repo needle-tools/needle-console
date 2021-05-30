@@ -9,7 +9,7 @@ using UnityEngine;
 // ReSharper disable UnusedType.Global
 // ReSharper disable UnusedMember.Local
 
-namespace Needle.Demystify
+namespace Needle.Console
 {
 		internal class Patch_ConsoleWindowListView : PatchBase
 		{

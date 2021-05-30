@@ -4,7 +4,7 @@ using System.Globalization;
 using UnityEditor;
 
 
-namespace Needle.Demystify
+namespace Needle.Console
 {
 	[Serializable]
 	public struct LogTime

@@ -2,7 +2,7 @@
 using UnityEditor;
 using UnityEngine;
 
-namespace Needle.Demystify
+namespace Needle.Console
 {
 	internal class FilterFoldoutContent : PopupWindowContent
 	{
@@ -29,13 +29,13 @@ namespace Needle.Demystify
 
 		public override void OnGUI(Rect rect)
 		{
-			var enabled = DemystifySettings.instance.CustomList;
+			var enabled = NeedleConsoleSettings.instance.CustomList;
 			if (!enabled)
 			{
 				EditorGUILayout.HelpBox("To support console filtering you need to enable \"Custom List\" in settings", MessageType.Warning);
 				if (GUILayout.Button("Enable Custom List", GUILayout.Height(30)))
 				{
-					DemystifySettings.instance.CustomList = true;
+					NeedleConsoleSettings.instance.CustomList = true;
 				}
 			}
 

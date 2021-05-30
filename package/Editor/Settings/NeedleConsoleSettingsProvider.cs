@@ -5,18 +5,18 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-namespace Needle.Demystify
+namespace Needle.Console
 {
-	public class DemystifySettingsProvider : SettingsProvider
+	public class NeedleConsoleSettingsProvider : SettingsProvider
 	{
-		public const string SettingsPath = "Preferences/Needle/Demystify";
+		public const string SettingsPath = "Preferences/Needle/Console";
 		[SettingsProvider]
 		public static SettingsProvider CreateDemystifySettings()
 		{
 			try
 			{
-				DemystifySettings.instance.Save();
-				return new DemystifySettingsProvider(SettingsPath, SettingsScope.User);
+				NeedleConsoleSettings.instance.Save();
+				return new NeedleConsoleSettingsProvider(SettingsPath, SettingsScope.User);
 			}
 			catch (Exception e)
 			{
@@ -26,7 +26,7 @@ namespace Needle.Demystify
 			return null;
 		}
 
-		private DemystifySettingsProvider(string path, SettingsScope scopes, IEnumerable<string> keywords = null) : base(path, scopes, keywords)
+		private NeedleConsoleSettingsProvider(string path, SettingsScope scopes, IEnumerable<string> keywords = null) : base(path, scopes, keywords)
 		{
 		}
 
@@ -36,21 +36,21 @@ namespace Needle.Demystify
 			ThemeNames = null;
 		}
 
-		[MenuItem("Tools/Demystify/Enable Development Mode", true)]
-		private static bool EnableDevelopmentModeValidate() => !DemystifySettings.DevelopmentMode;
-		[MenuItem("Tools/Demystify/Enable Development Mode")]
-		private static void EnableDevelopmentMode() => DemystifySettings.DevelopmentMode = true;
-		[MenuItem("Tools/Demystify/Disable Development Mode", true)]
-		private static bool DisableDevelopmentModeValidate() => DemystifySettings.DevelopmentMode;
-		[MenuItem("Tools/Demystify/Disable Development Mode")]
-		private static void DisableDevelopmentMode() => DemystifySettings.DevelopmentMode = false;
+		[MenuItem("Tools/Needle Console/Enable Development Mode", true)]
+		private static bool EnableDevelopmentModeValidate() => !NeedleConsoleSettings.DevelopmentMode;
+		[MenuItem("Tools/Needle Console/Enable Development Mode")]
+		private static void EnableDevelopmentMode() => NeedleConsoleSettings.DevelopmentMode = true;
+		[MenuItem("Tools/Needle Console/Disable Development Mode", true)]
+		private static bool DisableDevelopmentModeValidate() => NeedleConsoleSettings.DevelopmentMode;
+		[MenuItem("Tools/Needle Console/Disable Development Mode")]
+		private static void DisableDevelopmentMode() => NeedleConsoleSettings.DevelopmentMode = false;
 
 		private Vector2 scroll;
 
 		public override void OnGUI(string searchContext)
 		{
 			base.OnGUI(searchContext);
-			var settings = DemystifySettings.instance;
+			var settings = NeedleConsoleSettings.instance;
 
 			EditorGUI.BeginChangeCheck();
 
@@ -73,7 +73,7 @@ namespace Needle.Demystify
 				using (var scope = new EditorGUI.ChangeCheckScope())
 				{
 					settings.ColorMarker = EditorGUILayout.TextField(new GUIContent("Color Marker", "Colored marker added before console log"), settings.ColorMarker);
-					if(scope.changed) DemystifyProjectSettings.RaiseColorsChangedEvent();
+					if(scope.changed) NeedleConsoleProjectSettings.RaiseColorsChangedEvent();
 				}
 				
 				settings.CustomList = EditorGUILayout.Toggle(new GUIContent("Custom List", "The custom list replaces the console log drawing with a custom implementation that allows for advanced features such like very custom log filtering via context menus"), settings.CustomList);
@@ -82,7 +82,7 @@ namespace Needle.Demystify
 				settings.DynamicGrouping = EditorGUILayout.Toggle(new GUIContent("Dynamic Grouping"), settings.DynamicGrouping);
 				EditorGUI.indentLevel--;
 
-				if(DemystifySettings.DevelopmentMode)
+				if(NeedleConsoleSettings.DevelopmentMode)
 				// using(new EditorGUI.DisabledScope(!settings.DevelopmentMode))
 				{
 					EditorGUILayout.Space(10);
@@ -102,7 +102,7 @@ namespace Needle.Demystify
 			if (EditorGUI.EndChangeCheck())
 			{
 				settings.Save();
-				DemystifySettings.RaiseChangedEvent();
+				NeedleConsoleSettings.RaiseChangedEvent();
 			}
 		}
 
@@ -116,7 +116,7 @@ namespace Needle.Demystify
 
 		private static readonly string[] AlwaysInclude = new[] {"keywords", "link", "string_literal", "comment"};
 
-		private static void DrawSyntaxGUI(DemystifySettings settings)
+		private static void DrawSyntaxGUI(NeedleConsoleSettings settings)
 		{
 			EditorGUILayout.Space(10);
 			EditorGUILayout.LabelField("Syntax Highlighting", EditorStyles.boldLabel);
@@ -166,18 +166,18 @@ namespace Needle.Demystify
 			}
 		}
 
-		private static void DrawActivateGUI(DemystifySettings settings)
+		private static void DrawActivateGUI(NeedleConsoleSettings settings)
 		{
 			if (!settings.Enabled)// !UnityDemystify.Patches().All(PatchManager.IsActive))
 			{
-				if (GUILayout.Button(new GUIContent("Enable Demystify")))
-					UnityDemystify.Enable();
-				EditorGUILayout.HelpBox("Demystify is disabled, click the Button above to enable it", MessageType.Info);
+				if (GUILayout.Button(new GUIContent("Enable Needle Console")))
+					NeedleConsole.Enable();
+				EditorGUILayout.HelpBox("Needle Console is disabled, click the Button above to enable it", MessageType.Info);
 			}
 			else
 			{
-				if (GUILayout.Button(new GUIContent("Disable Demystify")))
-					UnityDemystify.Disable();
+				if (GUILayout.Button(new GUIContent("Disable Needle Console")))
+					NeedleConsole.Disable();
 			}
 		}
 		
@@ -235,7 +235,7 @@ namespace Needle.Demystify
 
 		private static int ActiveThemeIndex()
 		{
-			var active = DemystifySettings.instance.CurrentTheme;
+			var active = NeedleConsoleSettings.instance.CurrentTheme;
 			for (var index = 0; index < Themes.Length; index++) 
 			{
 				var theme = Themes[index];
@@ -250,10 +250,10 @@ namespace Needle.Demystify
 			EditorGUI.BeginChangeCheck(); 
 			var selected = EditorGUILayout.Popup("Theme", ActiveThemeIndex(), ThemeNames);
 			if(selected >= 0 && selected < Themes.Length)
-				DemystifySettings.instance.CurrentTheme = Themes[selected];
+				NeedleConsoleSettings.instance.CurrentTheme = Themes[selected];
 			if (EditorGUI.EndChangeCheck())
 			{
-				DemystifySettings.instance.Save();
+				NeedleConsoleSettings.instance.Save();
 				ThemeEditedOrChanged?.Invoke();
 			}
 		}
