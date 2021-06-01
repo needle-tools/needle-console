@@ -4,7 +4,6 @@ using System.Reflection;
 using System.Text.RegularExpressions;
 using HarmonyLib;
 using UnityEditor;
-using UnityEditor.ShortcutManagement;
 using UnityEngine;
 
 namespace Needle.Demystify

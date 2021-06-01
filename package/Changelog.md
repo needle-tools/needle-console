@@ -4,6 +4,9 @@ All notable changes to this package will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## [1.6.0-exp.2] - 2021-06-01
+- fixed compilation errors on 2020.3.10f1 and 2021.1+
+
 ## [1.6.0-exp] - 2021-05-25
 - Initial experimental support for individual logs collapsing (context menu)
 - Work towards custom log entry row drawing and potentially visualizing log data
