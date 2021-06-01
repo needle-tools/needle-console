@@ -419,7 +419,11 @@ namespace Needle.Demystify
 
 		internal static float DrawDefaultStacktrace(string message)
 		{
+#if UNITY_2020_3_OR_NEWER && !UNITY_2020_3_1 && !UNITY_2020_3_2 && !UNITY_2020_3_3 && !UNITY_2020_3_4
+			var stackWithHyperlinks = ConsoleWindow.StacktraceWithHyperlinks(message, 0);
+#else
 			var stackWithHyperlinks = ConsoleWindow.StacktraceWithHyperlinks(message);
+#endif
 			var stacktraceHeight = ConsoleWindow.Constants.MessageStyle.CalcHeight(GUIContent.Temp(stackWithHyperlinks), Screen.width);
 			DrawDefaultStacktrace(stackWithHyperlinks, stacktraceHeight);
 			return stacktraceHeight;
