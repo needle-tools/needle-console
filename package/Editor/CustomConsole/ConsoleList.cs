@@ -160,7 +160,12 @@ namespace Needle.Demystify
 			if (spl == null)
 			{
 				var size = SplitterSize;
+				
+				#if UNITY_2020_1_OR_NEWER
 				spl = SplitterState.FromRelative(new[] {size.x, size.y}, new float[] {32, 32}, null);
+				#else
+				spl = new SplitterState(new[] {size.x, size.y}, new int[] {32, 32}, (int[]) null, 0);
+				#endif
 			}
 
 			SplitterGUILayout.BeginVerticalSplit(spl);
