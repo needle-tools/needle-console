@@ -14,7 +14,7 @@ namespace Needle.Console
 		
 		internal void Save()
 		{
-			Undo.RegisterCompleteObjectUndo(this, "Save Demystify Project Settings");
+			Undo.RegisterCompleteObjectUndo(this, "Save Needle Console Project Settings");
 			base.Save(true);
 		}
 		

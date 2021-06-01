@@ -13,8 +13,8 @@ namespace Needle.Console
 		{
 			var settings = NeedleConsoleSettings.instance;
 			var projectSettings = NeedleConsoleProjectSettings.instance;
-			var link = new GenericHyperlink("OpenDemystifySettings", "Edit/Preferences/Needle/Demystify",
-				() => SettingsService.OpenUserPreferences("Preferences/Needle/Demystify"));
+			var link = new GenericHyperlink("OpenNeedleConsoleSettings", "Edit/Preferences/Needle/Console",
+				() => SettingsService.OpenUserPreferences("Preferences/Needle/Console"));
 			if (projectSettings.FirstInstall)
 			{
 				async void InstalledLog()
@@ -24,8 +24,8 @@ namespace Needle.Console
 					projectSettings.FirstInstall = false;
 					projectSettings.Save();
 					Debug.Log(
-						$"Thanks for installing Demystify. You can find Settings under {link}\n" +
-						$"If you discover issues please report them <a href=\"https://github.com/needle-tools/demystify/issues\">on github</a>\n" +
+						$"Thanks for installing Needle Console. You can find Settings under {link}\n" +
+						$"If you discover issues please report them <a href=\"https://github.com/needle-tools/needle-console/issues\">on github</a>\n" +
 						$"Also feel free to join <a href=\"https://discord.gg/CFZDp4b\">our discord</a>");
 				}
 

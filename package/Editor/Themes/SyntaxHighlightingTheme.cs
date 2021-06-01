@@ -8,7 +8,7 @@ using UnityEngine;
 
 namespace Needle.Console
 {
-	[CreateAssetMenu(menuName = "Needle/Demystify/Syntax Highlighting Theme")]
+	[CreateAssetMenu(menuName = "Needle/Console/Syntax Highlighting Theme")]
 	public class SyntaxHighlightingTheme : ScriptableObject
 	{
 		public Theme theme = new Theme("New Theme");

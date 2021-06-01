@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace Needle.Console
 {
-	[CreateAssetMenu(fileName = nameof(ConsoleFilterPreset), menuName = "Demystify/" + nameof(ConsoleFilterPreset))]
+	[CreateAssetMenu(fileName = nameof(ConsoleFilterPreset), menuName = "Needle/Console/Console Filter Preset")]
 	public class ConsoleFilterPreset : ScriptableObject
 	{
 		#region Static API

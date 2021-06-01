@@ -26,6 +26,10 @@ namespace Needle.Console
 
 		private static void OnLogEntryContext(GenericMenu menu, int itemIndex)
 		{
+			if (!NeedleConsoleSettings.instance.IndividualCollapse)
+			{
+				return;
+			}
 			if (itemIndex < 0) return;
 			var log = ConsoleList.CurrentEntries[itemIndex];
 			// var content = new GUIContent("Collapse " + Path.GetFileName(log.entry.file) + "::" + log.entry.line);
@@ -58,7 +62,7 @@ namespace Needle.Console
 		
 		private static bool CustomAdd(LogEntry entry, int row, string preview, List<CachedConsoleInfo> entries)
 		{
-			if (!NeedleConsoleSettings.instance.DynamicGrouping)
+			if (!NeedleConsoleSettings.instance.IndividualCollapse)
 			{
 				return false;
 			}

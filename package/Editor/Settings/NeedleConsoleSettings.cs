@@ -16,14 +16,14 @@ namespace Needle.Console
 		
 		internal void Save()
 		{
-			Undo.RegisterCompleteObjectUndo(this, "Save Demystify Settings");
+			Undo.RegisterCompleteObjectUndo(this, "Save Needle Console Settings");
 			base.Save(true);
 		}
 
 		public static bool DevelopmentMode
 		{
-			get => SessionState.GetBool("Demystify.DevelopmentMode", false);
-			set => SessionState.SetBool("Demystify.DevelopmentMode", value);
+			get => SessionState.GetBool("Needle.Console.DevelopmentMode", false);
+			set => SessionState.SetBool("Needle.Console.DevelopmentMode", value);
 		}
 
 		public Highlighting SyntaxHighlighting = Highlighting.Simple;
@@ -76,7 +76,7 @@ namespace Needle.Console
 		
 		public bool CustomList = true;
 		public bool RowColors = true;
-		public bool DynamicGrouping = true;
+		public bool IndividualCollapse = true;
 	}
 	
 }

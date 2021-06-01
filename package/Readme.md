@@ -1,4 +1,4 @@
-﻿# Demystify for Unity
+﻿# Needle Console
 ## High performance understanding for stack traces ⛷
 
 This package brings [Ben.Demystifier](https://github.com/benaadams/Ben.Demystifier) to Unity.

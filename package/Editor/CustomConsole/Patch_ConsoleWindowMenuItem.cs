@@ -15,7 +15,7 @@ namespace Needle.Console
 
 		private static void Postfix(GenericMenu menu)
 		{
-			const string prefix = "Demystify/";
+			const string prefix = "Needle Console/";
 			menu.AddItem(new GUIContent(prefix + "Code Preview"), NeedleConsoleSettings.instance.AllowCodePreview,
 				data => { NeedleConsoleSettings.instance.AllowCodePreview = !NeedleConsoleSettings.instance.AllowCodePreview; }, null);
 			menu.AddItem(new GUIContent(prefix + "Short Hyperlinks"), NeedleConsoleSettings.instance.ShortenFilePaths,
@@ -24,10 +24,10 @@ namespace Needle.Console
 				data => { NeedleConsoleSettings.instance.ShowFileName = !NeedleConsoleSettings.instance.ShowFileName; }, null);
 			menu.AddItem(new GUIContent(prefix + "Custom List"), NeedleConsoleSettings.instance.CustomList,
 				data => { NeedleConsoleSettings.instance.CustomList = !NeedleConsoleSettings.instance.CustomList; }, null);
-			menu.AddItem(new GUIContent(prefix + "Dynamic Grouping"), NeedleConsoleSettings.instance.DynamicGrouping,
+			menu.AddItem(new GUIContent(prefix + "Individual Collapse"), NeedleConsoleSettings.instance.IndividualCollapse,
 				data =>
 				{
-					NeedleConsoleSettings.instance.DynamicGrouping = !NeedleConsoleSettings.instance.DynamicGrouping;
+					NeedleConsoleSettings.instance.IndividualCollapse = !NeedleConsoleSettings.instance.IndividualCollapse;
 					ConsoleFilter.MarkDirty();
 				}, null);
 		}

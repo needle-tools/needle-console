@@ -235,7 +235,7 @@ namespace Needle.Console
 					registeredFilters[index].BeforeFilter();
 				}
 
-				var useDynamicGrouping = NeedleConsoleSettings.instance.DynamicGrouping;
+				var useDynamicGrouping = NeedleConsoleSettings.instance.IndividualCollapse;
 
 				for (var i = start; i < count; i++)
 				{

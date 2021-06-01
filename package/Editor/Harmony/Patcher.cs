@@ -34,7 +34,7 @@ namespace Needle.Console
 			}
 			
 			if (_harmony == null)
-				_harmony = new Harmony("com.needle.demystify");
+				_harmony = new Harmony("com.needle.console");
 			
 			foreach (var p in patches)
 				p.Apply(_harmony);
