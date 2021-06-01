@@ -1,4 +1,8 @@
-﻿using System;
+﻿#if UNITY_2020_3_OR_NEWER && !UNITY_2020_3_1 && !UNITY_2020_3_2 && !UNITY_2020_3_3 && !UNITY_2020_3_4 && !UNITY_2020_3_5 && !UNITY_2020_3_6 && !UNITY_2020_3_7
+#define UNITY_CONSOLE_STACKTRACE_TWO_PARAMETERS
+#endif
+
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -419,7 +423,7 @@ namespace Needle.Demystify
 
 		internal static float DrawDefaultStacktrace(string message)
 		{
-#if UNITY_2020_3_OR_NEWER && !UNITY_2020_3_1 && !UNITY_2020_3_2 && !UNITY_2020_3_3 && !UNITY_2020_3_4
+#if UNITY_CONSOLE_STACKTRACE_TWO_PARAMETERS
 			var stackWithHyperlinks = ConsoleWindow.StacktraceWithHyperlinks(message, 0);
 #else
 			var stackWithHyperlinks = ConsoleWindow.StacktraceWithHyperlinks(message);
