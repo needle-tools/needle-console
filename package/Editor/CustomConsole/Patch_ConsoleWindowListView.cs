@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
@@ -28,10 +29,8 @@ namespace Needle.Demystify
 				for (var index = 0; index < arr.Length; index++)
 				{
 					var inst = arr[index];
-
-					// if(customDraw && index >= 319 && index <= arr.Length-1) continue;
-					// if(index > 350 && index < 500)
-					// Debug.Log("<color=grey>" + index + ": " + inst + "</color>");
+					
+					// Debug.Log("<color=grey>" + index + ": " + inst + "</color>"); 
 
 					// get local index for current list view element
 					if (loadListViewElementIndex == -1 || inst.IsStloc() && inst.operand is LocalBuilder)
@@ -41,7 +40,7 @@ namespace Needle.Demystify
 							loadListViewElementIndex = loc.LocalIndex;
 					}
 
-					if (inst.opcode == OpCodes.Call && inst.operand is MethodInfo m)
+					if (inst.opcode == OpCodes.Call && inst.operand is MethodInfo m) 
 					{
 						if (m.DeclaringType == typeof(LogEntries) && m.Name == "GetLinesAndModeFromEntryInternal")
 						{
@@ -64,18 +63,22 @@ namespace Needle.Demystify
 					// https://github.com/Unity-Technologies/UnityCsReference/blob/61f92bd79ae862c4465d35270f9d1d57befd1761/Editor/Mono/ConsoleWindow.cs#L539
 #if UNITY_2021_1_OR_NEWER
 					if (index == 172)
-#else
+#elif UNITY_2020_1_OR_NEWER
 					if (index == 189)
+#else // 2019
+					if (index == 148)
 #endif
 					{
-						yield return CodeInstruction.Call(typeof(ConsoleToolbarFoldout), nameof(ConsoleToolbarFoldout.OnDrawFoldouts));
+						yield return CodeInstruction.Call(typeof(ConsoleToolbarFoldout), nameof(ConsoleToolbarFoldout.OnDrawFoldouts)); 
 					}
 					
 					// this is before "EndHorizontal"
 #if UNITY_2021_1_OR_NEWER
 					if (index == 329)
-#else
+#elif UNITY_2020_1_OR_NEWER
 					if (index == 317)
+#else // 2019
+					if (index == 313)
 #endif
 					{
 						yield return CodeInstruction.Call(typeof(ConsoleToolbarIcon), nameof(ConsoleToolbarIcon.OnDrawToolbar));
@@ -85,8 +88,10 @@ namespace Needle.Demystify
 					// this is right before  SplitterGUILayout.BeginVerticalSplit(spl);
 #if UNITY_2021_1_OR_NEWER
 					if (index == 330)
-#else
+#elif UNITY_2020_1_OR_NEWER
 					if (index == 318)
+#else // 2019
+					if (index == 315)
 #endif
 					{
 						yield return new CodeInstruction(OpCodes.Ldarg_0);
@@ -97,5 +102,29 @@ namespace Needle.Demystify
 					yield return inst;
 				}
 			}
+			
+			
+
+			// private class Instructor
+			// {
+			// 	public List<Func<CodeInstruction, bool>> List = new List<Func<CodeInstruction, bool>>();
+			// 	public Func<CodeInstruction, bool> OnFound;
+			//
+			// 	private int currentListIndex;
+			// 	private int firstIndex;
+			// 	
+			// 	public void Check(CodeInstruction inst, int index)
+			// 	{
+			// 		var check = List[currentListIndex];
+			// 		if (check(inst))
+			// 		{
+			// 			currentListIndex += 1;
+			// 			if (currentListIndex >= List.Count)
+			// 			{
+			// 				OnFound?.Invoke()
+			// 			}
+			// 		}
+			// 	}
+			// }
 		}
 }
