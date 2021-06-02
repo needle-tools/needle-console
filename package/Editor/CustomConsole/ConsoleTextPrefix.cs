@@ -7,7 +7,7 @@ using Unity.Profiling;
 using UnityEditor;
 using UnityEngine;
 
-namespace Needle.Demystify
+namespace Needle.Console
 {
 	internal static class ConsoleTextPrefix
 	{
@@ -18,7 +18,7 @@ namespace Needle.Demystify
 			cachedPrefix.Clear();
 			
 			// clear cache when colors change
-			DemystifyProjectSettings.ColorSettingsChanged += () =>
+			NeedleConsoleProjectSettings.ColorSettingsChanged += () =>
 			{
 				cachedInfo.Clear();
 				cachedPrefix.Clear();
@@ -49,7 +49,7 @@ namespace Needle.Demystify
 			
 			using (new ProfilerMarker("ConsoleList.ModifyText").Auto())
 			{
-				if (!DemystifySettings.instance.ShowFileName) return;
+				if (!NeedleConsoleSettings.instance.ShowFileName) return;
 				
 				var key = text;
 				if (cachedInfo.ContainsKey(key))
@@ -68,7 +68,7 @@ namespace Needle.Demystify
 						const string colorPrefix = "<color=#999999>";
 						const string colorPostfix = "</color>";
 						var colorKey = fileName;
-						var colorMarker = DemystifySettings.instance.ColorMarker; // " ▍";
+						var colorMarker = NeedleConsoleSettings.instance.ColorMarker; // " ▍";
 						if (!string.IsNullOrWhiteSpace(colorMarker))
 							LogColor.AddColor(colorKey, ref colorMarker);
 

@@ -2,7 +2,7 @@
 using UnityEditor;
 using UnityEngine;
 
-namespace Needle.Demystify
+namespace Needle.Console
 {
 	internal static class ConsoleToolbarFoldout
 	{

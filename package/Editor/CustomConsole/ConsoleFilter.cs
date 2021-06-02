@@ -5,7 +5,7 @@ using Unity.Profiling;
 using UnityEditor;
 using Object = UnityEngine.Object;
 
-namespace Needle.Demystify
+namespace Needle.Console
 {
 	public enum FilterResult
 	{
@@ -94,7 +94,7 @@ namespace Needle.Demystify
 				if (name.EndsWith(UndoPostfix))
 					MarkDirty();
 			};
-			DemystifySettings.Changed += OnSettingsChanged;
+			NeedleConsoleSettings.Changed += OnSettingsChanged;
 		}
 
 		private static void OnSettingsChanged()
@@ -235,7 +235,7 @@ namespace Needle.Demystify
 					registeredFilters[index].BeforeFilter();
 				}
 
-				var useDynamicGrouping = DemystifySettings.instance.DynamicGrouping;
+				var useDynamicGrouping = NeedleConsoleSettings.instance.IndividualCollapse;
 
 				for (var i = start; i < count; i++)
 				{

@@ -4,7 +4,7 @@ using System.IO;
 using UnityEditor;
 using PackageInfo = UnityEditor.PackageManager.PackageInfo;
 
-namespace Needle.Demystify
+namespace Needle.Console
 {
 	[Serializable]
 	public class PackageFilter : FilterBase<string>

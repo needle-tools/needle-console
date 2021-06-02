@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 
-namespace Needle.Demystify
+namespace Needle.Console
 {
 	[FilePath("UserSettings/ConsoleFilterUserSettings.asset", FilePathAttribute.Location.ProjectFolder)]
 	internal class ConsoleFilterUserSettings : ScriptableSingleton<ConsoleFilterUserSettings>

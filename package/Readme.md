@@ -1,17 +1,6 @@
-﻿# Demystify for Unity
-## High performance understanding for stack traces ⛷
+﻿# Needle Console
 
-This package brings [Ben.Demystifier](https://github.com/benaadams/Ben.Demystifier) to Unity.
-
-A brief overview of what Demystifier does:
-
->.NET stack traces output the compiler transformed methods; rather than the source code methods, which make them slow to mentally parse and match back to the source code.  
-Demystify outputs the modern C# 7.0 features in stack traces in an understandable fashion that looks like the source code that generated them.  
-  
-In a nutshell, all logs and exceptions will be made more understandable in the Unity Console.  
-Syntax highlighting can be configured, and we're fixing some issues with source code links in packages along the way. Editor logs (that end up in the editor.log file) are also demystified.
-
-![](Documentation~/beforeafter.jpg)
+### Better Stacktrace readability, syntax highlighting and filters
 
 ## Quick Start ⚡️
 
@@ -59,33 +48,30 @@ Settings can be configured under ``Edit > Preferences > Needle > Demystify``.
 ### **Demystified Stacktraces** 🔮 for any log message and exceptions.  
   It *just works*, you don't need to do anything.  
   Logs going into Editor logfiles will also be demystified.  
-  Standalone logs (when logging in builds) will _not_ be demystified (by design).
+  Logs in builds will _not_ be demystified (by design).
+
+>.NET stack traces output the compiler transformed methods; rather than the source code methods, which make them slow to mentally parse and match back to the source code.  
+Demystify outputs the modern C# 7.0 features in stack traces in an understandable fashion that looks like the source code that generated them.
 
 ### **Syntax Highlighting** 🎨
 
 We provide default syntax highlighting for Light and Dark Theme. You can also change colors to your liking.  
   Syntax highlighting comes with a slight performance impact when selecting a log (not when logging it).
 
-- Adjust the highlighting colors to your liking.  
-  
-  ![](Documentation~/preferences.png) 
-
+- Adjust the highlighting colors to your liking.
 - Disable specific highlight types by setting the Alpha value of the respective setting to 0.
-
-- Choose complexity of syntax highlighting
-  
-  ![](Documentation~/typesonly.png) 
-  *Types Only*
-
 - Dark and Light Theme support
-  
-  ![](Documentation~/darkskin.png) 
 
-  ![](Documentation~/lightskin.png) 
+![](Documentation~/preferences.png)
 
-### **Code Preview**
-Hover over lines in stacktrace that contain a filepath to see more context immediately without having to switching context.
-![](Documentation~/codepreview.gif)  
+
+### **Log Filtering** 🔍
+Log filters allow to hide specific logs in your project or only show the logs that matter for you right now. No need to change the way you write ``Debug.Log`` messages, it is all available at your fingertips via the console context menu.
+- Hide logs by message, file, line, package or even time
+- Solo logs: show only log entries that matter to you right now
+
+### **Collapse individual repeating logs** 🍔
+Multiple logs from the same source can be collapsed to single log and not spam your console bringing you more overview over your project.
 
 ### **Fixes to source code links** 🧁  
   Sometimes, links to code in embedded/local packages don't work, so while we were at it we fixed that as well. (Case 1304954 for Unity people stepping by) [Issue Tracker](https://issuetracker.unity3d.com/issues/script-file-that-references-package-script-is-opened-when-double-clicking-a-console-message-in-editor-that-comes-from-a-package)

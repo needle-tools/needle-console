@@ -1,7 +1,7 @@
 ﻿using UnityEditor;
 using UnityEngine;
 
-namespace Needle.Demystify
+namespace Needle.Console
 {
 	internal static class Textures
 	{
@@ -30,7 +30,7 @@ namespace Needle.Demystify
 		{
 			get
 			{
-				if (!solo) solo = AssetDatabase.LoadAssetAtPath<Texture2D>("Packages/com.needle.demystify/Editor/CustomConsole/GUI/Textures/Solo.png");
+				if (!solo) solo = AssetDatabase.LoadAssetAtPath<Texture2D>("Packages/com.needle.console/Editor/CustomConsole/GUI/Textures/Solo.png");
 				return solo;
 			}
 		}
@@ -40,7 +40,7 @@ namespace Needle.Demystify
 		{
 			get
 			{
-				if (!remove) remove = AssetDatabase.LoadAssetAtPath<Texture2D>("Packages/com.needle.demystify/Editor/CustomConsole/GUI/Textures/Remove.png");
+				if (!remove) remove = AssetDatabase.LoadAssetAtPath<Texture2D>("Packages/com.needle.console/Editor/CustomConsole/GUI/Textures/Remove.png");
 				return remove;
 			}
 		}

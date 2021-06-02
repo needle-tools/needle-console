@@ -1,22 +1,23 @@
-﻿using System.Text;
+﻿using System.IO;
+using System.Text;
 using System.Threading.Tasks;
 using Unity.Profiling;
 using UnityEditor;
 using UnityEngine;
 
-namespace Needle.Demystify
+namespace Needle.Console
 {
-	public static class UnityDemystify
+	public static class NeedleConsole
 	{
 		[InitializeOnLoadMethod]
 		private static void Init()
 		{
-			var settings = DemystifySettings.instance;
-			var projectSettings = DemystifyProjectSettings.instance;
-			var link = new GenericHyperlink("OpenDemystifySettings", "Edit/Preferences/Needle/Demystify",
-				() => SettingsService.OpenUserPreferences("Preferences/Needle/Demystify"));
+			var projectSettings = NeedleConsoleProjectSettings.instance;
+			var settings = NeedleConsoleSettings.instance;
 			if (projectSettings.FirstInstall)
 			{
+				var link = new GenericHyperlink("OpenNeedleConsoleSettings", "Edit/Preferences/Needle/Console",
+					() => SettingsService.OpenUserPreferences("Preferences/Needle/Console"));
 				async void InstalledLog()
 				{
 					await Task.Delay(100);
@@ -24,12 +25,21 @@ namespace Needle.Demystify
 					projectSettings.FirstInstall = false;
 					projectSettings.Save();
 					Debug.Log(
-						$"Thanks for installing Demystify. You can find Settings under {link}\n" +
-						$"If you discover issues please report them <a href=\"https://github.com/needle-tools/demystify/issues\">on github</a>\n" +
+						$"Thanks for installing Needle Console. You can find Settings under {link}\n" +
+						$"If you discover issues please report them <a href=\"https://github.com/needle-tools/needle-console/issues\">on github</a>\n" +
 						$"Also feel free to join <a href=\"https://discord.gg/CFZDp4b\">our discord</a>");
 				}
 
 				InstalledLog();
+				
+				try
+				{
+					settings.SetDefaultTheme();
+				}
+				catch
+				{
+					// ignore
+				}
 			}
 
 			if (settings.CurrentTheme != null)
@@ -41,13 +51,13 @@ namespace Needle.Demystify
 
 		public static void Enable()
 		{
-			DemystifySettings.instance.Enabled = true;
+			NeedleConsoleSettings.instance.Enabled = true;
 			Patcher.ApplyPatches();
 		}
 
 		public static void Disable()
 		{
-			DemystifySettings.instance.Enabled = false;
+			NeedleConsoleSettings.instance.Enabled = false;
 			Patcher.RemovePatches();
 		}
 
@@ -63,7 +73,7 @@ namespace Needle.Demystify
 					string[] lines = null;
 					using (new ProfilerMarker("Split Lines").Auto())
 						lines = stacktrace.Split('\n');
-					var settings = DemystifySettings.instance;
+					var settings = NeedleConsoleSettings.instance;
 					var foundPrefix = false;
 					var foundEnd = false;
 					foreach (var t in lines)

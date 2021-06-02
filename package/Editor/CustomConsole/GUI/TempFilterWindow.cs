@@ -3,11 +3,11 @@ using UnityEditor;
 using UnityEditorInternal;
 using UnityEngine;
 
-namespace Needle.Demystify
+namespace Needle.Console
 {
 	public class TempFilterWindow : EditorWindow
 	{
-		[MenuItem("Tools/Demystify/Dev Console Filter Window")]
+		[MenuItem("Tools/Needle Console/Internal/Console Filter Test Window")]
 		private static void Open()
 		{
 			var window = CreateWindow<TempFilterWindow>();

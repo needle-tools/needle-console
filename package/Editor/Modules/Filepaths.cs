@@ -4,7 +4,7 @@ using System.Net;
 using System.Text.RegularExpressions;
 using UnityEngine;
 
-namespace Needle.Demystify
+namespace Needle.Console
 {
 	internal static class Filepaths
 	{

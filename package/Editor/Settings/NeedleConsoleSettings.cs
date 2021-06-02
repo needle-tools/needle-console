@@ -1,12 +1,13 @@
 ﻿using System;
+using System.IO;
 using UnityEditor;
 using UnityEditorInternal;
 using UnityEngine;
 
-namespace Needle.Demystify
+namespace Needle.Console
 {
-	[FilePath("Preferences/DemystifySettings.asset", FilePathAttribute.Location.PreferencesFolder)]
-	internal class DemystifySettings : ScriptableSingleton<DemystifySettings>
+	[FilePath("Preferences/NeedleConsoleSettings.asset", FilePathAttribute.Location.PreferencesFolder)]
+	internal class NeedleConsoleSettings : ScriptableSingleton<NeedleConsoleSettings>
 	{
 		internal bool Enabled = true;
 		
@@ -16,14 +17,14 @@ namespace Needle.Demystify
 		
 		internal void Save()
 		{
-			Undo.RegisterCompleteObjectUndo(this, "Save Demystify Settings");
+			Undo.RegisterCompleteObjectUndo(this, "Save Needle Console Settings");
 			base.Save(true);
 		}
 
 		public static bool DevelopmentMode
 		{
-			get => SessionState.GetBool("Demystify.DevelopmentMode", false);
-			set => SessionState.SetBool("Demystify.DevelopmentMode", value);
+			get => SessionState.GetBool("Needle.Console.DevelopmentMode", false);
+			set => SessionState.SetBool("Needle.Console.DevelopmentMode", value);
 		}
 
 		public Highlighting SyntaxHighlighting = Highlighting.Simple;
@@ -55,7 +56,21 @@ namespace Needle.Demystify
 				CurrentTheme.SetActive();
 		}
 		
-		private static Theme GetNewDefaultThemeInstance() => new Theme(Theme.DefaultThemeName);
+		private static Theme GetNewDefaultThemeInstance()
+		{
+			var themes = AssetDatabase.FindAssets("t:" + nameof(SyntaxHighlightingTheme));
+			foreach (var theme in themes)
+			{
+				var path = AssetDatabase.GUIDToAssetPath(theme);
+				var name = Path.GetFileName(path);
+				if (name.ToLowerInvariant().Contains("default"))
+				{
+					var loaded = AssetDatabase.LoadAssetAtPath<SyntaxHighlightingTheme>(path);
+					if (loaded) return loaded.theme; 
+				}
+			}
+			return new Theme(Theme.DefaultThemeName);
+		}
 
 		public void UpdateCurrentTheme()
 		{
@@ -76,7 +91,7 @@ namespace Needle.Demystify
 		
 		public bool CustomList = true;
 		public bool RowColors = true;
-		public bool DynamicGrouping = true;
+		public bool IndividualCollapse = true;
 	}
 	
 }

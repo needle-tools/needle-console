@@ -1,6 +1,6 @@
 ﻿using HarmonyLib;
 
-namespace Needle.Demystify
+namespace Needle.Console
 {
 	public interface IPatch
 	{

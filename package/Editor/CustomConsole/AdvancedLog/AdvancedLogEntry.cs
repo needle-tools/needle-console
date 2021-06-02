@@ -1,7 +1,7 @@
 ﻿using System;
 using UnityEditor;
 
-namespace Needle.Demystify
+namespace Needle.Console
 {
 	[Serializable]
 	public class AdvancedLogEntry : IEquatable<CachedConsoleInfo>, IEquatable<LogEntry>

@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 
-namespace Needle.Demystify
+namespace Needle.Console
 {
-	[FilePath("ProjectSettings/DemystifySettings.asset", FilePathAttribute.Location.ProjectFolder)]
-	internal class DemystifyProjectSettings : ScriptableSingleton<DemystifyProjectSettings>
+	[FilePath("ProjectSettings/NeedleConsoleProjectSettings.asset", FilePathAttribute.Location.ProjectFolder)]
+	internal class NeedleConsoleProjectSettings : ScriptableSingleton<NeedleConsoleProjectSettings>
 	{
 		public static event Action ColorSettingsChanged;
 
@@ -14,7 +14,7 @@ namespace Needle.Demystify
 		
 		internal void Save()
 		{
-			Undo.RegisterCompleteObjectUndo(this, "Save Demystify Project Settings");
+			Undo.RegisterCompleteObjectUndo(this, "Save Needle Console Project Settings");
 			base.Save(true);
 		}
 		

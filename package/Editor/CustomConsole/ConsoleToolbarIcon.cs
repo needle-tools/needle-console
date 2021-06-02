@@ -1,7 +1,7 @@
 ﻿using UnityEditor;
 using UnityEngine;
 
-namespace Needle.Demystify
+namespace Needle.Console
 {
 	internal static class ConsoleToolbarIcon
 	{
@@ -10,7 +10,7 @@ namespace Needle.Demystify
 
 		internal static void OnDrawToolbar()
 		{
-			if (!DemystifySettings.instance.CustomList) return;
+			if (!NeedleConsoleSettings.instance.CustomList) return;
 			
 			if (!filterTextureInit)
 			{

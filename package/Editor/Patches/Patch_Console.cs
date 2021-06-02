@@ -5,7 +5,7 @@ using System.Reflection;
 using UnityEditor;
 using UnityEngine;
 
-namespace Needle.Demystify
+namespace Needle.Console
 {
 	internal class Patch_Console
 	{
@@ -113,7 +113,7 @@ namespace Needle.Demystify
 
 			public StacktracePatch()
 			{
-				DemystifySettingsProvider.ThemeEditedOrChanged += Repaint;
+				NeedleConsoleSettingsProvider.ThemeEditedOrChanged += Repaint;
 
 				void Repaint()
 				{
@@ -128,7 +128,7 @@ namespace Needle.Demystify
 
 			private static bool Prefix(ref string stacktraceText)
 			{
-				if (DemystifySettings.instance.CustomList == false)
+				if (NeedleConsoleSettings.instance.CustomList == false)
 				{
 					var r = GetStackScrollViewRect();
 					SeparatorLine.Draw(r.y);
@@ -138,7 +138,7 @@ namespace Needle.Demystify
 				if (textChanged)
 				{
 					lastText = stacktraceText;
-					UnityDemystify.Apply(ref stacktraceText);
+					NeedleConsole.Apply(ref stacktraceText);
 					lastResult = stacktraceText;
 				}
 
@@ -148,7 +148,7 @@ namespace Needle.Demystify
 
 			private static void Postfix(ref string __result)
 			{
-				if (DemystifySettings.instance.SyntaxHighlighting != Highlighting.None)
+				if (NeedleConsoleSettings.instance.SyntaxHighlighting != Highlighting.None)
 					Hyperlinks.ApplyHyperlinkColor(ref __result);
 			}
 		}

@@ -10,14 +10,14 @@ using System.Linq;
 using UnityEditor;
 using UnityEngine;
 
-namespace Needle.Demystify
+namespace Needle.Console
 {
 	internal static class ConsoleList
 	{
 		internal static bool DrawCustom
 		{
-			get => DemystifySettings.instance.CustomList;
-			set => DemystifySettings.instance.CustomList = value;
+			get => NeedleConsoleSettings.instance.CustomList;
+			set => NeedleConsoleSettings.instance.CustomList = value;
 		}
 
 		internal static IReadOnlyList<CachedConsoleInfo> CurrentEntries => currentEntries;
@@ -474,7 +474,7 @@ namespace Needle.Demystify
 			}
 
 			bool IsOdd() => row % 2 != 0;
-			var allowColors = DemystifySettings.instance.RowColors;
+			var allowColors = NeedleConsoleSettings.instance.RowColors;
 			if (entryIsSelected)
 			{
 				DrawBackground(new Color(.2f, .5f, .8f, .5f));

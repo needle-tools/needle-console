@@ -8,7 +8,7 @@ using UnityEditor;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
 
-namespace Needle.Demystify
+namespace Needle.Console
 {
 	internal enum Highlighting
 	{
@@ -69,7 +69,7 @@ namespace Needle.Demystify
 		{
 			get
 			{
-				regexPatterns.TryGetValue(DemystifySettings.instance.SyntaxHighlighting, out var patterns);
+				regexPatterns.TryGetValue(NeedleConsoleSettings.instance.SyntaxHighlighting, out var patterns);
 				return patterns;
 			}
 		}
@@ -86,7 +86,7 @@ namespace Needle.Demystify
 				{
 					_currentPattern = string.Join("|", CurrentPatternsList);
 
-					if (DemystifySettings.DevelopmentMode)
+					if (NeedleConsoleSettings.DevelopmentMode)
 					{
 						// this is just to give patching time to being loaded to add syntax highlighting to this call too :)
 						void NextFrame()

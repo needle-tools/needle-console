@@ -3,7 +3,7 @@ using System.ComponentModel;
 using System.Text.RegularExpressions;
 using UnityEngine;
 
-namespace Needle.Demystify
+namespace Needle.Console
 {
 	internal static class Hyperlinks
 	{
@@ -89,7 +89,7 @@ namespace Needle.Demystify
 		
 		private static void ModifyFilePath(ref string path)
 		{
-			if (DemystifySettings.instance.ShortenFilePaths == false) return;
+			if (NeedleConsoleSettings.instance.ShortenFilePaths == false) return;
 			// Debug.Log(path);
 			// var lineNumberStart = path.LastIndexOf(':');
 			// if(lineNumberStart > 0)

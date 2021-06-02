@@ -1,12 +1,10 @@
 {
   "dependencies": {
-    "com.needle.demystify": {
+    "com.needle.console": {
       "version": "file:../../../package",
       "depth": 0,
       "source": "local",
-      "dependencies": {
-        "com.needle.editorpatching": "1.2.0-exp.1"
-      }
+      "dependencies": {}
     },
     "com.needle.demystify.extras": {
       "version": "file:../../needle.demystify.extras",
@@ -14,11 +12,13 @@
       "source": "local",
       "dependencies": {}
     },
-    "com.needle.editorpatching": {
-      "version": "file:../../../../../package",
+    "com.needle.package-tools": {
+      "version": "file:C:\\git\\npm\\development\\pfc-packagetools",
       "depth": 0,
       "source": "local",
-      "dependencies": {}
+      "dependencies": {
+        "com.unity.nuget.mono-cecil": "1.10.1"
+      }
     },
     "com.unity.collab-proxy": {
       "version": "1.3.9",
@@ -53,6 +53,13 @@
     "com.unity.ide.vscode": {
       "version": "1.2.3",
       "depth": 0,
+      "source": "registry",
+      "dependencies": {},
+      "url": "https://packages.unity.com"
+    },
+    "com.unity.nuget.mono-cecil": {
+      "version": "1.10.1",
+      "depth": 1,
       "source": "registry",
       "dependencies": {},
       "url": "https://packages.unity.com"

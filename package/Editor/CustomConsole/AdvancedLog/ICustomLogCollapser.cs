@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using UnityEditor;
 
-namespace Needle.Demystify
+namespace Needle.Console
 {
 	internal interface ICustomLogCollapser
 	{

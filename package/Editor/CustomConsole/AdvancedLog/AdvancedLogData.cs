@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using UnityEngine;
 
-namespace Needle.Demystify
+namespace Needle.Console
 {
 	public class AdvancedLogData
 	{
