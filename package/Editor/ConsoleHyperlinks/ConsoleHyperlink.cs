@@ -14,7 +14,7 @@ namespace Needle
 		{
 			return "<a href=\"" + link + "\">" + text + "</a>";
 		}
-		
+
 		/// <summary>
 		/// register hyperlink clicked handler
 		/// </summary>
@@ -33,6 +33,7 @@ namespace Needle
 			{
 				registered.Add((priority, receiver));
 			}
+
 			dirty = true;
 		}
 
@@ -56,6 +57,9 @@ namespace Needle
 		private static void Init()
 		{
 			// subscribe to unity event
+#if UNITY_2021_2_OR_NEWER
+			EditorGUI.hyperLinkClicked += (_, args) => HandleClickArgs(args.hyperLinkData);
+#else
 			var evt = typeof(EditorGUI).GetEvent("hyperLinkClicked", BindingFlags.Static | BindingFlags.NonPublic);
 			if (evt != null)
 			{
@@ -66,7 +70,8 @@ namespace Needle
 					evt.AddMethod.Invoke(null, new object[] {handler});
 				}
 			}
-			
+#endif
+
 			// register types that implement interface
 			var implementations = TypeCache.GetTypesDerivedFrom<IHyperlinkCallbackReceiver>();
 			foreach (var t in implementations)
@@ -76,19 +81,19 @@ namespace Needle
 					if (typeof(Object).IsAssignableFrom(t))
 					{
 						var instances = Object.FindObjectsOfType(t);
-						foreach(var inst in instances)
-							RegisterClickedCallback(inst as IHyperlinkCallbackReceiver); 
+						foreach (var inst in instances)
+							RegisterClickedCallback(inst as IHyperlinkCallbackReceiver);
 					}
 					else
 					{
 						// skip bridge
 						if (typeof(MethodBridge).IsAssignableFrom(t)) continue;
-						
-						if(t.IsClass && !t.IsAbstract && t.GetConstructors().Any(c => c.GetParameters().Length <= 0))
-							RegisterClickedCallback(Activator.CreateInstance(t) as IHyperlinkCallbackReceiver); 
+
+						if (t.IsClass && !t.IsAbstract && t.GetConstructors().Any(c => c.GetParameters().Length <= 0))
+							RegisterClickedCallback(Activator.CreateInstance(t) as IHyperlinkCallbackReceiver);
 					}
 				}
-				catch(Exception e)
+				catch (Exception e)
 				{
 					Debug.LogException(e);
 				}
@@ -117,25 +122,31 @@ namespace Needle
 
 			if (property.GetValue(args) is Dictionary<string, string> infos)
 			{
-				if (infos.TryGetValue("href", out var path))
-				{
-					infos.TryGetValue("line", out var line);
-					EnsureCallbacksOrdered();
-					for (var index = registered.Count - 1; index >= 0; index--)
-					{
-						var (_, receiver) = registered[index];
-						if (receiver == null || (receiver is Object obj && !obj))
-						{
-							registered.RemoveAt(index);
-							continue;
-						}
-						var res = receiver?.OnHyperlinkClicked(path, line) ?? false;
-						if (res) break;
-					}
-				}
+				HandleClickArgs(infos);
 			}
 		}
-		
+
+
+		private static void HandleClickArgs(Dictionary<string, string> infos)
+		{
+			if (infos == null) return;
+			if (!infos.TryGetValue("href", out var path)) return;
+			infos.TryGetValue("line", out var line);
+			EnsureCallbacksOrdered();
+			for (var index = registered.Count - 1; index >= 0; index--)
+			{
+				var (_, receiver) = registered[index];
+				if (receiver == null || (receiver is Object obj && !obj))
+				{
+					registered.RemoveAt(index);
+					continue;
+				}
+
+				var res = receiver?.OnHyperlinkClicked(path, line) ?? false;
+				if (res) break;
+			}
+		}
+
 
 		private class MethodBridge : IHyperlinkCallbackReceiver
 		{
@@ -148,10 +159,10 @@ namespace Needle
 				var para = this.method.GetParameters();
 				pathOnly = para.Length == 1;
 			}
-			
+
 			public bool OnHyperlinkClicked(string path, string line)
 			{
-				var res = pathOnly ?method?.Invoke(null, new object[]{path}) : method?.Invoke(null, new object[]{path, line});
+				var res = pathOnly ? method?.Invoke(null, new object[] { path }) : method?.Invoke(null, new object[] { path, line });
 				if (res is bool boolResult) return boolResult;
 				return false;
 			}
