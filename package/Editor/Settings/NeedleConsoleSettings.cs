@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using UnityEditor;
 using UnityEditorInternal;
 using UnityEngine;
@@ -55,7 +56,21 @@ namespace Needle.Console
 				CurrentTheme.SetActive();
 		}
 		
-		private static Theme GetNewDefaultThemeInstance() => new Theme(Theme.DefaultThemeName);
+		private static Theme GetNewDefaultThemeInstance()
+		{
+			var themes = AssetDatabase.FindAssets("t:" + nameof(SyntaxHighlightingTheme));
+			foreach (var theme in themes)
+			{
+				var path = AssetDatabase.GUIDToAssetPath(theme);
+				var name = Path.GetFileName(path);
+				if (name.ToLowerInvariant().Contains("default"))
+				{
+					var loaded = AssetDatabase.LoadAssetAtPath<SyntaxHighlightingTheme>(path);
+					if (loaded) return loaded.theme; 
+				}
+			}
+			return new Theme(Theme.DefaultThemeName);
+		}
 
 		public void UpdateCurrentTheme()
 		{

@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.IO;
+using System.Text;
 using System.Threading.Tasks;
 using Unity.Profiling;
 using UnityEditor;
@@ -11,12 +12,12 @@ namespace Needle.Console
 		[InitializeOnLoadMethod]
 		private static void Init()
 		{
-			var settings = NeedleConsoleSettings.instance;
 			var projectSettings = NeedleConsoleProjectSettings.instance;
-			var link = new GenericHyperlink("OpenNeedleConsoleSettings", "Edit/Preferences/Needle/Console",
-				() => SettingsService.OpenUserPreferences("Preferences/Needle/Console"));
+			var settings = NeedleConsoleSettings.instance;
 			if (projectSettings.FirstInstall)
 			{
+				var link = new GenericHyperlink("OpenNeedleConsoleSettings", "Edit/Preferences/Needle/Console",
+					() => SettingsService.OpenUserPreferences("Preferences/Needle/Console"));
 				async void InstalledLog()
 				{
 					await Task.Delay(100);
@@ -30,6 +31,15 @@ namespace Needle.Console
 				}
 
 				InstalledLog();
+				
+				try
+				{
+					settings.SetDefaultTheme();
+				}
+				catch
+				{
+					// ignore
+				}
 			}
 
 			if (settings.CurrentTheme != null)
