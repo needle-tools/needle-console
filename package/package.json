@@ -3,7 +3,7 @@
 	"name": "com.needle.console",
 	"version": "2.0.0-exp",
 	"unity": "2019.4",
-	"description": "Demystifying stacktraces using https://github.com/needle-tools/Ben.Demystifier",
+	"description": "Better Unity console featuring improved stacktrace readability using Ben.Demystifier, filtering of log entries, collapsing of individual logs",
 	"keywords": [
 		"Editor",
 		"Console",
@@ -14,7 +14,7 @@
 	},
     "repository": {
       "type": "git",
-      "url": "https://github.com/needle-tools/demystify"
+      "url": "https://github.com/needle-tools/needle-console"
     },
 	"author": {
 		"name": "Needle",
