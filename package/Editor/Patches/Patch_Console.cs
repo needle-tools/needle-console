@@ -94,7 +94,18 @@ namespace Needle.Console
 		{
 			protected override IEnumerable<MethodBase> GetPatches()
 			{
-				yield return ConsoleWindowType?.GetMethod("StacktraceWithHyperlinks", (BindingFlags) ~0, null, new[] {typeof(string)}, null);
+				// broke somewhere between 2020.3.4f1 and 2020.3.10f1
+				// could #ifdef but seems Unity changed this relatively randomly in some 2020.3 and some 2021.1, so just trying both feels easier
+				var methodWithIntParameter = ConsoleWindowType?.GetMethod("StacktraceWithHyperlinks", (BindingFlags) ~0, null, new[] {typeof(string), typeof(int)}, null);
+				if (methodWithIntParameter != null)
+				{
+					yield return methodWithIntParameter;
+					yield break;
+				}
+				
+				var methodWithoutIntParameter = ConsoleWindowType?.GetMethod("StacktraceWithHyperlinks", (BindingFlags) ~0, null, new[] {typeof(string)}, null);
+				if (methodWithoutIntParameter != null)
+					yield return methodWithoutIntParameter;
 			}
 
 			private static string lastText;

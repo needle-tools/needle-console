@@ -4,7 +4,6 @@ using System.Reflection;
 using System.Text.RegularExpressions;
 using HarmonyLib;
 using UnityEditor;
-using UnityEditor.ShortcutManagement;
 using UnityEngine;
 
 namespace Needle.Console
@@ -16,7 +15,22 @@ namespace Needle.Console
 	{
 		protected override IEnumerable<MethodBase> GetPatches()
 		{
-			yield return AccessTools.Method(typeof(EditorGUI), "DoTextField");
+			MethodInfo doTextField;
+			try
+			{
+				doTextField = AccessTools.Method(typeof(EditorGUI), "DoTextField");
+			}
+			catch (AmbiguousMatchException)
+			{
+				doTextField = AccessTools.Method(typeof(EditorGUI), "DoTextField", new Type[]  
+				{
+					// 2021.1 introduces a new overload here, so we need to specify explicitly which version we want.
+					// (EditorGUI.RecycledTextEditor editor,											 int id,	  Rect position, string text,	 GUIStyle style,   string allowedLetters, out bool changed,                 bool reset,   bool multiline, bool passwordField)
+					typeof(EditorGUI).Assembly.GetType("UnityEditor.EditorGUI+RecycledTextEditor"), typeof(int), typeof(Rect),  typeof(string), typeof(GUIStyle), typeof(string),        typeof(bool).MakeByRefType(),     typeof(bool), typeof(bool),   typeof(bool)
+				});
+			}
+
+			yield return doTextField;
 		}
 		
 		private static CodePreview.Window window;

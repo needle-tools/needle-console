@@ -1,4 +1,9 @@
-﻿using System;
+﻿#if UNITY_2020_3_OR_NEWER && !UNITY_2020_3_0 && !UNITY_2020_3_1 && !UNITY_2020_3_2 && !UNITY_2020_3_3 && !UNITY_2020_3_4 && !UNITY_2020_3_5 && !UNITY_2020_3_6 && !UNITY_2020_3_7 && !UNITY_2021_1_0 && !UNITY_2021_1_1
+// has changed somewhere between 2020.3.10f1-2020.3.10f1, 2021.1.1f1-2021.1.6f1 and 2021.2.0a16+ - in-between versions not tested
+#define UNITY_CONSOLE_STACKTRACE_TWO_PARAMETERS
+#endif
+
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -155,7 +160,12 @@ namespace Needle.Console
 			if (spl == null)
 			{
 				var size = SplitterSize;
+				
+				#if UNITY_2020_1_OR_NEWER
 				spl = SplitterState.FromRelative(new[] {size.x, size.y}, new float[] {32, 32}, null);
+				#else
+				spl = new SplitterState(new[] {size.x, size.y}, new int[] {32, 32}, (int[]) null, 0);
+				#endif
 			}
 
 			SplitterGUILayout.BeginVerticalSplit(spl);
@@ -419,7 +429,11 @@ namespace Needle.Console
 
 		internal static float DrawDefaultStacktrace(string message)
 		{
+#if UNITY_CONSOLE_STACKTRACE_TWO_PARAMETERS
+			var stackWithHyperlinks = ConsoleWindow.StacktraceWithHyperlinks(message, 0);
+#else
 			var stackWithHyperlinks = ConsoleWindow.StacktraceWithHyperlinks(message);
+#endif
 			var stacktraceHeight = ConsoleWindow.Constants.MessageStyle.CalcHeight(GUIContent.Temp(stackWithHyperlinks), Screen.width);
 			DrawDefaultStacktrace(stackWithHyperlinks, stacktraceHeight);
 			return stacktraceHeight;

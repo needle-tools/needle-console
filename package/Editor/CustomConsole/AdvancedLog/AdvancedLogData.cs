@@ -57,9 +57,9 @@ namespace Needle.Console
 
 	public interface ILogData
 	{
-		public int Id { get; set; }
-		public float Time { get; set; }
-		public int Frame { get; set; }
+		int Id { get; set; }
+		float Time { get; set; }
+		int Frame { get; set; }
 	}
 
 	public interface ILogData<T> : ILogData

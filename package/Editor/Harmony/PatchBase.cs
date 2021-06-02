@@ -25,6 +25,11 @@ namespace Needle.Console
 			var t = GetType(); 
 			foreach (var m in GetPatches())
 			{
+				if (m == null)
+				{
+					Debug.LogError($"Null method returned from {this} ({this.GetType()}). Please report a bug and note your Unity and package versions.");
+					continue;
+				}
 				var prefix = AccessTools.Method(t, "Prefix");
 				var postfix = AccessTools.Method(t, "Postfix");
 				var transpiler = AccessTools.Method(t, "Transpiler");
