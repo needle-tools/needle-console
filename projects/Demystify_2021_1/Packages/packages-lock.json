@@ -4,9 +4,7 @@
       "version": "file:../../../package",
       "depth": 0,
       "source": "local",
-      "dependencies": {
-        "com.needle.editorpatching": "1.2.0.exp"
-      }
+      "dependencies": {}
     },
     "com.needle.demystify.extras": {
       "version": "file:../../needle.demystify.extras",
@@ -78,7 +76,7 @@
       "url": "https://packages.unity.com"
     },
     "com.unity.timeline": {
-      "version": "1.5.2",
+      "version": "1.5.4",
       "depth": 0,
       "source": "registry",
       "dependencies": {

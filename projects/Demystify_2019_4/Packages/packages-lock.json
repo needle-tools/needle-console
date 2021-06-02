@@ -1,21 +1,13 @@
 {
   "dependencies": {
-    "com.needle.demystify": {
+    "com.needle.console": {
       "version": "file:../../../package",
-      "depth": 0,
-      "source": "local",
-      "dependencies": {
-        "com.needle.editorpatching": "1.2.0-exp.1"
-      }
-    },
-    "com.needle.demystify.extras": {
-      "version": "file:../../needle.demystify.extras",
       "depth": 0,
       "source": "local",
       "dependencies": {}
     },
-    "com.needle.editorpatching": {
-      "version": "file:../../../../../package",
+    "com.needle.demystify.extras": {
+      "version": "file:../../needle.demystify.extras",
       "depth": 0,
       "source": "local",
       "dependencies": {}
@@ -88,16 +80,20 @@
       "url": "https://packages.unity.com"
     },
     "com.unity.purchasing": {
-      "version": "2.2.2",
+      "version": "3.0.2",
       "depth": 0,
       "source": "registry",
       "dependencies": {
-        "com.unity.ugui": "1.0.0"
+        "com.unity.ugui": "1.0.0",
+        "com.unity.modules.unityanalytics": "1.0.0",
+        "com.unity.modules.unitywebrequest": "1.0.0",
+        "com.unity.modules.jsonserialize": "1.0.0",
+        "com.unity.modules.androidjni": "1.0.0"
       },
       "url": "https://packages.unity.com"
     },
     "com.unity.test-framework": {
-      "version": "1.1.22",
+      "version": "1.1.24",
       "depth": 0,
       "source": "registry",
       "dependencies": {

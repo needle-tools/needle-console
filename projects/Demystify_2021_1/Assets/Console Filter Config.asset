@@ -13,11 +13,10 @@ MonoBehaviour:
   m_Name: Console Filter Config
   m_EditorClassIdentifier: 
   messages: []
-  files:
-  - Element: ../needle.demystify.extras/Editor/DemystifyTestCode/Sample.cs
+  files: []
+  packages:
+  - Element: com.needle.demystify
     Active: 1
     Solo: 0
-  packages: []
   ids: []
   lines: []
-  times: []
