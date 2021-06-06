@@ -88,7 +88,7 @@ namespace Needle.Console
 		private static GUIStyle logStyle;
 
 		private static bool HasFlag(int flags) => (LogEntries.consoleFlags & (int) flags) != 0;
-		private static bool HasMode(int mode, ConsoleWindow.Mode modeToCheck) => (uint) ((ConsoleWindow.Mode) mode & modeToCheck) > 0U;
+		internal static bool HasMode(int mode, ConsoleWindow.Mode modeToCheck) => (uint) ((ConsoleWindow.Mode) mode & modeToCheck) > 0U;
 
 		private static ConsoleWindow _consoleWindow;
 		private static bool shouldScrollToSelectedItem;

@@ -283,49 +283,54 @@ namespace Needle.Console
 						}
 					}
 
+					var allowFilter = !ConsoleList.HasMode(entry.mode, ConsoleWindow.Mode.ScriptCompileError | ConsoleWindow.Mode.GraphCompileError);
+
 					// else if(enabled)
 					LogEntryInfo info = new LogEntryInfo(entry);
 					var skip = false;
-					for (var index = 0; index < registeredFilters.Count; index++)
+					if (allowFilter)
 					{
-						var filter = registeredFilters[index];
-						if (!filter.Enabled) continue;
-						using (new ProfilerMarker("Filter Exclude").Auto())
+						for (var index = 0; index < registeredFilters.Count; index++)
 						{
-							var res = filter.Filter(preview, mask, i, info);
-
-							void AddResultToStat()
+							var filter = registeredFilters[index];
+							if (!filter.Enabled) continue;
+							using (new ProfilerMarker("Filter Exclude").Auto())
 							{
-								var stats = registeredFiltersStats[index];
-								stats.Add(res);
-								registeredFiltersStats[index] = stats;
-							}
+								var res = filter.Filter(preview, mask, i, info);
 
-							if (HasAnyFilterSolo)
-							{
-								skip = true;
-								if (res == FilterResult.Solo)
+								void AddResultToStat()
 								{
-									skip = false;
-									AddResultToStat();
-									break;
+									var stats = registeredFiltersStats[index];
+									stats.Add(res);
+									registeredFiltersStats[index] = stats;
 								}
-							}
-							else
-							{
-								if (res == FilterResult.Exclude)
+
+								if (HasAnyFilterSolo)
 								{
 									skip = true;
-									AddResultToStat();
-									break;
+									if (res == FilterResult.Solo)
+									{
+										skip = false;
+										AddResultToStat();
+										break;
+									}
+								}
+								else
+								{
+									if (res == FilterResult.Exclude)
+									{
+										skip = true;
+										AddResultToStat();
+										break;
+									}
 								}
 							}
 						}
-					}
 
-					if (skip)
-					{
-						AddGlobalStat(FilterResult.Exclude);
+						if (skip)
+						{
+							AddGlobalStat(FilterResult.Exclude);
+						}
 					}
 
 					var key = (preview, entry.instanceID);
