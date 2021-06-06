@@ -4,6 +4,13 @@ All notable changes to this package will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## [2.0.0-exp.1] - 2021-06-06
+- Update package url
+- Update some readme
+- Fix setting default theme on first installation
+- Fix Console-Hyperlink in latest 2021.2 alpha
+- Dont filter compiler errors
+
 ## [2.0.0-exp] - 2021-06-02
 - Rename to Needle Console
 - Fix IL error in 2019.4
