@@ -32,7 +32,7 @@ public class PrintSomeValues : MonoBehaviour
 		lastTime = Time.time;
 
 		if (LogSimple)
-			Debug.Log("Sine Wave: " + Mathf.Sin(time));
+			Debug.Log("Log Simple: " + Mathf.Sin(time));
 		if (LogSimple2)
 			Debug.Log("Sine Wave: " + Mathf.Sin(time) + "; Cos Wave: " + Mathf.Cos(time));
 		if (LogComplex)
@@ -43,9 +43,7 @@ public class PrintSomeValues : MonoBehaviour
 			Debug.Log("Group without value " + someStrings[index % someStrings.Length]);
 		if (LogVector3)
 			Debug.Log("Vector3 log: " + new Vector3(Mathf.Sin(time), Mathf.Cos(time), Random.value));
-
-		Debug.Log(Time.frameCount);
-
+		
 		index += 1;
 	}
 }

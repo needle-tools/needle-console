@@ -75,7 +75,7 @@ namespace Needle.Console
 			}
 		}
 
-		private static void SaveEntries() => AdvancedLogUserSettings.instance.Save();
+		internal static void SaveEntries() => AdvancedLogUserSettings.instance.Save();
 		private static List<AdvancedLogEntry> Entries => AdvancedLogUserSettings.instance.selections;
 
 		private static bool TryGetIndex(LogEntryInfo entry, out int index)
