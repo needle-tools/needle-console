@@ -1,4 +1,5 @@
 ﻿using System;
+using JetBrains.Annotations;
 using UnityEditor;
 
 namespace Needle.Console
@@ -9,6 +10,7 @@ namespace Needle.Console
 		public bool Active = true;
 		public string File;
 		public int Line;
+		[CanBeNull] public string LineString;
 
 		public bool Equals(CachedConsoleInfo other)
 		{

@@ -17,12 +17,14 @@ namespace Needle.Console
 			ConsoleFilter.CustomAddEntry += CustomAdd;
 			ConsoleList.LogEntryContextMenu += OnLogEntryContext;
 
-			var list = AdvancedLogUserSettings.instance.selections;  
-			handler = new AdvancedLogHandler(list);
-			ConsoleList.RegisterCustomDrawer(handler);
+			var list = AdvancedLogUserSettings.instance.selections;
+			collapse = new AdvancedLogCollapse(list);
+			drawer = new AdvancedLogDrawer();
+			ConsoleList.RegisterCustomDrawer(drawer);
 		}
 
-		private static AdvancedLogHandler handler;
+		private static AdvancedLogDrawer drawer;
+		private static AdvancedLogCollapse collapse;
 
 		private static void OnLogEntryContext(GenericMenu menu, int itemIndex)
 		{
@@ -57,7 +59,7 @@ namespace Needle.Console
 
 		private static void OnClear()
 		{
-			handler.ClearCache();
+			collapse.ClearCache();
 		}
 		
 		private static bool CustomAdd(LogEntry entry, int row, string preview, List<CachedConsoleInfo> entries)
@@ -69,7 +71,7 @@ namespace Needle.Console
 
 			using (new ProfilerMarker("Console Log Grouping").Auto())
 			{
-				return handler.OnHandleLog(entry, row, preview, entries);
+				return collapse.OnHandleLog(entry, row, preview, entries);
 			}
 		}
 
