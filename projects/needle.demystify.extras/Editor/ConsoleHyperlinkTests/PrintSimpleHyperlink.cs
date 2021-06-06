@@ -8,6 +8,6 @@ public static class PrintSimpleHyperlink
     [MenuItem("Test/Print Links")]
     private static void Init()
     {
-        Debug.Log("<a href=\"www.google.de\">google.de</a>");
+        Debug.Log("<a href=\"www.unity.com\">unity.com</a>");
     }
 }
