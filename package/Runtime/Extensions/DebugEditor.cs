@@ -1,12 +1,17 @@
-using UnityEngine;
+using System;
 using Debug = UnityEngine.Debug;
+using Object = UnityEngine.Object;
 
 namespace Needle.Console
 {
 	public static class DebugEditor
 	{
 		public static string Separator = null;
-		
+
+		/// <summary>
+		/// Use to log only in UnityEditor. Avoid string concatenations when calling this method - if you dont this call will have no performance impact on your build.
+		/// Call it like DebugEditor.Log(this, MyClass, SomeString, SomeOtherString); 
+		/// </summary>
 		public static void Log(Object context, params object[] obj)
 		{
 #if UNITY_EDITOR
@@ -15,6 +20,10 @@ namespace Needle.Console
 #endif
 		}
 
+		/// <summary>
+		/// Use to log only in UnityEditor. Avoid string concatenations when calling this method - if you dont this call will have no performance impact on your build.
+		/// Call it like DebugEditor.Log(MyClass, SomeString, SomeOtherString); 
+		/// </summary>
 		public static void Log(params object[] obj)
 		{
 #if UNITY_EDITOR
@@ -23,6 +32,10 @@ namespace Needle.Console
 #endif
 		}
 		
+		/// <summary>
+		/// Use to log only in UnityEditor. Avoid string concatenations when calling this method - if you dont this call will have no performance impact on your build.
+		/// Call it like DebugEditor.Log(this, MyClass, SomeString, SomeOtherString); 
+		/// </summary>
 		public static void LogWarning(Object context, params object[] obj)
 		{
 #if UNITY_EDITOR
@@ -31,12 +44,32 @@ namespace Needle.Console
 #endif
 		}
 		
+		/// <summary>
+		/// Use to log only in UnityEditor. Avoid string concatenations when calling this method - if you dont this call will have no performance impact on your build.
+		/// Call it like DebugEditor.Log(this, MyClass, SomeString, SomeOtherString); 
+		/// </summary>
 		public static void LogError(Object context, params object[] obj)
 		{
 #if UNITY_EDITOR
 			Debug.LogError(string.Join(Separator ?? string.Empty, obj), context);
 			Separator = null;
 #endif
+		}
+		
+		
+		[Obsolete("Please use DebugEditor.Log(context, params object[]) overload, avoid string concatenations at all cost", true)]
+		public static void Log(string useParamsOverload, Object context = null)
+		{
+		}
+		
+		[Obsolete("Please use DebugEditor.Log(context, params object[]) overload, avoid string concatenations at all cost", true)]
+		public static void LogWarning(string useParamsOverload, Object context = null)
+		{
+		}
+		
+		[Obsolete("Please use DebugEditor.Log(context, params object[]) overload, avoid string concatenations at all cost", true)]
+		public static void LogError(string useParamsOverload, Object context = null)
+		{
 		}
 	}
 }

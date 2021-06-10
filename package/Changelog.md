@@ -4,7 +4,7 @@ All notable changes to this package will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
-## [2.1.0-exp.1] - 2021-06-10
+## [2.1.0-exp.2] - 2021-06-10
 - Add editor only logs (won't show up in standalone):``DebugEditor.Log``, ``DebugEditor.Warning``, ``DebugEditor.LogError``.  Hyperlink path is skipped for methods that contains ``DebugEditor.Log`` so double click opens original file. These class and methods can be defined in user code as well.
 - Make compiler errors background magenta similar to shader compiler errors.
 - Fix auto scroll
