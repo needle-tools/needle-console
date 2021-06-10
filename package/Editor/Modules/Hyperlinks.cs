@@ -22,7 +22,7 @@ namespace Needle.Console
 				if (!string.IsNullOrEmpty(path))
 				{
 					// dont append path to editor only lines to force unity to open the previous file path
-					if (line.Contains("DebugEditor.Log("))
+					if (line.Contains("DebugEditor.Log"))
 					{
 					}
 					else

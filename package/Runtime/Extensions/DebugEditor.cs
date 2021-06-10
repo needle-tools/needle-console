@@ -1,4 +1,3 @@
-using System.Diagnostics;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
 
@@ -10,6 +9,20 @@ namespace Needle.Console
 		{
 #if UNITY_EDITOR
 			Debug.Log(obj, context);
+#endif
+		}
+		
+		public static void LogWarning(object obj, Object context = null)
+		{
+#if UNITY_EDITOR
+			Debug.LogWarning(obj, context);
+#endif
+		}
+		
+		public static void LogError(object obj, Object context = null)
+		{
+#if UNITY_EDITOR
+			Debug.LogError(obj, context);
 #endif
 		}
 	}
