@@ -21,9 +21,17 @@ namespace Needle.Console
 				var path = Fix(ref line);
 				if (!string.IsNullOrEmpty(path))
 				{
-					path = path.Replace("\n", "");
-					line += ")" + path;
-					Filepaths.TryMakeRelative(ref line);
+					// dont append path to editor only lines to force unity to open the previous file path
+					if (line.Contains("DebugEditor.Log("))
+					{
+					}
+					else
+					{
+						path = path.Replace("\n", "");
+						line += ")" + path;
+						Filepaths.TryMakeRelative(ref line);
+					}
+					
 				}
 
 				stacktrace += line + "\n";
