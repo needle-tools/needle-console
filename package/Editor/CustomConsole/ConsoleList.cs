@@ -92,7 +92,7 @@ namespace Needle.Console
 		/// if scrollbar was at bottom, signal to continue scroll to bottom when logs change
 		/// can and should be interrupted by focus or click or manual scroll
 		/// </summary>
-		private static bool isAutoScrolling;
+		private static bool isAutoScrolling = true;
 
 		private static bool logsCountChanged, logsAdded;
 		private static int previousLogsCount, logCountDiff;
@@ -109,6 +109,13 @@ namespace Needle.Console
 		private static ListViewElement element;
 		private static int xOffset;
 		private static float lineHeight;
+		
+		// scroll stuff
+		private static float scrollY, previousScrollY;
+		/// <summary>
+		/// set when e.g. user clicks log item to stop auto scroll
+		/// </summary>
+		private static DateTime scrollEntryInteractionTime = DateTime.Now;
 
 		internal static void RequestRepaint()
 		{
@@ -188,7 +195,8 @@ namespace Needle.Console
 			var yTop = EditorGUIUtility.singleLineHeight + 3;
 			lineHeight = EditorGUIUtility.singleLineHeight * lineCount + 3;
 			count = currentEntries.Count;
-			var scrollAreaHeight = Screen.height - spl.realSizes[1] - 44;
+			const int scrollAreaBottomBuffer = 44;
+			var scrollAreaHeight = Screen.height - spl.realSizes[1] - scrollAreaBottomBuffer;
 
 			var contentHeight = count * lineHeight;
 			if (Event.current.type == EventType.Repaint)
@@ -211,7 +219,7 @@ namespace Needle.Console
 			var width = Screen.width - 3;
 			if (contentHeight > scrollArea.height)
 				width -= 13;
-			var contentSize = new Rect(0, 0, width, contentHeight);
+			var contentSize = new Rect(0, 0, width, contentHeight - lineHeight);
 
 			// scroll to bottom if logs changed and it was at the bottom previously
 			if (!shouldScrollToSelectedItem)
@@ -228,6 +236,15 @@ namespace Needle.Console
 
 
 			scroll = GUI.BeginScrollView(scrollArea, scroll, contentSize);
+			
+			var captureScrollPosition = Event.current.type == EventType.Layout 
+			                            || Event.current.type == EventType.ScrollWheel 
+			                            || Event.current.type == EventType.MouseDown;
+			if (captureScrollPosition)
+			{
+				previousScrollY = scrollY;
+				scrollY = scroll.y;
+			}
 
 			var position = new Rect(0, 0, width, lineHeight);
 			element = new ListViewElement();
@@ -298,6 +315,7 @@ namespace Needle.Console
 								if (!leftClickedLog && rect.Contains(Event.current.mousePosition))
 								{
 									leftClickedLog = true;
+									scrollEntryInteractionTime = DateTime.Now;
 
 									var entry = currentEntries[k].entry;
 									isAutoScrolling = false;
@@ -325,6 +343,7 @@ namespace Needle.Console
 							{
 								if (rect.Contains(Event.current.mousePosition))
 								{
+									isAutoScrolling = false;
 									var item = currentEntries[k];
 									var menu = new GenericMenu();
 									if (ConsoleFilter.RegisteredFilter.Count > 0)
@@ -395,24 +414,35 @@ namespace Needle.Console
 				previouslySelectedRowIndex = -1;
 			}
 
+			
 			GUI.EndScrollView();
-
-			if (Event.current.type == EventType.Repaint && selectedRowIndex < 0)
+			
+			if (Event.current.type == EventType.Repaint)
 			{
-				var diffToBottom = (contentHeight - scrollAreaHeight) - scroll.y;
-				isAutoScrolling = diffToBottom <= (lineHeight * Mathf.Max(0, logCountDiff)) || contentHeight < scrollAreaHeight;
+				var didScrollDown = previousScrollY < scrollY;
+				Debug.Log(previousScrollY + ", " + scrollY);
+				if (isAutoScrolling || didScrollDown)
+				{
+					var timeSinceInteraction = (DateTime.Now - scrollEntryInteractionTime).TotalSeconds;
+					Debug.Log(timeSinceInteraction);
+					if (timeSinceInteraction > .2f)
+					{
+						var diffToBottom = (contentHeight - scrollAreaHeight) - scroll.y - scrollAreaBottomBuffer;
+						isAutoScrolling = diffToBottom <= (lineHeight * Mathf.Max(2, logCountDiff)) || contentHeight <= scrollAreaHeight;
+					}
+				}
 			}
 
 			// Display active text (We want word wrapped text with a vertical scrollbar)
-			scrollAreaHeight += 2;
-			GUILayout.Space(scrollAreaHeight);
-			SeparatorLine.Draw(scrollAreaHeight + EditorGUIUtility.singleLineHeight);
+			var tempScrollAreaHeight = scrollAreaHeight + 2;
+			GUILayout.Space(tempScrollAreaHeight);
+			SeparatorLine.Draw(tempScrollAreaHeight + EditorGUIUtility.singleLineHeight);
 			scrollStacktrace = GUILayout.BeginScrollView(scrollStacktrace, ConsoleWindow.Constants.Box);
 
 			var didDrawStacktrace = false;
 			var text = selectedText ?? string.Empty;
-			scrollAreaHeight += 1;
-			var stacktraceContentRect = new Rect(0, scrollAreaHeight, width, Screen.height - scrollAreaHeight);
+			tempScrollAreaHeight += 1;
+			var stacktraceContentRect = new Rect(0, tempScrollAreaHeight, width, Screen.height - tempScrollAreaHeight);
 			try
 			{
 				foreach (var drawer in customDrawers)
@@ -628,20 +658,20 @@ namespace Needle.Console
 
 					break;
 				case KeyCode.Space:
-					if (selectedRowIndex >= 0 && currentEntries.Count > 0)
-					{
-						var menu = new GenericMenu();
-						if (ConsoleFilter.RegisteredFilter.Count > 0)
-						{
-							var info = currentEntries[selectedRowIndex];
-							ConsoleFilter.AddMenuItems(menu, info.entry, info.str);
-						}
-
-						AddConfigMenuItems(menu, selectedRowIndex);
-						var rect = position;
-						rect.y = selectedRowIndex * lineHeight;
-						menu.DropDown(rect);
-					}
+					// if (selectedRowIndex >= 0 && currentEntries.Count > 0)
+					// {
+					// 	var menu = new GenericMenu();
+					// 	if (ConsoleFilter.RegisteredFilter.Count > 0)
+					// 	{
+					// 		var info = currentEntries[selectedRowIndex];
+					// 		ConsoleFilter.AddMenuItems(menu, info.entry, info.str);
+					// 	}
+					//
+					// 	AddConfigMenuItems(menu, selectedRowIndex);
+					// 	var rect = position;
+					// 	rect.y = selectedRowIndex * lineHeight;
+					// 	menu.DropDown(rect);
+					// }
 
 					break;
 				case KeyCode.Return:
