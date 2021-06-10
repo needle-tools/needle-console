@@ -9,6 +9,13 @@ namespace Needle.Console
 {
 	public static class NeedleConsole
 	{
+
+		[HyperlinkCallback(Href = "OpenNeedleConsoleSettings")]
+		private static void OpenNeedleConsoleUserPreferences()
+		{
+			SettingsService.OpenUserPreferences("Preferences/Needle/Console");
+		}
+		
 		[InitializeOnLoadMethod]
 		private static void Init()
 		{
@@ -16,8 +23,6 @@ namespace Needle.Console
 			var settings = NeedleConsoleSettings.instance;
 			if (projectSettings.FirstInstall)
 			{
-				var link = new GenericHyperlink("OpenNeedleConsoleSettings", "Edit/Preferences/Needle/Console",
-					() => SettingsService.OpenUserPreferences("Preferences/Needle/Console"));
 				async void InstalledLog()
 				{
 					await Task.Delay(100);
@@ -25,7 +30,7 @@ namespace Needle.Console
 					projectSettings.FirstInstall = false;
 					projectSettings.Save();
 					Debug.Log(
-						$"Thanks for installing Needle Console. You can find Settings under {link}\n" +
+						$"Thanks for installing Needle Console. You can find Settings under <a href=\"OpenNeedleConsoleSettings\">Edit/Preferences/Needle/Console</a>\n" +
 						$"If you discover issues please report them <a href=\"https://github.com/needle-tools/needle-console/issues\">on github</a>\n" +
 						$"Also feel free to join <a href=\"https://discord.gg/CFZDp4b\">our discord</a>");
 				}

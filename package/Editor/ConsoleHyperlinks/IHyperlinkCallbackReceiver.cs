@@ -20,5 +20,6 @@ namespace Needle
 	public class HyperlinkCallback : Attribute
 	{
 		public int Priority;
+		public string Href = null;
 	}
 }

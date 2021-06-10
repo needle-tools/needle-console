@@ -103,8 +103,8 @@ namespace Needle
 			foreach (var m in methods)
 			{
 				if (!m.IsStatic) continue;
-				var wrapper = new MethodBridge(m);
 				var attribute = m.GetCustomAttribute<HyperlinkCallback>();
+				var wrapper = new MethodBridge(m, attribute.Href);
 				RegisterClickedCallback(wrapper, attribute.Priority);
 			}
 		}
@@ -151,18 +151,36 @@ namespace Needle
 		private class MethodBridge : IHyperlinkCallbackReceiver
 		{
 			private readonly MethodInfo method;
-			private bool pathOnly;
+			private readonly string href;
+			private readonly int argsCount;
 
-			public MethodBridge(MethodInfo method)
+			public MethodBridge(MethodInfo method, string href)
 			{
 				this.method = method;
+				this.href = href;
 				var para = this.method.GetParameters();
-				pathOnly = para.Length == 1;
+				argsCount = para.Length;
 			}
 
 			public bool OnHyperlinkClicked(string path, string line)
 			{
-				var res = pathOnly ? method?.Invoke(null, new object[] { path }) : method?.Invoke(null, new object[] { path, line });
+				var isHref = path != href;
+				if (!string.IsNullOrEmpty(href) && !isHref) return false;
+				object res = null;
+				switch (argsCount)
+				{
+					case 0:
+						res = method?.Invoke(null, null);
+						break;
+					case 1:
+						res = method?.Invoke(null, new object[] { path });
+						break;
+					case 2:
+						res = method?.Invoke(null, new object[] { path, line });
+						break;
+				}
+				// when attribute specifies exact href only call one callback
+				if (isHref) return true;
 				if (res is bool boolResult) return boolResult;
 				return false;
 			}
