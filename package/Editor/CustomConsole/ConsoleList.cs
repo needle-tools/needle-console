@@ -219,10 +219,10 @@ namespace Needle.Console
 			var width = Screen.width - 3;
 			if (contentHeight > scrollArea.height)
 				width -= 13;
-			var contentSize = new Rect(0, 0, width, contentHeight - lineHeight);
+			var contentSize = new Rect(0, 0, width, contentHeight);
 
 			// scroll to bottom if logs changed and it was at the bottom previously
-			if (!shouldScrollToSelectedItem)
+			if ((!shouldScrollToSelectedItem || isAutoScrolling) && (Event.current.type == EventType.Layout || Event.current.type == EventType.Repaint))
 			{
 				if (isAutoScrolling && logsAdded)
 				{
@@ -234,12 +234,12 @@ namespace Needle.Console
 				}
 			}
 
-
 			scroll = GUI.BeginScrollView(scrollArea, scroll, contentSize);
-			
-			var captureScrollPosition = Event.current.type == EventType.Layout 
-			                            || Event.current.type == EventType.ScrollWheel 
-			                            || Event.current.type == EventType.MouseDown;
+
+			var captureScrollPosition = Event.current.type == EventType.Layout
+			                            || Event.current.type == EventType.ScrollWheel
+			                            || Event.current.type == EventType.MouseDown
+			                            || Event.current.type == EventType.MouseDrag;
 			if (captureScrollPosition)
 			{
 				previousScrollY = scrollY;
@@ -425,8 +425,9 @@ namespace Needle.Console
 					var timeSinceInteraction = (DateTime.Now - scrollEntryInteractionTime).TotalSeconds;
 					if (timeSinceInteraction > .2f)
 					{
-						var diffToBottom = (contentHeight - scrollAreaHeight) - scroll.y - scrollAreaBottomBuffer;
-						isAutoScrolling = diffToBottom <= (lineHeight * Mathf.Max(2, logCountDiff)) || contentHeight <= scrollAreaHeight;
+						var height = contentHeight - lineHeight;
+						var diffToBottom = (height - scrollAreaHeight) - scroll.y - scrollAreaBottomBuffer;
+						isAutoScrolling = diffToBottom <= (lineHeight * Mathf.Max(2, logCountDiff)) || height <= scrollAreaHeight;
 					}
 				}
 			}
