@@ -491,9 +491,9 @@ namespace Needle.Console
 			{
 				DrawBackground(new Color(.2f, .5f, .8f, .5f));
 			}
-			else if (allowColors && HasMode(entry.mode, ConsoleWindow.Mode.ScriptCompileError))
+			else if (allowColors && HasMode(entry.mode, ConsoleWindow.Mode.ScriptCompileError | ConsoleWindow.Mode.GraphCompileError))
 			{
-				DrawBackground(IsOdd() ? new Color(1, 0, 0, .2f) : new Color(1, .2f, .25f, .25f));
+				DrawBackground(IsOdd() ? new Color(1, 0, 1, .2f) : new Color(1, .2f, 1f, .25f));
 			}
 			else if (allowColors && HasMode(entry.mode,
 				ConsoleWindow.Mode.ScriptingError | ConsoleWindow.Mode.Error | ConsoleWindow.Mode.StickyError |
