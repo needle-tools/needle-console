@@ -57,19 +57,5 @@ namespace Needle.Console
 		}
 		
 		
-		[Obsolete("Please use DebugEditor.Log(context, params object[]) overload, avoid string concatenations at all cost", true)]
-		public static void Log(string useParamsOverload, Object context = null)
-		{
-		}
-		
-		[Obsolete("Please use DebugEditor.Log(context, params object[]) overload, avoid string concatenations at all cost", true)]
-		public static void LogWarning(string useParamsOverload, Object context = null)
-		{
-		}
-		
-		[Obsolete("Please use DebugEditor.Log(context, params object[]) overload, avoid string concatenations at all cost", true)]
-		public static void LogError(string useParamsOverload, Object context = null)
-		{
-		}
 	}
 }
