@@ -52,7 +52,10 @@ namespace Needle.Console
 				if (!NeedleConsoleSettings.instance.ShowFileName) return;
 				
 				var key = text;
-				if (cachedInfo.ContainsKey(key))
+				var isSelected = ConsoleList.IsSelectedRow(element.row);
+				var cacheEntry = !isSelected;
+				var isInCache = cachedInfo.ContainsKey(key);
+				if (cacheEntry && isInCache)
 				{
 					text = cachedInfo[key];
 					return;
@@ -63,9 +66,11 @@ namespace Needle.Console
 					try
 					{
 						var filePath = tempEntry.file;
-
 						var fileName = Path.GetFileNameWithoutExtension(filePath);
-						const string colorPrefix = "<color=#999999>";
+						const string colorPrefixDefault = "<color=#999999>";
+						const string colorPrefixSelected = "<color=#bbbbbb>";
+						// const string colorPrefixSelected = "<color=#111122>";
+						var colorPrefix = isInCache && isSelected ? colorPrefixSelected : colorPrefixDefault;
 						const string colorPostfix = "</color>";
 						var colorKey = fileName;
 						var colorMarker = NeedleConsoleSettings.instance.ColorMarker; // " ▍";
@@ -75,7 +80,7 @@ namespace Needle.Console
 						string GetPrefix()
 						{
 							var key2 = tempEntry.file + ":" + tempEntry.line + ":" + tempEntry.column;
-							if (cachedPrefix.TryGetValue(key2, out var cached))
+							if (!isSelected && cachedPrefix.TryGetValue(key2, out var cached))
 							{
 								return cached;
 							}
@@ -98,7 +103,8 @@ namespace Needle.Console
 							// str = "<b>" + str + "</b>";
 							// str = "\t" + str;
 							str = $"{colorPrefix} {str} {colorPostfix}"; // + " |";
-							cachedPrefix.Add(key2, str);
+							if(cacheEntry)
+								cachedPrefix.Add(key2, str);
 							return str;
 						}
 
@@ -119,18 +125,21 @@ namespace Needle.Console
 							// LogColor.AddColor(colorKey, ref message);
 							text = $"{colorPrefix}{text.Substring(1, endTimeIndex - 1)}{colorPostfix} {colorMarker}{GetPrefix()}{message}";
 						}
-
-						cachedInfo.Add(key, text);
+						
+						if(cacheEntry)
+							cachedInfo.Add(key, text);
 					}
 					catch (ArgumentException)
 					{
 						// sometimes filepath contains illegal characters and is not actually a path
-						cachedInfo.Add(key, text);
+						if(cacheEntry)
+							cachedInfo.Add(key, text);
 					}
 					catch (Exception e)
 					{
 						Debug.LogException(e);
-						cachedInfo.Add(key, text);
+						if(cacheEntry)
+							cachedInfo.Add(key, text);
 					}
 				}
 			}

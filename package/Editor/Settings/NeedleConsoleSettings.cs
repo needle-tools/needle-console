@@ -29,8 +29,7 @@ namespace Needle.Console
 
 		public Highlighting SyntaxHighlighting = Highlighting.Simple;
 		public bool UseSyntaxHighlighting => SyntaxHighlighting != Highlighting.None;
-		
-		
+
 		[SerializeField] private Theme Theme;
 
 		public static event Action ThemeChanged;
@@ -92,6 +91,8 @@ namespace Needle.Console
 		public bool CustomList = true;
 		public bool RowColors = true;
 		public bool IndividualCollapse = true;
+		public bool UseCustomFont = true;
+		public string LogEntryFont = "Fira Code";
 	}
 	
 }

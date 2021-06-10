@@ -80,6 +80,8 @@ namespace Needle.Console
 				EditorGUI.indentLevel++;
 				settings.RowColors = EditorGUILayout.Toggle(new GUIContent("Row Colors", "Allow custom list to tint row background for warnings and errors"), settings.RowColors);
 				settings.IndividualCollapse = EditorGUILayout.Toggle(new GUIContent("Individual Collapse", "When enabled the log context menu allows to collapse individual logs"), settings.IndividualCollapse);
+				settings.UseCustomFont = EditorGUILayout.Toggle(new GUIContent("Use Custom Font", "Allow using a custom font. Specify a font name that you have installed below"), settings.UseCustomFont);
+				settings.LogEntryFont = EditorGUILayout.TextField(new GUIContent("Log Entry Font", "Font name"), settings.LogEntryFont);
 				EditorGUI.indentLevel--;
 
 				if(NeedleConsoleSettings.DevelopmentMode)

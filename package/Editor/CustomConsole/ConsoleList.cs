@@ -109,6 +109,7 @@ namespace Needle.Console
 		private static ListViewElement element;
 		private static int xOffset;
 		private static float lineHeight;
+		private static Font defaultFont, logEntryFont;
 		
 		// scroll stuff
 		private static float scrollY, previousScrollY;
@@ -116,6 +117,16 @@ namespace Needle.Console
 		/// set when e.g. user clicks log item to stop auto scroll
 		/// </summary>
 		private static DateTime scrollEntryInteractionTime = DateTime.Now;
+
+		internal static bool IsSelectedRow(int row)
+		{
+			if (DrawCustom)
+			{
+				return row == selectedRowNumber;
+			}
+
+			return false;
+		}
 
 		internal static void RequestRepaint()
 		{
@@ -248,11 +259,22 @@ namespace Needle.Console
 
 			var position = new Rect(0, 0, width, lineHeight);
 			element = new ListViewElement();
+			var allowCustomFont = NeedleConsoleSettings.instance.UseCustomFont;
+			if (allowCustomFont && !logEntryFont || logEntryFont.name != NeedleConsoleSettings.instance.LogEntryFont)
+			{
+				logEntryFont = Font.CreateDynamicFontFromOSFont(NeedleConsoleSettings.instance.LogEntryFont, 13);
+			}
 			if (logStyle == null)
 			{
 				logStyle = new GUIStyle(ConsoleWindow.Constants.LogSmallStyle);
 				logStyle.alignment = TextAnchor.UpperLeft;
+				logStyle.padding.top += 1;
+				defaultFont = logStyle.font;
 			}
+
+			if (allowCustomFont && logEntryFont)
+				logStyle.font = logEntryFont;
+			else logStyle.font = defaultFont;
 
 			tempContent = new GUIContent();
 			var evt = Event.current;
