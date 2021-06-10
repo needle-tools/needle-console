@@ -5,24 +5,37 @@ namespace Needle.Console
 {
 	public static class DebugEditor
 	{
-		public static void Log(object obj, Object context = null)
+		public static string Separator = null;
+		
+		public static void Log(Object context, params object[] obj)
 		{
 #if UNITY_EDITOR
-			Debug.Log(obj, context);
+			Debug.Log(string.Join(Separator ?? string.Empty, obj), context);
+			Separator = null;
+#endif
+		}
+
+		public static void Log(params object[] obj)
+		{
+#if UNITY_EDITOR
+			Debug.Log(string.Join(Separator ?? string.Empty, obj));
+			Separator = null;
 #endif
 		}
 		
-		public static void LogWarning(object obj, Object context = null)
+		public static void LogWarning(Object context, params object[] obj)
 		{
 #if UNITY_EDITOR
-			Debug.LogWarning(obj, context);
+			Debug.LogWarning(string.Join(Separator ?? string.Empty, obj), context);
+			Separator = null;
 #endif
 		}
 		
-		public static void LogError(object obj, Object context = null)
+		public static void LogError(Object context, params object[] obj)
 		{
 #if UNITY_EDITOR
-			Debug.LogError(obj, context);
+			Debug.LogError(string.Join(Separator ?? string.Empty, obj), context);
+			Separator = null;
 #endif
 		}
 	}
