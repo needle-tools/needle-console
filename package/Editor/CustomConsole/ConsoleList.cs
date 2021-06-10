@@ -420,11 +420,9 @@ namespace Needle.Console
 			if (Event.current.type == EventType.Repaint)
 			{
 				var didScrollDown = previousScrollY < scrollY;
-				Debug.Log(previousScrollY + ", " + scrollY);
 				if (isAutoScrolling || didScrollDown)
 				{
 					var timeSinceInteraction = (DateTime.Now - scrollEntryInteractionTime).TotalSeconds;
-					Debug.Log(timeSinceInteraction);
 					if (timeSinceInteraction > .2f)
 					{
 						var diffToBottom = (contentHeight - scrollAreaHeight) - scroll.y - scrollAreaBottomBuffer;
