@@ -164,7 +164,7 @@ namespace Needle
 
 			public bool OnHyperlinkClicked(string path, string line)
 			{
-				var isHref = path != href;
+				var isHref = path == href;
 				if (!string.IsNullOrEmpty(href) && !isHref) return false;
 				object res = null;
 				switch (argsCount)
