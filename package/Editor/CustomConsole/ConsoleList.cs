@@ -18,6 +18,7 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using UnityEditor;
 using UnityEngine;
@@ -259,11 +260,7 @@ namespace Needle.Console
 
 			var position = new Rect(0, 0, width, lineHeight);
 			element = new ListViewElement();
-			var allowCustomFont = NeedleConsoleSettings.instance.UseCustomFont;
-			if (allowCustomFont && !logEntryFont || logEntryFont.name != NeedleConsoleSettings.instance.LogEntryFont)
-			{
-				logEntryFont = Font.CreateDynamicFontFromOSFont(NeedleConsoleSettings.instance.LogEntryFont, 13);
-			}
+			
 			if (logStyle == null)
 			{
 				logStyle = new GUIStyle(ConsoleWindow.Constants.LogSmallStyle);
@@ -272,6 +269,23 @@ namespace Needle.Console
 				defaultFont = logStyle.font;
 			}
 
+			var settings = NeedleConsoleSettings.instance;
+			var allowCustomFont = settings.UseCustomFont;
+			if (allowCustomFont)
+			{
+				if(settings.CustomLogEntryFont)
+					logEntryFont = settings.CustomLogEntryFont;
+				else if (settings.InstalledLogEntryFont != null)
+				{
+					if (!logEntryFont || logEntryFont.name != settings.InstalledLogEntryFont)
+					{
+						logEntryFont = Font.CreateDynamicFontFromOSFont(settings.InstalledLogEntryFont, 13);
+						if (logEntryFont)
+							logEntryFont.name = settings.InstalledLogEntryFont;
+					}
+				}
+				else logEntryFont = null;
+			}
 			if (allowCustomFont && logEntryFont)
 				logStyle.font = logEntryFont;
 			else logStyle.font = defaultFont;

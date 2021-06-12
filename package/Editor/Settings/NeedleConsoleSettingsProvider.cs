@@ -81,7 +81,10 @@ namespace Needle.Console
 				settings.RowColors = EditorGUILayout.Toggle(new GUIContent("Row Colors", "Allow custom list to tint row background for warnings and errors"), settings.RowColors);
 				settings.IndividualCollapse = EditorGUILayout.Toggle(new GUIContent("Individual Collapse", "When enabled the log context menu allows to collapse individual logs"), settings.IndividualCollapse);
 				settings.UseCustomFont = EditorGUILayout.Toggle(new GUIContent("Use Custom Font", "Allow using a custom font. Specify a font name that you have installed below"), settings.UseCustomFont);
-				settings.LogEntryFont = EditorGUILayout.TextField(new GUIContent("Log Entry Font", "Font name"), settings.LogEntryFont);
+				var fontOptions = Font.GetOSInstalledFontNames();
+				var selectedFont = EditorGUILayout.Popup(new GUIContent("Installed Fonts"), fontOptions.IndexOf(f => f == settings.InstalledLogEntryFont), fontOptions);
+				if (selectedFont >= 0 && selectedFont < fontOptions.Length) settings.InstalledLogEntryFont = fontOptions[selectedFont];
+				settings.CustomLogEntryFont = (Font) EditorGUILayout.ObjectField(new GUIContent("Custom Font", "Will override installed font" ), settings.CustomLogEntryFont, typeof(Font), false);
 				EditorGUI.indentLevel--;
 
 				if(NeedleConsoleSettings.DevelopmentMode)
@@ -92,6 +95,8 @@ namespace Needle.Console
 					if (GUILayout.Button("Refresh Themes List"))
 						Themes = null;
 				}
+
+				EditorGUILayout.Space(20);
 			}
 
 			// GUILayout.FlexibleSpace();

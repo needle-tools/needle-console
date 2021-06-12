@@ -92,7 +92,8 @@ namespace Needle.Console
 		public bool RowColors = true;
 		public bool IndividualCollapse = true;
 		public bool UseCustomFont = true;
-		public string LogEntryFont = "Fira Code";
+		public string InstalledLogEntryFont = "Arial";
+		public Font CustomLogEntryFont;
 	}
 	
 }
