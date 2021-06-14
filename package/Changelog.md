@@ -4,9 +4,10 @@ All notable changes to this package will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
-## [2.1.2-exp] - 2021-06-11
+## [2.1.2-exp.1] - 2021-06-11
 - ``DebugEditor`` now uses ``Conditional`` attribute to eliminate impact in builds and method signature  is now just like in ``Debug``
 - Add ``Href`` to ``HyperlinkCallback`` attribute to be called automatically for a specific link e.g. a method with ``[HyperlinkCallback("Test")]`` is called for ``<a href="Test">Call Test</a>``
+- Add support for font asset and replace textfield with dropdown of system fonts
 
 ## [2.1.1-exp] - 2021-06-10
 - Add support to specify custom log font
