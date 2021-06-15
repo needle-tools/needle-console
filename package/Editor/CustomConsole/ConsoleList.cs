@@ -207,8 +207,8 @@ namespace Needle.Console
 			var yTop = EditorGUIUtility.singleLineHeight + 3;
 			lineHeight = EditorGUIUtility.singleLineHeight * lineCount + 3;
 			count = currentEntries.Count;
-			const int scrollAreaBottomBuffer = 44;
-			var scrollAreaHeight = Screen.height - spl.realSizes[1] - scrollAreaBottomBuffer;
+			const int scrollAreaBottomBuffer = 21;
+			var scrollAreaHeight = console.position.height - spl.realSizes[1] - scrollAreaBottomBuffer;
 
 			var contentHeight = count * lineHeight;
 			if (Event.current.type == EventType.Repaint)
@@ -227,8 +227,8 @@ namespace Needle.Console
 				}
 			}
 
-			var scrollArea = new Rect(0, yTop, Screen.width - 3, scrollAreaHeight);
-			var width = Screen.width - 3;
+			var scrollArea = new Rect(0, yTop, console.position.width - 3, scrollAreaHeight);
+			var width = console.position.width - 3;
 			if (contentHeight > scrollArea.height)
 				width -= 13;
 			var contentSize = new Rect(0, 0, width, contentHeight);
@@ -421,7 +421,7 @@ namespace Needle.Console
 					isAutoScrolling = false;
 					break;
 				case EventType.MouseUp when Event.current.button == 0:
-					if (!leftClickedLog && new Rect(0,0, Screen.width, Screen.height).Contains(Event.current.mousePosition))
+					if (!leftClickedLog && new Rect(0,0, console.position.width, console.position.height).Contains(Event.current.mousePosition))
 					{ 
 						SelectRow(-1); 
 						console.Repaint(); 
@@ -477,7 +477,7 @@ namespace Needle.Console
 			var didDrawStacktrace = false;
 			var text = selectedText ?? string.Empty;
 			tempScrollAreaHeight += 1;
-			var stacktraceContentRect = new Rect(0, tempScrollAreaHeight, width, Screen.height - tempScrollAreaHeight);
+			var stacktraceContentRect = new Rect(0, tempScrollAreaHeight, width, console.position.height - tempScrollAreaHeight);
 			try
 			{
 				foreach (var drawer in customDrawers)
@@ -511,7 +511,7 @@ namespace Needle.Console
 #else
 			var stackWithHyperlinks = ConsoleWindow.StacktraceWithHyperlinks(message);
 #endif
-			var stacktraceHeight = ConsoleWindow.Constants.MessageStyle.CalcHeight(GUIContent.Temp(stackWithHyperlinks), Screen.width);
+			var stacktraceHeight = ConsoleWindow.Constants.MessageStyle.CalcHeight(GUIContent.Temp(stackWithHyperlinks), _consoleWindow.position.width);
 			DrawDefaultStacktrace(stackWithHyperlinks, stacktraceHeight);
 			return stacktraceHeight;
 		}
