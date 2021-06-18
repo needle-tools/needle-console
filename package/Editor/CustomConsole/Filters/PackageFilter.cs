@@ -10,7 +10,7 @@ namespace Needle.Console
 	public class PackageFilter : FilterBase<string>
 	{
 		private static PackageInfo[] allPackages;
-		private Dictionary<string, int> filePackageDict = new Dictionary<string, int>();
+		private static Dictionary<string, int> filePackageDict = new Dictionary<string, int>();
 
 		public PackageFilter(ref List<FilterEntry> packages) : base(ref packages)
 		{
@@ -63,7 +63,7 @@ namespace Needle.Console
 			return false;
 		}
 
-		private bool TryGetPackage(string path, out PackageInfo package)
+		internal static bool TryGetPackage(string path, out PackageInfo package)
 		{
 			if (allPackages == null)
 			{

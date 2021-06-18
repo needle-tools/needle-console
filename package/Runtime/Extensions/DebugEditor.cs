@@ -4,6 +4,11 @@ using Object = UnityEngine.Object;
 
 namespace Needle.Console
 {
+	/// <summary>
+	/// Class to log only in Unity editor, double clicking console logs produced by this class still open the calling source file)
+	/// 
+	/// NOTE: Implement your own version of this is supported. Just implement a class named "DebugEditor" and any method inside this class starting with "Log" will, when double clicking logs produced by that method, open the calling file
+	/// </summary>
 	public static class DebugEditor
 	{
 		[Conditional("UNITY_EDITOR")]

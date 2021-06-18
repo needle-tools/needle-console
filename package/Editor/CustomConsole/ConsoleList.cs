@@ -753,6 +753,22 @@ namespace Needle.Console
 			try
 			{
 				LogEntryContextMenu?.Invoke(menu, itemIndex);
+				if (menu.GetItemCount() > 1)
+				{
+					var current = currentEntries[itemIndex];
+					var file = current.entry.file;
+					if (file != null && File.Exists(file))
+					{
+						menu.AddItem(new GUIContent("Ping Script"), false, () =>
+						{
+							if (ConsoleUtils.TryMakeProjectRelative(file, out file))
+							{
+								var script = AssetDatabase.LoadAssetAtPath<MonoScript>(file);
+								EditorGUIUtility.PingObject(script);
+							}
+						});
+					}
+				}
 			}
 			catch (Exception e)
 			{
