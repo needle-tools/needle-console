@@ -1,17 +1,23 @@
-﻿# Demystify for Unity
-## High performance understanding for stack traces
-
-This package brings [Ben.Demystifier](https://github.com/benaadams/Ben.Demystifier) to Unity.
-
-![](package/Documentation~/beforeafter.jpg)
-
+﻿# Needle Console
+ 
+## **Feature Overview**
+- 🔮 Improved stacktrace readability
+- 🎨 Syntax highlight stacktraces
+- 🚦 Log background colors by type (e.g. warning, error, compiler error)
+- 📍 Console log prefixes (only visually in editor)
+- 🔍 Filter logs: Hide or Solo (e.g. by package, file, line, message)
+- 🍔 Collapse individual logs
+- 📯 Ping script files from log
+- 🔗 Console hyperlinks
+- 📑 Editor-only logs (extensible)
+- 🧁 Fixes to source code links
 
 ## How to Install
 
 <details>
 <summary>Add from OpenUPM <em>| via scoped registry, recommended</em></summary>
 
-This package is available on OpenUPM: https://openupm.com/packages/com.needle.demystify  
+This package is available on OpenUPM: https://openupm.com/packages/com.needle.console
 
 To add it the package to your project:
 
@@ -26,7 +32,7 @@ To add it the package to your project:
 - open Package Manager
 - click <kbd>+</kbd>
 - select <kbd>Add from Git URL</kbd>
-- paste `com.needle.demystify`
+- paste `com.needle.console`
 - click <kbd>Add</kbd>
 </details>
 
@@ -38,15 +44,17 @@ You can also add it directly from GitHub on Unity 2019.4+. Note that you won't b
 - open Package Manager
 - click <kbd>+</kbd>
 - select <kbd>Add from Git URL</kbd>
-- paste `https://github.com/needle-tools/demystify.git?path=/package`
+- paste `https://github.com/needle-tools/console.git?path=/package`
 - click <kbd>Add</kbd>
 </details>
 
+After installation, by default all logs and exceptions will be demystified in the Console.<br>
+Syntax highlighting will also be applied, and can be configured to your liking.<br/>
+Settings can be configured under ``Edit > Preferences > Needle > Console``.
+
+
 ## How To Use 💡
 Please open the <a href="https://github.com/needle-tools/demystify/blob/main/package/Readme.md">Package Readme</a> for more information.
-
-## Support 💚
-This project is supported via donations. If you or your team have found it useful, please consider supporting further development through [patreon](https://www.patreon.com/needletools)
 
 ## Contact ✒️
 <b>[🌵 needle — tools for unity](https://needle.tools)</b> • 
