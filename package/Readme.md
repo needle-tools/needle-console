@@ -82,9 +82,6 @@ Log filters allow to hide specific logs in your project or only show the logs th
 - Hide logs by message, file, line, package or even time
 - Solo logs: show only log entries that matter to you right now
 
-https://github.com/needle-tools/needle-console/tree/main/package/Documentation~/filter-log-hide.mp4
-https://github.com/needle-tools/needle-console/tree/main/package/Documentation~/filter-log-solo.mp4
-
 ![](Documentation~/filter-log-hide.gif) ![](Documentation~/filter-log-solo.gif)
 
 ### **Collapse individual repeating logs** 🍔
