@@ -56,9 +56,15 @@ Settings can be configured under ``Edit > Preferences > Needle > Console``.
 ## How To Use 💡
 Please open the <a href="https://github.com/needle-tools/demystify/blob/main/package/Readme.md">Package Readme</a> for more information.
 
+## Supported Versions
+Unity 2019.4 until 2021.1
+
 ## Contact ✒️
 <b>[🌵 needle — tools for unity](https://needle.tools)</b> • 
 [@NeedleTools](https://twitter.com/NeedleTools) • 
 [@marcel_wiessler](https://twitter.com/marcel_wiessler) • 
 [@hybridherbst](https://twitter.com/hybridherbst)
+
+[![discord online](https://img.shields.io/discord/717429793926283276?label=Needle&logo=discord&style=social)](https://discord.gg/CFZDp4b)
+
 
