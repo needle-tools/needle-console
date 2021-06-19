@@ -1,19 +1,19 @@
 ﻿# Needle Console
 
-*Better Stacktrace readability, syntax highlighting, filters and more*
+*Better stacktrace readability, syntax highlighting, log filters, functional hyperlinks and more*
 
 
 ## **Feature Overview**
 - 🔮 Improved stacktrace readability
 - 🎨 Syntax highlight stacktraces
-- Filter logs: Hide or Solo (e.g. by package, file, line, message)
-- Collapse individual logs
-- Ping script files from log
-- Editor-only logs (extensible)
-- Console hyperlinks
-- Log background colors by type (e.g. warning, error, compiler error)
-- Console log prefixes (only visually in editor)
-
+- 🚦 Log background colors by type (e.g. warning, error, compiler error)
+- 📍 Console log prefixes (only visually in editor)
+- 🔍 Filter logs: Hide or Solo (e.g. by package, file, line, message)
+- 🍔 Collapse individual logs
+- 📯 Ping script files from log
+- 🔗 Console hyperlinks
+- 📑 Editor-only logs (extensible)
+- 🧁 Fixes to source code links
 
 
 ## Quick Start ⚡️
@@ -21,7 +21,7 @@
 <details>
 <summary>Add from OpenUPM <em>| via scoped registry, recommended</em></summary>
 
-This package is available on OpenUPM: https://openupm.com/packages/com.needle.demystify
+This package is available on OpenUPM: https://openupm.com/packages/com.needle.console
 
 To add it the package to your project:
 
@@ -36,7 +36,7 @@ To add it the package to your project:
 - open Package Manager
 - click <kbd>+</kbd>
 - select <kbd>Add from Git URL</kbd>
-- paste `com.needle.demystify`
+- paste `com.needle.console`
 - click <kbd>Add</kbd>
 </details>
 
@@ -48,17 +48,17 @@ You can also add it directly from GitHub on Unity 2019.4+. Note that you won't b
 - open Package Manager
 - click <kbd>+</kbd>
 - select <kbd>Add from Git URL</kbd>
-- paste `https://github.com/needle-tools/demystify.git?path=/package`
+- paste `https://github.com/needle-tools/console.git?path=/package`
 - click <kbd>Add</kbd>
 </details>  
 <br/>
 After installation, by default all logs and exceptions will be demystified in the Console.  
 Syntax highlighting will also be applied, and can be configured to your liking.  
 
-Settings can be configured under ``Edit > Preferences > Needle > Demystify``.
+Settings can be configured under ``Edit > Preferences > Needle > Console``.
 
 
-## Features in depth 📜
+## Features 📜
 
 ### **Demystified Stacktraces** 🔮 for any log message and exceptions
 Logs going into Editor logfiles will also be demystified.  
@@ -81,8 +81,11 @@ We provide default syntax highlighting for Light and Dark Theme. You can also ch
 Log filters allow to hide specific logs in your project or only show the logs that matter for you right now. No need to change the way you write ``Debug.Log`` messages, it is all available at your fingertips via the console context menu.
 - Hide logs by message, file, line, package or even time
 - Solo logs: show only log entries that matter to you right now
+  1) *Solo logs will take priority over hidden logs - e.g. when you solo logs in file x it will also show logs that you*
 
 ![](Documentation~/filter-log-hide.gif) ![](Documentation~/filter-log-solo.gif)
+
+![](Documentation~/filter-foldout.gif)
 
 ### **Collapse individual repeating logs** 🍔
 Multiple logs from the same source can be collapsed into a single log.  
@@ -91,33 +94,59 @@ Prevent spamming your console - keep context visible
 
 ![](Documentation~/collapse-log.png)
 
-### **Log Colors**
-- Log colors can be enabled or disabled to show the severity of a log.  
+### **Ping script** 📯
+Right click a console log to ping the source script file  
+Works with scripts in assets, embedded, local or registry packages
+
+
+### **Console Hyperlinks** 🔗 
+Console hyperlinks make logs with rich text usable and extendable.   
+By default we provide handling for urls and files.  
+Example to log a clickable link to Unity.com ``Debug.Log(<a href="www.unity.com">Open Unity Website</a>``   
+Example to open a file somewhere on disc: ``Debug.Log(<a href="../project/relative/path.txt">Open some file</a>``
+
+#### Custom Hyperlink Handling 🧷
+To receive callbacks to hyperlinks you can use the ``HyperlinkCallback`` attribute.   
+The method **must** be static. Either with return type **void** when you don't care if any other callback is executed as well or **bool** to control if other callbacks are called.   
+
+The following example receives a callback when a link with ``<a href href="OpenNeedleConsoleSettings">`` in a log message is clicked and opens the Needle console preference window.
+```csharp 
+[HyperlinkCallback(Href = "OpenNeedleConsoleSettings")]
+private static void OpenNeedleConsoleUserPreferences()
+{
+	SettingsService.OpenUserPreferences("Preferences/Needle/Console");
+}
+```
+
+
+### **Log Background Colors** 🚦
+- Log background colors can be enabled or disabled to show the severity of a log.  
 - Compiler errors receive special treatment and are rendered magenta so that shader programmers will feel right at home (it's great, really!)
 
 ![](Documentation~/log-type-colors.png) 
 
 
-### **Log prefixes**
+### **Log prefixes** 📍
 Logs can automatically be prefixed with file- and method-name providing more context at your log output at a glance. Additionally we add a colored bar in front of the log message that shows which logs belong together / come from the same file.
 - Prefix can be disabled
 - Prefix color symbol can be configured or removed
 
 ![](Documentation~/log-prefixes-2.png)
 
-### **Console Hyperlinks**
+### **Editor Only logs** 📑
+Use ``DebugEditor`` methods to log messages **only** in Unity Editor.   
+No garbage or cpu cycles will be wasted in your standalone application.  
+It is also possible to implement a class named ``DebugEditor`` somewhere in your code to add custom functionality.  
+**NOTE**: Double clicking log entries that contain ``DebugEditor.Log`` in the console will still open the right file for you.  
 
-### **Editor Only Logs**
 
 ### **Fixes to source code links** 🧁  
   Sometimes, links to code in embedded/local packages don't work, so while we were at it we fixed that as well. (Case 1304954 for Unity people stepping by) [Issue Tracker](https://issuetracker.unity3d.com/issues/script-file-that-references-package-script-is-opened-when-double-clicking-a-console-message-in-editor-that-comes-from-a-package)
 
-## Known Issues
+## Known Issues 🩹
 
 - syntax highlighting has a performance impact, so if you're on a very slow machine you might want to turn it off (demystifying is highly optimized and shouldn't have a noticeable performance impact)
 
-## Support 💚
-This project is supported via donations. If you or your team have found it useful, please consider supporting further development through [patreon](https://www.patreon.com/needletools)
 
 ## Contact ✒️
 <b>[🌵 needle — tools for unity](https://needle.tools)</b> • 
