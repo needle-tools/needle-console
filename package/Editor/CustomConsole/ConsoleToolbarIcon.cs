@@ -10,7 +10,7 @@ namespace Needle.Console
 
 		internal static void OnDrawToolbar()
 		{
-			if (!NeedleConsoleSettings.instance.CustomList) return;
+			if (!NeedleConsoleSettings.instance.CustomConsole) return;
 			
 			if (!filterTextureInit)
 			{

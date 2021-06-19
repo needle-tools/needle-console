@@ -29,8 +29,8 @@ namespace Needle.Console
 	{
 		internal static bool DrawCustom
 		{
-			get => NeedleConsoleSettings.instance.CustomList;
-			set => NeedleConsoleSettings.instance.CustomList = value;
+			get => NeedleConsoleSettings.instance.CustomConsole;
+			set => NeedleConsoleSettings.instance.CustomConsole = value;
 		}
 
 		internal static IReadOnlyList<CachedConsoleInfo> CurrentEntries => currentEntries;
@@ -197,7 +197,7 @@ namespace Needle.Console
 				var size = SplitterSize;
 				
 				#if UNITY_2020_1_OR_NEWER
-				spl = SplitterState.FromRelative(new[] {size.x, size.y}, new float[] {32, 32}, null);
+				spl = SplitterState.FromRelative(new[] {size.x, size.y}, new float[] {32, 45}, null);
 				#else
 				spl = new SplitterState(new[] {size.x, size.y}, new int[] {32, 32}, (int[]) null, 0);
 				#endif

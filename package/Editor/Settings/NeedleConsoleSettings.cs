@@ -3,6 +3,7 @@ using System.IO;
 using UnityEditor;
 using UnityEditorInternal;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace Needle.Console
 {
@@ -81,16 +82,18 @@ namespace Needle.Console
 		}
 
 		public string Separator = "—";
-		public bool AllowCodePreview = true;
+		public bool AllowCodePreview = false;
 		public KeyCode CodePreviewKeyCode = KeyCode.None;
 
 		public bool ShortenFilePaths = true;
 		public bool ShowFileName = true;
 		public string ColorMarker = "┃";// "┃";
 		
-		public bool CustomList = true;
+		[FormerlySerializedAs("CustomList")] public bool CustomConsole = true;
 		public bool RowColors = true;
 		public bool IndividualCollapse = true;
+		
+		[Header("Experimental")]
 		public bool UseCustomFont = true;
 		public string InstalledLogEntryFont = "Arial";
 		public Font CustomLogEntryFont;

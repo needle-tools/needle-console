@@ -1,8 +1,10 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Diagnostics;
 using System.IO;
 using UnityEditor;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
+using Random = UnityEngine.Random;
 
 namespace Demystify._Tests
 {
@@ -11,20 +13,25 @@ namespace Demystify._Tests
 		[MenuItem("Test/Log")]
 		private static void Log()
 		{
-			Debug.Log("hello");
+			Debug.Log("A normal log message");
 		}
 
 		[MenuItem("Test/LogWarning")]
 		private static void Warning()
 		{
-			Debug.LogWarning("hello");
+			Debug.LogWarning("A warning log");
 		}
-
 
 		[MenuItem("Test/LogError")]
 		private static void Error()
 		{
-			Debug.LogError("hello");
+			Debug.LogError("An error log");
+		}
+
+		[MenuItem("Test/LogException")]
+		private static void Exception()
+		{
+			Debug.LogException(new Exception("An exception log", new Exception("a inner exception")));
 		}
 
 		// [InitializeOnLoadMethod]
@@ -34,7 +41,7 @@ namespace Demystify._Tests
 			Debug.Log(string.Empty);
 			Debug.LogWarning("");
 			Debug.LogError(null);
-			Debug.LogFormat(LogType.Log, LogOption.NoStacktrace, null, "123");
+			Debug.LogFo rmat(LogType.Log, LogOption.NoStacktrace, null, "123");
 		}
 
 		[MenuItem("Test/Log Many")]

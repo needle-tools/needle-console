@@ -128,7 +128,7 @@ namespace Needle.Console
 
 			private static bool Prefix(ref string stacktraceText)
 			{
-				if (NeedleConsoleSettings.instance.CustomList == false)
+				if (NeedleConsoleSettings.instance.CustomConsole == false)
 				{
 					var r = GetStackScrollViewRect();
 					SeparatorLine.Draw(r.y);

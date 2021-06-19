@@ -29,13 +29,13 @@ namespace Needle.Console
 
 		public override void OnGUI(Rect rect)
 		{
-			var enabled = NeedleConsoleSettings.instance.CustomList;
+			var enabled = NeedleConsoleSettings.instance.CustomConsole;
 			if (!enabled)
 			{
 				EditorGUILayout.HelpBox("To support console filtering you need to enable \"Custom List\" in settings", MessageType.Warning);
 				if (GUILayout.Button("Enable Custom List", GUILayout.Height(30)))
 				{
-					NeedleConsoleSettings.instance.CustomList = true;
+					NeedleConsoleSettings.instance.CustomConsole = true;
 				}
 			}
 

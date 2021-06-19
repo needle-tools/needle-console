@@ -1,13 +1,26 @@
 ﻿# Needle Console
 
-### Better Stacktrace readability, syntax highlighting and filters
+*Better Stacktrace readability, syntax highlighting, filters and more*
+
+
+## **Feature Overview**
+- 🔮 Improved stacktrace readability
+- 🎨 Syntax highlight stacktraces
+- Filter logs: Hide or Solo (e.g. by package, file, line, message)
+- Collapse individual logs
+- Ping script files from log
+- Editor-only logs (extensible)
+- Log background colors by type (e.g. warning, error, compiler error)
+- Console hyperlinks
+
+
 
 ## Quick Start ⚡️
 
 <details>
 <summary>Add from OpenUPM <em>| via scoped registry, recommended</em></summary>
 
-This package is available on OpenUPM: https://openupm.com/packages/com.needle.demystify  
+This package is available on OpenUPM: https://openupm.com/packages/com.needle.demystify
 
 To add it the package to your project:
 
@@ -41,9 +54,10 @@ You can also add it directly from GitHub on Unity 2019.4+. Note that you won't b
 After installation, by default all logs and exceptions will be demystified in the Console.  
 Syntax highlighting will also be applied, and can be configured to your liking.  
 
-Settings can be configured under ``Edit > Preferences > Needle > Demystify``. 
+Settings can be configured under ``Edit > Preferences > Needle > Demystify``.
 
-## Features 📜
+
+## Features in depth 📜
 
 ### **Demystified Stacktraces** 🔮 for any log message and exceptions.  
   It *just works*, you don't need to do anything.  
@@ -70,8 +84,18 @@ Log filters allow to hide specific logs in your project or only show the logs th
 - Hide logs by message, file, line, package or even time
 - Solo logs: show only log entries that matter to you right now
 
+### **Log Colors**
+Log colors can be enabled or disabled to show the severity of a log. Compiler errors receive special treatment and are rendered magenta, shader programmers will feel right at home.
+
+![](Documentation~/log-type-colors.png) 
+
+
 ### **Collapse individual repeating logs** 🍔
 Multiple logs from the same source can be collapsed to single log and not spam your console bringing you more overview over your project.
+
+### **Console Hyperlinks**
+
+### **Editor Only Logs**
 
 ### **Fixes to source code links** 🧁  
   Sometimes, links to code in embedded/local packages don't work, so while we were at it we fixed that as well. (Case 1304954 for Unity people stepping by) [Issue Tracker](https://issuetracker.unity3d.com/issues/script-file-that-references-package-script-is-opened-when-double-clicking-a-console-message-in-editor-that-comes-from-a-package)
