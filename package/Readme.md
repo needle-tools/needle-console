@@ -50,11 +50,10 @@ You can also add it directly from GitHub on Unity 2019.4+. Note that you won't b
 - select <kbd>Add from Git URL</kbd>
 - paste `https://github.com/needle-tools/console.git?path=/package`
 - click <kbd>Add</kbd>
-</details>  
-<br/>
-After installation, by default all logs and exceptions will be demystified in the Console.  
-Syntax highlighting will also be applied, and can be configured to your liking.  
+</details>
 
+After installation, by default all logs and exceptions will be demystified in the Console.<br>
+Syntax highlighting will also be applied, and can be configured to your liking.<br/>
 Settings can be configured under ``Edit > Preferences > Needle > Console``.
 
 
