@@ -81,11 +81,8 @@ We provide default syntax highlighting for Light and Dark Theme. You can also ch
 Log filters allow to hide specific logs in your project or only show the logs that matter for you right now. No need to change the way you write ``Debug.Log`` messages, it is all available at your fingertips via the console context menu.
 - Hide logs by message, file, line, package or even time
 - Solo logs: show only log entries that matter to you right now
-  1) *Solo logs will take priority over hidden logs - e.g. when you solo logs in file x it will also show logs that you*
 
-![](Documentation~/filter-log-hide.gif) ![](Documentation~/filter-log-solo.gif)
-
-![](Documentation~/filter-foldout.gif)
+![](Documentation~/filter-log-solo.gif)
 
 ### **Collapse individual repeating logs** 🍔
 Multiple logs from the same source can be collapsed into a single log.  
