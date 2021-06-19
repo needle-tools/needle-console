@@ -192,6 +192,7 @@ namespace Needle.Console
 		private static int _prevCount, _lastFlags;
 		internal static bool HasAnyFilterSolo { get; private set; }
 
+		internal static bool IsDirty => isDirty;
 		internal static bool ShouldUpdate(int logCount)
 		{
 			if (_prevCount != logCount) return true;

@@ -166,9 +166,13 @@ namespace Needle.Console
 					var shouldUpdateLogs = ConsoleFilter.ShouldUpdate(count);
 					if (shouldUpdateLogs)
 					{
-						if (selectedRowIndex >= 0 && !logsAdded)
+						if (selectedRowIndex >= 0 && selectedRowIndex < currentEntries.Count)
 						{
-							shouldScrollToSelectedItem = true;
+							selectedRowNumber = currentEntries[selectedRowIndex].row;
+							if (!logsAdded || ConsoleFilter.IsDirty)
+							{
+								shouldScrollToSelectedItem = true;
+							}
 						}
 
 						ConsoleFilter.HandleUpdate(count, currentEntries);
@@ -304,10 +308,12 @@ namespace Needle.Console
 
 					for (var k = 0; k < currentEntries.Count; k++)
 					{
+						var entry = currentEntries[k];
+						
 						var isVisible = IsVisible(position);
 						bool IsVisible(Rect r) => r.y + r.height >= scroll.y && r.y <= scroll.y + scrollAreaHeight;
-
-						if (selectedRowIndex == k)
+						
+						if (selectedRowNumber == entry.row)
 						{
 							SelectRow(k);
 						}
@@ -353,7 +359,6 @@ namespace Needle.Console
 									leftClickedLog = true;
 									scrollEntryInteractionTime = DateTime.Now;
 
-									var entry = currentEntries[k].entry;
 									isAutoScrolling = false;
 									SelectRow(k);
 
@@ -365,8 +370,8 @@ namespace Needle.Console
 									}
 									else
 									{
-										if (entry.instanceID != 0)
-											EditorGUIUtility.PingObject(entry.instanceID);
+										if (entry.entry.instanceID != 0)
+											EditorGUIUtility.PingObject(entry.entry.instanceID);
 									}
 
 									lastClickTime = DateTime.Now;
@@ -397,15 +402,7 @@ namespace Needle.Console
 
 						if (shouldScrollToSelectedItem && selectedRowNumber == currentEntries[k].row)
 						{
-							shouldScrollToSelectedItem = false;
-							var scrollTo = position.y;
-							if (contentHeight > scrollAreaHeight)
-							{
-								scrollTo -= scrollAreaHeight * .5f - lineHeight;
-							}
-
-							SetScroll(scrollTo);
-							RequestRepaint();
+							ScrollTo(position, contentHeight, scrollAreaHeight);
 						}
 					}
 				}
@@ -502,6 +499,19 @@ namespace Needle.Console
 			GUILayout.EndScrollView();
 			SplitterGUILayout.EndVerticalSplit();
 			return false;
+		}
+
+		private static void ScrollTo(Rect position, float contentHeight, float scrollAreaHeight)
+		{
+			shouldScrollToSelectedItem = false;
+			var scrollTo = position.y;
+			if (contentHeight > scrollAreaHeight)
+			{
+				scrollTo -= scrollAreaHeight * .5f - lineHeight;
+			}
+
+			SetScroll(scrollTo);
+			RequestRepaint();
 		}
 
 		internal static float DrawDefaultStacktrace(string message)
