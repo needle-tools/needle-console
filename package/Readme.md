@@ -125,8 +125,6 @@ private static void OpenNeedleConsoleUserPreferences()
 
 ### **Log prefixes** 📍
 Logs can automatically be prefixed with file- and method-name providing more context at your log output at a glance. Additionally we add a colored bar in front of the log message that shows which logs belong together / come from the same file.
-- Prefix can be disabled
-- Prefix color symbol can be configured or removed
 
 ![](Documentation~/log-prefixes-2.png)
 
