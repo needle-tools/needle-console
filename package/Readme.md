@@ -10,8 +10,9 @@
 - Collapse individual logs
 - Ping script files from log
 - Editor-only logs (extensible)
-- Log background colors by type (e.g. warning, error, compiler error)
 - Console hyperlinks
+- Log background colors by type (e.g. warning, error, compiler error)
+- Console log prefixes (only visually in editor)
 
 
 
@@ -59,24 +60,21 @@ Settings can be configured under ``Edit > Preferences > Needle > Demystify``.
 
 ## Features in depth 📜
 
-### **Demystified Stacktraces** 🔮 for any log message and exceptions.  
-  It *just works*, you don't need to do anything.  
-  Logs going into Editor logfiles will also be demystified.  
-  Logs in builds will _not_ be demystified (by design).
+### **Demystified Stacktraces** 🔮 for any log message and exceptions
+Logs going into Editor logfiles will also be demystified.  
+Logs in builds will _not_ be demystified (by design).
 
 >.NET stack traces output the compiler transformed methods; rather than the source code methods, which make them slow to mentally parse and match back to the source code.  
 Demystify outputs the modern C# 7.0 features in stack traces in an understandable fashion that looks like the source code that generated them.
 
-### **Syntax Highlighting** 🎨
+### **Stacktrace Syntax Highlighting** 🎨
 
 We provide default syntax highlighting for Light and Dark Theme. You can also change colors to your liking.  
   Syntax highlighting comes with a slight performance impact when selecting a log (not when logging it).
 
-- Adjust the highlighting colors to your liking.
+- Adjust highlighting colors to your liking.
 - Disable specific highlight types by setting the Alpha value of the respective setting to 0.
 - Dark and Light Theme support
-
-![](Documentation~/preferences.png)
 
 
 ### **Log Filtering** 🔍
@@ -84,14 +82,31 @@ Log filters allow to hide specific logs in your project or only show the logs th
 - Hide logs by message, file, line, package or even time
 - Solo logs: show only log entries that matter to you right now
 
+https://github.com/needle-tools/needle-console/tree/main/package/Documentation~/filter-log-hide.mp4
+https://github.com/needle-tools/needle-console/tree/main/package/Documentation~/filter-log-solo.mp4
+
+![](Documentation~/filter-log-hide.gif) ![](Documentation~/filter-log-solo.gif)
+
+### **Collapse individual repeating logs** 🍔
+Multiple logs from the same source can be collapsed into a single log.  
+Log history is preserved and can be seen in the stacktrace view when the log is selected.   
+Prevent spamming your console - keep context visible  
+
+![](Documentation~/collapse-log.png)
+
 ### **Log Colors**
-Log colors can be enabled or disabled to show the severity of a log. Compiler errors receive special treatment and are rendered magenta, shader programmers will feel right at home.
+- Log colors can be enabled or disabled to show the severity of a log.  
+- Compiler errors receive special treatment and are rendered magenta so that shader programmers will feel right at home (it's great, really!)
 
 ![](Documentation~/log-type-colors.png) 
 
 
-### **Collapse individual repeating logs** 🍔
-Multiple logs from the same source can be collapsed to single log and not spam your console bringing you more overview over your project.
+### **Log prefixes**
+Logs can automatically be prefixed with file- and method-name providing more context at your log output at a glance. Additionally we add a colored bar in front of the log message that shows which logs belong together / come from the same file.
+- Prefix can be disabled
+- Prefix color symbol can be configured or removed
+
+![](Documentation~/log-prefixes-2.png)
 
 ### **Console Hyperlinks**
 

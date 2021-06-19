@@ -41,7 +41,7 @@ namespace Demystify._Tests
 			Debug.Log(string.Empty);
 			Debug.LogWarning("");
 			Debug.LogError(null);
-			Debug.LogFo rmat(LogType.Log, LogOption.NoStacktrace, null, "123");
+			Debug.LogFormat(LogType.Log, LogOption.NoStacktrace, null, "123");
 		}
 
 		[MenuItem("Test/Log Many")]
