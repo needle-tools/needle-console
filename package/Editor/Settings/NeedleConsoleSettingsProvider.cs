@@ -76,7 +76,7 @@ namespace Needle.Console
 					if(scope.changed) NeedleConsoleProjectSettings.RaiseColorsChangedEvent();
 				}
 				
-				settings.CustomList = EditorGUILayout.Toggle(new GUIContent("Custom List", "The custom list replaces the console log drawing with a custom implementation that allows for advanced features such like very custom log filtering via context menus"), settings.CustomList);
+				settings.CustomConsole = EditorGUILayout.Toggle(new GUIContent("Custom List", "The custom list replaces the console log drawing with a custom implementation that allows for advanced features such like very custom log filtering via context menus"), settings.CustomConsole);
 				EditorGUI.indentLevel++;
 				settings.RowColors = EditorGUILayout.Toggle(new GUIContent("Row Colors", "Allow custom list to tint row background for warnings and errors"), settings.RowColors);
 				settings.IndividualCollapse = EditorGUILayout.Toggle(new GUIContent("Individual Collapse", "When enabled the log context menu allows to collapse individual logs"), settings.IndividualCollapse);
