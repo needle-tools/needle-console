@@ -6,7 +6,7 @@ namespace Needle.Console
 {
 	internal static class LogColor
 	{
-		public static void AddColor(string key, ref string str)
+		public static void CalcLogColor(string key, ref string str)
 		{
 			var col = GetColor(key, out var t);
 			// str += " " + t;

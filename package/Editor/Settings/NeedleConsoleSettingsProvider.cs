@@ -64,7 +64,7 @@ namespace Needle.Console
 				EditorGUILayout.LabelField("Console Options", EditorStyles.boldLabel);
 				settings.Separator = EditorGUILayout.TextField(new GUIContent("Stacktrace Separator", "Adds a separator to Console stacktrace output between each stacktrace"), settings.Separator);
 				settings.ShortenFilePaths = EditorGUILayout.Toggle(new GUIContent("Shorten File Paths", "When enabled demystify tries to shorten package paths to <package_name>@<version> <fileName><line>"), settings.ShortenFilePaths); 
-				settings.ShowFileName = EditorGUILayout.Toggle(new GUIContent("Show Filename", "When enabled demystify will prefix console log entries with the file name of the log source"), settings.ShowFileName); 
+				settings.ShowLogPrefix = EditorGUILayout.Toggle(new GUIContent("Show Filename", "When enabled demystify will prefix console log entries with the file name of the log source"), settings.ShowLogPrefix); 
 				
 				EditorGUILayout.Space();
 				EditorGUILayout.LabelField("Experimental", EditorStyles.boldLabel);
@@ -74,10 +74,11 @@ namespace Needle.Console
 				settings.CodePreviewKeyCode = (KeyCode)EditorGUILayout.EnumPopup(new GUIContent("Shortcut", "If None: code preview popup will open on hover. If any key assigned: code preview popup will only open if that key is pressed on hover"), settings.CodePreviewKeyCode);
 				EditorGUI.indentLevel--;
 				EditorGUI.EndDisabledGroup();
-				using (var scope = new EditorGUI.ChangeCheckScope())
+				using (var _scope = new EditorGUI.ChangeCheckScope())
 				{
+					settings.UseColorMarker = EditorGUILayout.Toggle(new GUIContent("Draw Color Marker"), settings.UseColorMarker);
 					settings.ColorMarker = EditorGUILayout.TextField(new GUIContent("Color Marker", "Colored marker added before console log"), settings.ColorMarker);
-					if(scope.changed) NeedleConsoleProjectSettings.RaiseColorsChangedEvent();
+					if(_scope.changed) NeedleConsoleProjectSettings.RaiseColorsChangedEvent();
 				}
 				
 				settings.CustomConsole = EditorGUILayout.Toggle(new GUIContent("Custom Console", "The custom list replaces the console log drawing with a custom implementation that allows for advanced features such like very custom log filtering via context menus"), settings.CustomConsole);

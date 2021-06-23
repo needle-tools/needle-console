@@ -23,6 +23,11 @@ namespace Needle.Console
 				cachedInfo.Clear();
 				cachedPrefix.Clear();
 			};
+			NeedleConsoleSettings.Changed += () =>
+			{
+				cachedInfo.Clear();
+				cachedPrefix.Clear();
+			};
 		}
 		
 		private static readonly LogEntry tempEntry = new LogEntry();
@@ -49,7 +54,8 @@ namespace Needle.Console
 			
 			using (new ProfilerMarker("ConsoleList.ModifyText").Auto())
 			{
-				if (!NeedleConsoleSettings.instance.ShowFileName) return;
+				var settings = NeedleConsoleSettings.instance;
+				if (!settings.ShowLogPrefix && (string.IsNullOrWhiteSpace(settings.ColorMarker) || !settings.UseColorMarker)) return;
 				
 				var key = text;
 				var isSelected = ConsoleList.IsSelectedRow(element.row);
@@ -73,12 +79,13 @@ namespace Needle.Console
 						var colorPrefix = isInCache && isSelected ? colorPrefixSelected : colorPrefixDefault;
 						const string colorPostfix = "</color>";
 						var colorKey = fileName;
-						var colorMarker = NeedleConsoleSettings.instance.ColorMarker; // " ▍";
-						if (!string.IsNullOrWhiteSpace(colorMarker))
-							LogColor.AddColor(colorKey, ref colorMarker);
+						var colorMarker = settings.UseColorMarker ? NeedleConsoleSettings.instance.ColorMarker : string.Empty; // " ▍";
+						if (settings.UseColorMarker && !string.IsNullOrWhiteSpace(colorMarker))
+							LogColor.CalcLogColor(colorKey, ref colorMarker);
 
 						string GetPrefix()
 						{
+							if (!NeedleConsoleSettings.instance.ShowLogPrefix) return string.Empty;
 							var key2 = tempEntry.file + ":" + tempEntry.line + ":" + tempEntry.column;
 							if (!isSelected && cachedPrefix.TryGetValue(key2, out var cached))
 							{

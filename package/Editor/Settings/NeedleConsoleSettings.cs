@@ -87,7 +87,8 @@ namespace Needle.Console
 		public KeyCode CodePreviewKeyCode = KeyCode.None;
 
 		public bool ShortenFilePaths = true;
-		public bool ShowFileName = true;
+		[FormerlySerializedAs("ShowFileName")] public bool ShowLogPrefix = true;
+		public bool UseColorMarker = true;
 		public string ColorMarker = "┃";// "┃";
 		
 		[FormerlySerializedAs("CustomList")] public bool CustomConsole = true;
@@ -95,7 +96,7 @@ namespace Needle.Console
 		public bool IndividualCollapse = true;
 		
 		[Header("Experimental")]
-		public bool UseCustomFont = true;
+		public bool UseCustomFont = false;
 		public string InstalledLogEntryFont = "Arial";
 		public Font CustomLogEntryFont;
 	}

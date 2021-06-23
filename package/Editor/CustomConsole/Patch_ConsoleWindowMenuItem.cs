@@ -20,8 +20,8 @@ namespace Needle.Console
 				data => { NeedleConsoleSettings.instance.AllowCodePreview = !NeedleConsoleSettings.instance.AllowCodePreview; }, null);
 			menu.AddItem(new GUIContent(prefix + "Short Hyperlinks"), NeedleConsoleSettings.instance.ShortenFilePaths,
 				data => { NeedleConsoleSettings.instance.ShortenFilePaths = !NeedleConsoleSettings.instance.ShortenFilePaths; }, null);
-			menu.AddItem(new GUIContent(prefix + "Show Filename"), NeedleConsoleSettings.instance.ShowFileName,
-				data => { NeedleConsoleSettings.instance.ShowFileName = !NeedleConsoleSettings.instance.ShowFileName; }, null);
+			menu.AddItem(new GUIContent(prefix + "Show Filename"), NeedleConsoleSettings.instance.ShowLogPrefix,
+				data => { NeedleConsoleSettings.instance.ShowLogPrefix = !NeedleConsoleSettings.instance.ShowLogPrefix; }, null);
 			menu.AddItem(new GUIContent(prefix + "Custom Console"), NeedleConsoleSettings.instance.CustomConsole,
 				data => { NeedleConsoleSettings.instance.CustomConsole = !NeedleConsoleSettings.instance.CustomConsole; }, null);
 			menu.AddItem(new GUIContent(prefix + "Individual Collapse"), NeedleConsoleSettings.instance.IndividualCollapse,
