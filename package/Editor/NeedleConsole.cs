@@ -36,14 +36,21 @@ namespace Needle.Console
 				}
 
 				InstalledLog();
-				
-				try
+				InstallDefaultTheme();
+				async void InstallDefaultTheme()
 				{
-					settings.SetDefaultTheme();
-				}
-				catch
-				{
-					// ignore
+					while (true)
+					{
+						try
+						{
+							if (settings.SetDefaultTheme()) break;
+						}
+						catch
+						{
+							// ignore
+						}
+						await Task.Delay(1_000);
+					}
 				}
 			}
 

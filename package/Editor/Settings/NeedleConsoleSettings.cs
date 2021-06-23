@@ -50,14 +50,21 @@ namespace Needle.Console
 			}
 		}
  
-		public void SetDefaultTheme()
+		public bool SetDefaultTheme()
 		{
-			CurrentTheme = GetNewDefaultThemeInstance();
-			if (CurrentTheme.isDirty)
-				CurrentTheme.SetActive();
+			var theme = TryLoadDefaultThemeAssetInstance();
+			if (theme != null)
+			{
+				CurrentTheme = theme;
+				if (CurrentTheme.isDirty)
+					CurrentTheme.SetActive();
+				return true;
+			}
+
+			return false;
 		}
 		
-		private static Theme GetNewDefaultThemeInstance()
+		private static Theme TryLoadDefaultThemeAssetInstance()
 		{
 			var themes = AssetDatabase.FindAssets("t:" + nameof(SyntaxHighlightingTheme));
 			foreach (var theme in themes)
@@ -67,10 +74,11 @@ namespace Needle.Console
 				if (name.ToLowerInvariant().Contains("default"))
 				{
 					var loaded = AssetDatabase.LoadAssetAtPath<SyntaxHighlightingTheme>(path);
+					// Debug.Log("Set default theme " + path + " loaded: " + loaded, loaded);
 					if (loaded) return loaded.theme; 
 				}
 			}
-			return new Theme(Theme.DefaultThemeName);
+			return null;
 		}
 
 		public void UpdateCurrentTheme()
