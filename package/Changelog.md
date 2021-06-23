@@ -6,6 +6,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [2.1.3-exp.1] - 2021-06-19
 - Fix scrolling to selected log with filters 
+- Disable CodePreview by default, moved to experimental
+- Settings cleanup pass
+- Fix issue with Console enabled state not being serialized
 
 ## [2.1.3-exp] - 2021-06-18
 - Add ``Ping script`` context menu option to logs
