@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Disable CodePreview by default, moved to experimental
 - Settings cleanup pass
 - Fix issue with Console enabled state not being serialized
+- Log prefix text and color marker can now be enabled/disabled individually 
 
 ## [2.1.3-exp] - 2021-06-18
 - Add ``Ping script`` context menu option to logs
