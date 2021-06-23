@@ -57,12 +57,14 @@ namespace Needle.Console
 		public static void Enable()
 		{
 			NeedleConsoleSettings.instance.Enabled = true;
+			NeedleConsoleSettings.instance.Save();
 			Patcher.ApplyPatches();
 		}
 
 		public static void Disable()
 		{
 			NeedleConsoleSettings.instance.Enabled = false;
+			NeedleConsoleSettings.instance.Save();
 			Patcher.RemovePatches();
 		}
 

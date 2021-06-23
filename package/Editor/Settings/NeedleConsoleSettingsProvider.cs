@@ -125,8 +125,8 @@ namespace Needle.Console
 
 		private static bool SyntaxHighlightSettingsThemeFoldout
 		{
-			get => SessionState.GetBool("Demystify.SyntaxHighlightingThemeFoldout", true);
-			set => SessionState.SetBool("Demystify.SyntaxHighlightingThemeFoldout", value);
+			get => SessionState.GetBool("NeedleConsole.SyntaxHighlightingThemeFoldout", false);
+			set => SessionState.SetBool("NeedleConsole.SyntaxHighlightingThemeFoldout", value);
 		}
 
 		public static event Action ThemeEditedOrChanged;
