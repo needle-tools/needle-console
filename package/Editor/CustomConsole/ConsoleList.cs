@@ -274,8 +274,8 @@ namespace Needle.Console
 			}
 
 			var settings = NeedleConsoleSettings.instance;
-			var allowCustomFont = settings.UseCustomFont;
-			if (allowCustomFont)
+			var allowCustomFont = settings?.UseCustomFont ?? false;
+			if (allowCustomFont && settings)
 			{
 				if(settings.CustomLogEntryFont)
 					logEntryFont = settings.CustomLogEntryFont;
