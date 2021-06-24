@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Text.RegularExpressions;
 using Unity.Profiling;
 using UnityEditor;
@@ -44,6 +45,7 @@ namespace Needle.Console
 
 		private static readonly Dictionary<string, string> cachedInfo = new Dictionary<string, string>();
 		private static readonly Dictionary<string, string> cachedPrefix = new Dictionary<string, string>();
+		private static StringBuilder keyBuilder = new StringBuilder();
 
 		// called from console list with current list view element and console text
 
@@ -56,8 +58,11 @@ namespace Needle.Console
 			{
 				var settings = NeedleConsoleSettings.instance;
 				if (!settings.ShowLogPrefix && (string.IsNullOrWhiteSpace(settings.ColorMarker) || !settings.UseColorMarker)) return;
+
+				if (!LogEntries.GetEntryInternal(element.row, tempEntry)) return;
 				
-				var key = text;
+				keyBuilder.Clear();
+				var key = keyBuilder.Append(tempEntry.file).Append(tempEntry.line).ToString();
 				var isSelected = ConsoleList.IsSelectedRow(element.row);
 				var cacheEntry = !isSelected;
 				var isInCache = cachedInfo.ContainsKey(key);
@@ -67,7 +72,7 @@ namespace Needle.Console
 					return;
 				}
 
-				if (LogEntries.GetEntryInternal(element.row, tempEntry))
+				// if (LogEntries.GetEntryInternal(element.row, tempEntry))
 				{
 					try
 					{

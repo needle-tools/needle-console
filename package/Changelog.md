@@ -4,6 +4,9 @@ All notable changes to this package will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## [2.1.3-exp.2] - 2021-06-24
+- Fix prefix using false cached value for same message
+
 ## [2.1.3-exp.1] - 2021-06-19
 - Fix scrolling to selected log with filters 
 - Disable CodePreview by default, moved to experimental
