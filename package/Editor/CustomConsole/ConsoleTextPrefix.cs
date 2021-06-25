@@ -62,7 +62,7 @@ namespace Needle.Console
 				if (!LogEntries.GetEntryInternal(element.row, tempEntry)) return;
 				
 				keyBuilder.Clear();
-				var key = keyBuilder.Append(tempEntry.file).Append(tempEntry.line).ToString();
+				var key = keyBuilder.Append(tempEntry.file).Append(tempEntry.line).Append(text).ToString();
 				var isSelected = ConsoleList.IsSelectedRow(element.row);
 				var cacheEntry = !isSelected;
 				var isInCache = cachedInfo.ContainsKey(key);
@@ -78,8 +78,8 @@ namespace Needle.Console
 					{
 						var filePath = tempEntry.file;
 						var fileName = Path.GetFileNameWithoutExtension(filePath);
-						const string colorPrefixDefault = "<color=#999999>";
-						const string colorPrefixSelected = "<color=#bbbbbb>";
+						const string colorPrefixDefault = "<color=#888888>";
+						const string colorPrefixSelected = "<color=#cccccc>";
 						// const string colorPrefixSelected = "<color=#111122>";
 						var colorPrefix = isInCache && isSelected ? colorPrefixSelected : colorPrefixDefault;
 						const string colorPostfix = "</color>";
@@ -91,7 +91,8 @@ namespace Needle.Console
 						string GetPrefix()
 						{
 							if (!NeedleConsoleSettings.instance.ShowLogPrefix) return string.Empty;
-							var key2 = tempEntry.file + ":" + tempEntry.line + ":" + tempEntry.column;
+							keyBuilder.Clear();
+							var key2 = keyBuilder.Append(tempEntry.file).Append(tempEntry.line).Append(tempEntry.column).ToString();
 							if (!isSelected && cachedPrefix.TryGetValue(key2, out var cached))
 							{
 								return cached;
