@@ -56,8 +56,8 @@ namespace Needle.Console
 
 		private static Vector2 scroll
 		{
-			get => SessionState.GetVector3("ConsoleList-Scroll", Vector3.zero);
-			set => SessionState.SetVector3("ConsoleList-Scroll", value);
+			get => SessionState.GetVector3("NeedleConsole-Scroll", Vector3.zero);
+			set => SessionState.SetVector3("NeedleConsole-Scroll", value);
 		}
 
 		private static Vector2 scrollStacktrace;
@@ -66,27 +66,26 @@ namespace Needle.Console
 
 		private static Vector2 SplitterSize
 		{
-			get => SessionState.GetVector3("CustomConsoleSplitter", new Vector2(70, 30));
-			set => SessionState.SetVector3("CustomConsoleSplitter", value);
+			get => SessionState.GetVector3("NeedleConsole-Splitter", new Vector2(70, 30));
+			set => SessionState.SetVector3("NeedleConsole-Splitter", value);
 		}
 
 		private static SplitterState spl;
 
 		private static int SelectedRowIndex
 		{
-			get => SessionState.GetInt("ConsoleList-SelectedRow", -1);
-			set => SessionState.SetInt("ConsoleList-SelectedRow", value);
+			get => SessionState.GetInt("NeedleConsole-SelectedRow", -1);
+			set => SessionState.SetInt("NeedleConsole-SelectedRow", value);
 		}
 
-		private static int selectedRowIndex
-		{
-			get => SelectedRowIndex;
-			set => SelectedRowIndex = value;
-		}
-
-		private static int previouslySelectedRowIndex = -2, rowDoubleClicked = -1;
+		private static int previouslySelectedRowIndex = -2, rowDoubleClicked = -1; 
 		private static int selectedRowNumber = -1;
-		private static string selectedText;
+
+		private static string selectedText
+		{
+			get => SessionState.GetString("NeedleConsole-SelectedText", null);
+			set => SessionState.SetString("NeedleConsole-SelectedText", value);
+		}
 		private static int collapsedFlag = 1 << 0;
 
 		/// <summary>
@@ -159,16 +158,16 @@ namespace Needle.Console
 					if (count <= 0)
 					{
 						selectedText = null;
-						selectedRowIndex = -1;
+						SelectedRowIndex = -1;
 						previouslySelectedRowIndex = -1;
 					}
 
 					var shouldUpdateLogs = ConsoleFilter.ShouldUpdate(count);
 					if (shouldUpdateLogs)
 					{
-						if (selectedRowIndex >= 0 && selectedRowIndex < currentEntries.Count)
+						if (SelectedRowIndex >= 0 && SelectedRowIndex < currentEntries.Count)
 						{
-							selectedRowNumber = currentEntries[selectedRowIndex].row;
+							selectedRowNumber = currentEntries[SelectedRowIndex].row;
 							if (!logsAdded || ConsoleFilter.IsDirty)
 							{
 								shouldScrollToSelectedItem = true;
@@ -187,7 +186,7 @@ namespace Needle.Console
 			if (Event.current.type == EventType.MouseDown)
 			{
 				rowDoubleClicked = -1;
-				previouslySelectedRowIndex = selectedRowIndex;
+				previouslySelectedRowIndex = SelectedRowIndex;
 				// selectedRowIndex = -1;
 			}
 
@@ -197,7 +196,7 @@ namespace Needle.Console
 				var size = SplitterSize;
 				
 				#if UNITY_2020_1_OR_NEWER
-				spl = SplitterState.FromRelative(new[] {size.x, size.y}, new float[] {32, 45}, null);
+				spl = SplitterState.FromRelative(new[] {size.x, size.y}, new float[] {32, 32}, null);
 				#else
 				spl = new SplitterState(new[] {size.x, size.y}, new int[] {32, 32}, (int[]) null, 0);
 				#endif
@@ -334,7 +333,7 @@ namespace Needle.Console
 							var handledByCustomDrawer = false;
 							foreach (var drawer in customDrawers)
 							{
-								if (drawer.OnDrawEntry(k, selectedRowIndex == k, position, isVisible, out var res))
+								if (drawer.OnDrawEntry(k, SelectedRowIndex == k, position, isVisible, out var res))
 								{
 									position.height = res;
 									RegisterRect(position);
@@ -362,11 +361,11 @@ namespace Needle.Console
 									isAutoScrolling = false;
 									SelectRow(k);
 
-									if (previouslySelectedRowIndex == selectedRowIndex)
+									if (previouslySelectedRowIndex == SelectedRowIndex)
 									{
 										var td = (DateTime.Now - lastClickTime).Seconds;
 										if (td < 1)
-											rowDoubleClicked = currentEntries[selectedRowIndex].row;
+											rowDoubleClicked = currentEntries[SelectedRowIndex].row;
 									}
 									else
 									{
@@ -428,13 +427,13 @@ namespace Needle.Console
 				case EventType.MouseUp when Event.current.button == 1:
 				{
 					var menu = new GenericMenu();
-					AddConfigMenuItems(menu, selectedRowIndex);
+					AddConfigMenuItems(menu, SelectedRowIndex);
 					menu.ShowAsContext();
 					break;
 				}
 				case EventType.KeyDown:
 				{
-					if (selectedRowIndex >= 0)
+					if (SelectedRowIndex >= 0)
 						HandleKeyboardInput(position, console, scrollAreaHeight, lineHeight);
 					break;
 				}
@@ -479,7 +478,7 @@ namespace Needle.Console
 			{
 				foreach (var drawer in customDrawers)
 				{
-					if (drawer.OnDrawStacktrace(selectedRowIndex, text, stacktraceContentRect))
+					if (drawer.OnDrawStacktrace(SelectedRowIndex, text, stacktraceContentRect))
 					{
 						didDrawStacktrace = true;
 						break;
@@ -587,8 +586,8 @@ namespace Needle.Console
 			}
 
 			// draw icon
-			GUIStyle iconStyle = ConsoleWindow.GetStyleForErrorMode(entry.mode, true, ConsoleWindow.Constants.LogStyleLineCount == 1);
-			Rect iconRect = rect;
+			var iconStyle = ConsoleWindow.GetStyleForErrorMode(entry.mode, true, ConsoleWindow.Constants.LogStyleLineCount == 1);
+			var iconRect = rect;
 			iconRect.y += 2;
 			iconStyle.Draw(iconRect, false, false, entryIsSelected, false);
 
@@ -628,7 +627,7 @@ namespace Needle.Console
 			switch (Event.current.keyCode)
 			{
 				case KeyCode.Escape:
-					selectedRowIndex = -1;
+					SelectedRowIndex = -1;
 					selectedRowNumber = -1;
 					selectedText = null;
 					isAutoScrolling = false;
@@ -648,13 +647,13 @@ namespace Needle.Console
 				case KeyCode.PageDown:
 				case KeyCode.D:
 				case KeyCode.RightArrow:
-					if (selectedRowIndex >= 0)
+					if (SelectedRowIndex >= 0)
 					{
-						var newIndex = selectedRowIndex + (int) (scrollAreaHeight / lineHeight);
+						var newIndex = SelectedRowIndex + (int) (scrollAreaHeight / lineHeight);
 						newIndex = Mathf.Clamp(newIndex, 0, currentEntries.Count);
 						if (newIndex >= 0 && (newIndex) < currentEntries.Count)
 						{
-							SetScroll(scroll.y + (newIndex - selectedRowIndex) * lineHeight);
+							SetScroll(scroll.y + (newIndex - SelectedRowIndex) * lineHeight);
 							SelectRow(newIndex);
 							console.Repaint();
 						}
@@ -665,13 +664,13 @@ namespace Needle.Console
 				case KeyCode.PageUp:
 				case KeyCode.A:
 				case KeyCode.LeftArrow:
-					if (selectedRowIndex >= 0)
+					if (SelectedRowIndex >= 0)
 					{
-						var newIndex = selectedRowIndex - (int) (scrollAreaHeight / lineHeight);
+						var newIndex = SelectedRowIndex - (int) (scrollAreaHeight / lineHeight);
 						newIndex = Mathf.Clamp(newIndex, 0, currentEntries.Count);
 						if (newIndex >= 0 && (newIndex) < currentEntries.Count)
 						{
-							SetScroll(scroll.y + (newIndex - selectedRowIndex) * lineHeight);
+							SetScroll(scroll.y + (newIndex - SelectedRowIndex) * lineHeight);
 							SelectRow(newIndex);
 							console.Repaint();
 						}
@@ -681,10 +680,10 @@ namespace Needle.Console
 
 				case KeyCode.S:
 				case KeyCode.DownArrow:
-					if (selectedRowIndex >= 0 && (selectedRowIndex + 1) < currentEntries.Count)
+					if (SelectedRowIndex >= 0 && (SelectedRowIndex + 1) < currentEntries.Count)
 					{
 						SetScroll(scroll.y + lineHeight);
-						SelectRow(selectedRowIndex + 1);
+						SelectRow(SelectedRowIndex + 1);
 						// if(selectedRow * lineHeight > scroll.y + (contentHeight - scrollAreaHeight))
 						// 	scrollArea
 						console.Repaint();
@@ -693,9 +692,9 @@ namespace Needle.Console
 					break;
 				case KeyCode.W:
 				case KeyCode.UpArrow:
-					if (currentEntries.Count > 0 && selectedRowIndex > 0 && selectedRowIndex < currentEntries.Count)
+					if (currentEntries.Count > 0 && SelectedRowIndex > 0 && SelectedRowIndex < currentEntries.Count)
 					{
-						SelectRow(selectedRowIndex - 1);
+						SelectRow(SelectedRowIndex - 1);
 						SetScroll(scroll.y - lineHeight);
 						if (scroll.y < 0) SetScroll(0);
 						console.Repaint();
@@ -720,9 +719,9 @@ namespace Needle.Console
 
 					break;
 				case KeyCode.Return:
-					if (selectedRowIndex > 0)
+					if (SelectedRowIndex > 0)
 					{
-						rowDoubleClicked = currentEntries[selectedRowIndex].row;
+						rowDoubleClicked = currentEntries[SelectedRowIndex].row;
 					}
 
 					break;
@@ -733,14 +732,14 @@ namespace Needle.Console
 		{
 			if (index >= 0 && index < currentEntries.Count)
 			{
-				selectedRowIndex = index;
+				SelectedRowIndex = index;
 				var i = currentEntries[index];
 				selectedRowNumber = i.row;
 				selectedText = i.entry.message;
 			}
 			else if (index == -1)
 			{
-				selectedRowIndex = -1;
+				SelectedRowIndex = -1;
 				selectedText = null;
 				selectedRowNumber = -1;
 			}

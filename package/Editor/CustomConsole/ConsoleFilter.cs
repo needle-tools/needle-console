@@ -189,14 +189,16 @@ namespace Needle.Console
 				fil.AddLogEntryContextMenuItems(menu, clickedLog, preview);
 		}
 
-		private static int _prevCount, _lastFlags;
+		private static int _prevCount, _lastFlags, _lastLineCount;
+		
 		internal static bool HasAnyFilterSolo { get; private set; }
 
 		internal static bool IsDirty => isDirty;
 		internal static bool ShouldUpdate(int logCount)
 		{
 			if (_prevCount != logCount) return true;
-			if (LogEntries.consoleFlags != _lastFlags)
+			if (_lastLineCount != ConsoleWindow.Constants.LogStyleLineCount) return true;
+			if (LogEntries.consoleFlags != _lastFlags) 
 			{
 				return true;
 			}
@@ -211,7 +213,8 @@ namespace Needle.Console
 				var start = _prevCount;
 				var cleared = count < _prevCount;
 				var flagsChanged = LogEntries.consoleFlags != _lastFlags;
-				if (isDirty || cleared || flagsChanged)
+				var lineCountChanged = _lastLineCount != ConsoleWindow.Constants.LogStyleLineCount;
+				if (isDirty || cleared || flagsChanged || lineCountChanged)
 				{
 					ClearingCachedData?.Invoke();
 					start = 0;
@@ -224,6 +227,7 @@ namespace Needle.Console
 				isDirty = false;
 				_prevCount = count;
 				_lastFlags = LogEntries.consoleFlags;
+				_lastLineCount = ConsoleWindow.Constants.LogStyleLineCount;
 
 				HasAnyFilterSolo = registeredFilters.Any(f => f.HasAnySolo());
 
@@ -236,7 +240,7 @@ namespace Needle.Console
 					registeredFilters[index].BeforeFilter();
 				}
 
-				var useDynamicGrouping = NeedleConsoleSettings.instance.IndividualCollapse;
+				// var useDynamicGrouping = NeedleConsoleSettings.instance.IndividualCollapse;
 
 				for (var i = start; i < count; i++)
 				{

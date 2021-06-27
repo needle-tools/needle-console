@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Diagnostics.Eventing.Reader;
 using System.IO;
 using UnityEditor;
 using UnityEngine;
@@ -57,6 +58,23 @@ namespace Demystify._Tests
 				}
 				Debug.Log(str);
 			}
+		}
+
+		private static Action[] randomLogMethods = {
+			LogEmpty,
+			Exception,
+			Error,
+			Log,
+			Log,
+			Log,
+			Warning
+		};
+
+		[MenuItem("Test/Log Random")]
+		private static void LogRandom()
+		{
+			for (var i = 0; i < 5; i++)
+				randomLogMethods[Mathf.FloorToInt(randomLogMethods.Length * Random.value)]();
 		}
 	}
 }

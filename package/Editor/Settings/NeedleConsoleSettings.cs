@@ -102,6 +102,10 @@ namespace Needle.Console
 		[FormerlySerializedAs("CustomList")] public bool CustomConsole = true;
 		public bool RowColors = true;
 		public bool IndividualCollapse = true;
+		/// <summary>
+		/// collapsed logs will be broken by other logs
+		/// </summary>
+		public bool IndividualCollapsePreserveContext = true;
 		
 		[Header("Experimental")]
 		public bool UseCustomFont = false;

@@ -82,21 +82,31 @@ namespace Needle.Console
 				}
 				
 				settings.CustomConsole = EditorGUILayout.Toggle(new GUIContent("Custom Console", "The custom list replaces the console log drawing with a custom implementation that allows for advanced features such like very custom log filtering via context menus"), settings.CustomConsole);
-				EditorGUI.BeginDisabledGroup(!settings.CustomConsole);
-				EditorGUI.indentLevel++;
-				settings.RowColors = EditorGUILayout.Toggle(new GUIContent("Row Colors", "Allow custom list to tint row background for warnings and errors"), settings.RowColors);
-				settings.IndividualCollapse = EditorGUILayout.Toggle(new GUIContent("Individual Collapse", "When enabled the log context menu allows to collapse individual logs"), settings.IndividualCollapse);
-				settings.UseCustomFont = EditorGUILayout.Toggle(new GUIContent("Use Custom Font", "Allow using a custom font. Specify a font name that you have installed below"), settings.UseCustomFont);
-				EditorGUI.BeginDisabledGroup(!settings.UseCustomFont);
-				EditorGUI.indentLevel++;
-				var fontOptions = Font.GetOSInstalledFontNames();
-				var selectedFont = EditorGUILayout.Popup(new GUIContent("Installed Fonts"), fontOptions.IndexOf(f => f == settings.InstalledLogEntryFont), fontOptions);
-				if (selectedFont >= 0 && selectedFont < fontOptions.Length) settings.InstalledLogEntryFont = fontOptions[selectedFont];
-				settings.CustomLogEntryFont = (Font) EditorGUILayout.ObjectField(new GUIContent("Custom Font", "Will override installed font" ), settings.CustomLogEntryFont, typeof(Font), false);
-				EditorGUI.indentLevel--;
-				EditorGUI.EndDisabledGroup();
-				EditorGUI.indentLevel--;
-				EditorGUI.EndDisabledGroup();
+				using (new EditorGUI.DisabledScope(!settings.CustomConsole))
+				{
+					EditorGUI.indentLevel++;
+					settings.RowColors = EditorGUILayout.Toggle(new GUIContent("Row Colors", "Allow custom list to tint row background for warnings and errors"), settings.RowColors);
+				
+					settings.IndividualCollapse = EditorGUILayout.Toggle(new GUIContent("Individual Collapse", "When enabled the log context menu allows to collapse individual logs"), settings.IndividualCollapse);
+					using (new EditorGUI.DisabledScope(!settings.IndividualCollapse))
+					{
+						EditorGUI.indentLevel++;
+						settings.IndividualCollapsePreserveContext = EditorGUILayout.Toggle(new GUIContent("Keep Context", "When enabled collapsing will be interupted by other log messages"), settings.IndividualCollapsePreserveContext);
+						EditorGUI.indentLevel--;
+					}
+				
+					settings.UseCustomFont = EditorGUILayout.Toggle(new GUIContent("Use Custom Font", "Allow using a custom font. Specify a font name that you have installed below"), settings.UseCustomFont);
+					using (new EditorGUI.DisabledScope(!settings.UseCustomFont))
+					{
+						EditorGUI.indentLevel++;
+						var fontOptions = Font.GetOSInstalledFontNames();
+						var selectedFont = EditorGUILayout.Popup(new GUIContent("Installed Fonts"), fontOptions.IndexOf(f => f == settings.InstalledLogEntryFont), fontOptions);
+						if (selectedFont >= 0 && selectedFont < fontOptions.Length) settings.InstalledLogEntryFont = fontOptions[selectedFont];
+						settings.CustomLogEntryFont = (Font) EditorGUILayout.ObjectField(new GUIContent("Custom Font", "Will override installed font" ), settings.CustomLogEntryFont, typeof(Font), false);
+						EditorGUI.indentLevel--;
+					}
+					EditorGUI.indentLevel--;
+				}
 				
 				if(NeedleConsoleSettings.DevelopmentMode)
 				// using(new EditorGUI.DisabledScope(!settings.DevelopmentMode))

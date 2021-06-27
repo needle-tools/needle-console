@@ -17,7 +17,7 @@ namespace Needle.Console
 		{
 			this.selectedLogs = selectedLogs;
 		}
-		
+
 		private static readonly Dictionary<string, int> logs = new Dictionary<string, int>();
 		private static readonly Dictionary<int, AdvancedLogData> logsData = new Dictionary<int, AdvancedLogData>();
 
@@ -32,30 +32,41 @@ namespace Needle.Console
 		// private static readonly Dictionary<string, string> fileContent = new Dictionary<string, string>();
 		// private static readonly List<int> notFoundCandidates = new List<int>();
 
+		private string lastKey;
+		private int messageCounter;
 
 		public bool OnHandleLog(LogEntry entry, int row, string preview, List<CachedConsoleInfo> entries)
 		{
+			if (selectedLogs.Count <= 0) return false;
+
+			builder.Clear();
+			builder.Append(entry.file).Append("::").Append(entry.line);
+			if (entry.instanceID != 0) builder.Append("@").Append(entry.instanceID);
+			var key = builder.ToString();
+			if (NeedleConsoleSettings.instance.IndividualCollapsePreserveContext)
+			{
+				if (!string.IsNullOrEmpty(lastKey) && key != lastKey) messageCounter += 1;
+				lastKey = key;
+				builder.Append("-").Append(messageCounter);
+				key = builder.ToString();
+			}
+
 			// notFoundCandidates.Clear();
 			for (var i = 0; i < selectedLogs.Count; i++)
 			{
 				var selected = selectedLogs[i];
 				if (!selected.Active) continue;
-				var collapse = selected.Line == entry.line && selected.File == entry.file;
+				var matches = selected.Line == entry.line && selected.File == entry.file;
 
-				if (!collapse)
+				if (!matches)
 				{
-					if (selected.File == entry.file)
-					{
-						// notFoundCandidates.Add(i);
-					}
+					// if (selected.File == entry.file)
+					// {
+					// notFoundCandidates.Add(i);
+					// }
 
 					continue;
 				}
-
-				builder.Clear();
-				builder.Append(entry.file).Append("::").Append(entry.line);
-				if (entry.instanceID != 0) builder.Append("@").Append(entry.instanceID);
-				var key = builder.ToString();
 
 				// entry.message += "\n" + UnityDemystify.DemystifyEndMarker;
 				var newEntry = new CachedConsoleInfo()
@@ -85,8 +96,12 @@ namespace Needle.Console
 					logsData.Add(newIndex, data);
 				}
 
-				var id = 0;
-				data.AddData(preview, id++);
+				// var e = entries[logs[key]];
+				// e.str += collapseCounter;
+				// entries[logs[key]] = e;
+				
+				// var id = 0;
+				// data.AddData(preview, id++);
 
 				// parse data
 				// const string timestampStart = "[";
@@ -104,7 +119,7 @@ namespace Needle.Console
 
 			return false;
 		}
-		
+
 		// number matcher https://regex101.com/r/D0dFIj/1/ -> [-\d.]+
 		// non number matcher https://regex101.com/r/VRXwpC/1/
 		// grouped numbers, separated by ,s https://regex101.com/r/GJVz7t/1 -> [,-.\d ]+

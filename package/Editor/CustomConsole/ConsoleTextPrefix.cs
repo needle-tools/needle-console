@@ -45,7 +45,7 @@ namespace Needle.Console
 
 		private static readonly Dictionary<string, string> cachedInfo = new Dictionary<string, string>();
 		private static readonly Dictionary<string, string> cachedPrefix = new Dictionary<string, string>();
-		private static StringBuilder keyBuilder = new StringBuilder();
+		private static readonly StringBuilder keyBuilder = new StringBuilder();
 
 		// called from console list with current list view element and console text
 
