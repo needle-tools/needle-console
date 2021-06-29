@@ -1,16 +1,16 @@
 ﻿# Needle Console
  
 ## **Feature Overview**
-- 🔮 Improved stacktrace readability
-- 🎨 Syntax highlight stacktraces
-- 🚦 Log background colors by type (e.g. warning, error, compiler error)
-- 📍 Console log prefixes (only visually in editor)
-- 🔍 Filter logs: Hide or Solo (e.g. by package, file, line, message)
-- 🍔 Collapse individual logs
-- 📯 Ping script files from log
-- 🔗 Console hyperlinks
-- 📑 Editor-only logs (extensible)
-- 🧁 Fixes to source code links
+- Improved stacktrace readability
+- Syntax highlight stacktraces
+- Log background colors by type (e.g. warning, error, compiler error)
+- Console log prefixes (only visually in editor)
+- Filter logs: Hide or Solo (e.g. by package, file, line, message)
+- Collapse individual logs
+- Ping script files from log
+- Console hyperlinks
+- Editor-only logs (extensible)
+- Fixes to source code links
 
 ## How to Install
 
