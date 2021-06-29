@@ -4,16 +4,16 @@
 
 
 ## **Feature Overview**
-- Improved stacktrace readability powered by [Demystifier](https://github.com/benaadams/Ben.Demystifier) 🔮
-- Syntax-highlighted stacktraces 🎨
-- Background colors by log type (e.g. warning, error, compiler error) 🚦
-- Log prefixes and color-coding (only visually in editor) 📍
-- Filter logs: Hide or Solo logs by package, file, line, message... 🔍
-- Collapse individual logs 🍔
-- Ping script files from log 📯
-- Fully functional console hyperlinks 🔗
-- Editor-only logs without impact on builds 📑
-- Fixes to source code links 🧁
+- Improved stacktrace readability powered by [Demystifier](https://github.com/benaadams/Ben.Demystifier)
+- Syntax-highlighted stacktraces
+- Background colors by log type (e.g. warning, error, compiler error)
+- Log prefixes and color-coding (only visually in editor)
+- Filter logs: Hide or Solo logs by package, file, line, message...
+- Collapse individual logs
+- Ping script files from log
+- Fully functional console hyperlinks
+- Editor-only logs without impact on builds
+- Fixes to source code links
 
 
 ## Quick Start ⚡️
