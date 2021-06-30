@@ -159,7 +159,12 @@ namespace Needle.Console
 												if (m1.Index != group.Index)
 													return m1.Value;
 												replaced = true;
-												// return group.Value;
+												
+												// if (group.Name == "namespace")
+												// {
+												// 	return string.Empty;
+												// }
+												
 												using (new ProfilerMarker("Concat").Auto())
 													return "<color=" + col + ">" + @group.Value + "</color>";
 											}, RegexOptions.Compiled);
