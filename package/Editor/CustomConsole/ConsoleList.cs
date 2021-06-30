@@ -732,10 +732,15 @@ namespace Needle.Console
 		{
 			if (index >= 0 && index < currentEntries.Count)
 			{
+				var changed = index != SelectedRowIndex;
 				SelectedRowIndex = index;
 				var i = currentEntries[index];
 				selectedRowNumber = i.row;
 				selectedText = i.entry.message;
+				if(changed)
+				{
+					GUIUtility.keyboardControl = 0;  
+				}
 			}
 			else if (index == -1)
 			{
