@@ -76,7 +76,7 @@ namespace Needle.Console
 				foreach (var entry in this.Entries)
 				{
 					if (Ignored(entry.Color)) continue;
-					var html = ColorUtility.ToHtmlStringRGB(entry.Color);
+					var html = ColorUtility.ToHtmlStringRGBA(entry.Color);
 					if (string.IsNullOrEmpty(html)) continue;
 					if (!html.StartsWith("#")) html = "#" + html;
 					dict.Add(entry.Key, html);
