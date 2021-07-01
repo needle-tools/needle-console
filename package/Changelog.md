@@ -4,6 +4,11 @@ All notable changes to this package will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## [2.2.1-exp] - 2021-07-01
+- Syntax highlighting uses alpha
+- Fix stacktrace selection being stuck sometimes after recompile
+- Draw collapsed logs in filter foldout
+
 ## [2.2.0-exp] - 2021-06-28
 - Add option to preserve context when collapsing logs
 - Fix logs updating when user changes log line count
