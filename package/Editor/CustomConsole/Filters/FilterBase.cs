@@ -275,7 +275,7 @@ namespace Needle.Console
 				var anySolo = HasAnySolo();
 
 				EditorGUI.indentLevel++;
-				var iconWidth = GUILayout.Width(15);
+				var iconWidth = GUILayout.Width(Styles.RemoveIconWith);
 				var statsStyle = new GUIStyle(EditorStyles.label);
 				statsStyle.alignment = TextAnchor.MiddleRight;
 				

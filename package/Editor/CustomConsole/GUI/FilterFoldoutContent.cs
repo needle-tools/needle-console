@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using UnityEditor;
 using UnityEngine;
 
@@ -26,6 +27,8 @@ namespace Needle.Console
 		{
 			base.OnOpen();
 		}
+
+		internal static event Action<Rect> FoldoutOnGUI;
 
 		public override void OnGUI(Rect rect)
 		{
@@ -109,6 +112,8 @@ namespace Needle.Console
 			}
 			
 			Draw.FilterList(ConsoleFilter.RegisteredFilter);
+			
+			FoldoutOnGUI?.Invoke(rect);
 
 			EditorGUILayout.EndScrollView();
 		}

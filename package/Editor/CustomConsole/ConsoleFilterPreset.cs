@@ -160,7 +160,7 @@ namespace Needle.Console
 		internal static void DrawHowToFilterHelpBox()
 		{
 			EditorGUILayout.HelpBox(
-				"You haven't selected any logs for filtering yet. Try right clicking a log in the console window. Select an option in the menu to start using console filters",
+				"You haven't filtered any logs yet. Context click a log message for options",
 				MessageType.Info);
 		}
 	}

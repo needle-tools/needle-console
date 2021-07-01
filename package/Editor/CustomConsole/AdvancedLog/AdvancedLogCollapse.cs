@@ -100,8 +100,8 @@ namespace Needle.Console
 				// e.str += collapseCounter;
 				// entries[logs[key]] = e;
 				
-				// var id = 0;
-				// data.AddData(preview, id++);
+				var id = 0;
+				data.AddData(preview, id++);
 
 				// parse data
 				// const string timestampStart = "[";

@@ -6,6 +6,8 @@ namespace Needle.Console
 	internal static class Styles
 	{
 		private static GUIStyle toggleButton;
+		
+		internal const int RemoveIconWith = 15;
 
 		public static GUIStyle FilterToggleButton(float height = -1)
 		{
