@@ -497,6 +497,15 @@ namespace Needle.Console
 
 			GUILayout.EndScrollView();
 			SplitterGUILayout.EndVerticalSplit();
+			
+			// Copy & Paste selected item
+			if ((evt.type == EventType.ValidateCommand || evt.type == EventType.ExecuteCommand) && evt.commandName == EventCommandNames.Copy && tempContent != null)
+			{
+				if (evt.type == EventType.ExecuteCommand)
+					EditorGUIUtility.systemCopyBuffer = text;
+				evt.Use();
+			}
+			
 			return false;
 		}
 
