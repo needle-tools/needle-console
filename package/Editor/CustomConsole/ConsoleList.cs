@@ -578,7 +578,7 @@ namespace Needle.Console
 			{
 				DrawBackground(IsOdd() ? new Color(1, 0, 1, .2f) : new Color(1, .2f, 1f, .25f));
 			}
-			else if (allowColors && HasMode(entry.mode,
+			else if (allowColors && HasMode(entry.mode, ConsoleWindow.Mode.Assert | 
 				ConsoleWindow.Mode.ScriptingError | ConsoleWindow.Mode.Error | ConsoleWindow.Mode.StickyError |
 				ConsoleWindow.Mode.AssetImportError))
 			{
