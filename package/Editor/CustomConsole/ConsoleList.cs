@@ -582,12 +582,12 @@ namespace Needle.Console
 				ConsoleWindow.Mode.ScriptingError | ConsoleWindow.Mode.Error | ConsoleWindow.Mode.StickyError |
 				ConsoleWindow.Mode.AssetImportError))
 			{
-				DrawBackground(IsOdd() ? new Color(1, 0, 0, .1f) : new Color(1, .2f, .25f, .15f));
+				DrawBackground(IsOdd() ? new Color(1, 0, 0, .1f) : new Color(1, .2f, .2f, .15f));
 			}
 			else if (allowColors && HasMode(entry.mode,
 				ConsoleWindow.Mode.ScriptingWarning | ConsoleWindow.Mode.AssetImportWarning | ConsoleWindow.Mode.ScriptCompileWarning))
 			{
-				DrawBackground(IsOdd() ? new Color(.5f, .5f, 0, .08f) : new Color(1, 1f, .1f, .04f));
+				DrawBackground(IsOdd() ? new Color(.5f, .5f, 0, .08f) : new Color(.7f, .7f, .1f, .08f));
 			}
 			else if (IsOdd())
 			{
