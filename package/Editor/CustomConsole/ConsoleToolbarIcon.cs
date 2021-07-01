@@ -1,4 +1,5 @@
-﻿using UnityEditor;
+﻿using System;
+using UnityEditor;
 using UnityEngine;
 
 namespace Needle.Console
@@ -7,6 +8,7 @@ namespace Needle.Console
 	{
 		private static bool filterTextureInit;
 		private static Texture2D filterIcon, filterIconDisabled;
+		private static GUIStyle filterButtonStyle;
 
 		internal static void OnDrawToolbar()
 		{
@@ -19,13 +21,23 @@ namespace Needle.Console
 				filterIconDisabled = EditorGUIUtility.FindTexture("animationvisibilitytoggleon");
 			}
 
-			var text = " " + (ConsoleFilter.HiddenCount >= 1000 ? "999+" : ConsoleFilter.HiddenCount.ToString());
+			var count = ConsoleFilter.HiddenCount;
+			var aboveThreshold = count >= 1000;
+			var text = " " + (aboveThreshold ? "999+" : count.ToString());
 			var icon = ConsoleFilter.enabled ? filterIcon : filterIconDisabled;
-			var tooltip = ConsoleFilter.HiddenCount > 1 ? ConsoleFilter.HiddenCount + " logs" : ConsoleFilter.HiddenCount + " log";
+			var tooltip = count > 1 ? count + " logs" : count + " log";
 			if (ConsoleFilter.enabled) tooltip += " hidden";
 			else tooltip += " would be hidden";
 			var content = new GUIContent(text, icon, tooltip);
-			ConsoleFilter.enabled = !GUILayout.Toggle(!ConsoleFilter.enabled, content, ConsoleWindow.Constants.MiniButtonRight);
+
+			if (filterButtonStyle == null)
+			{
+				filterButtonStyle = new GUIStyle(ConsoleWindow.Constants.MiniButtonRight);
+				filterButtonStyle.alignment = TextAnchor.MiddleLeft;
+			}
+
+			var width = count < 100 ? new[] { GUILayout.MinWidth(52) } : Array.Empty<GUILayoutOption>();
+			ConsoleFilter.enabled = !GUILayout.Toggle(!ConsoleFilter.enabled, content, filterButtonStyle, width);
 			
 			// var rect = GUILayoutUtility.GetLastRect();
 			// rect.x += rect.width;
