@@ -524,14 +524,25 @@ namespace Needle.Console
 
 		internal static float DrawDefaultStacktrace(string message)
 		{
+			try
+			{
 #if UNITY_CONSOLE_STACKTRACE_TWO_PARAMETERS
-			var stackWithHyperlinks = ConsoleWindow.StacktraceWithHyperlinks(message, 0);
+				var stackWithHyperlinks = ConsoleWindow.StacktraceWithHyperlinks(message, 0);
 #else
-			var stackWithHyperlinks = ConsoleWindow.StacktraceWithHyperlinks(message);
+				var stackWithHyperlinks = ConsoleWindow.StacktraceWithHyperlinks(message);
 #endif
-			var stacktraceHeight = ConsoleWindow.Constants.MessageStyle.CalcHeight(GUIContent.Temp(stackWithHyperlinks), _consoleWindow.position.width);
-			DrawDefaultStacktrace(stackWithHyperlinks, stacktraceHeight);
-			return stacktraceHeight;
+				var stacktraceHeight = ConsoleWindow.Constants.MessageStyle.CalcHeight(GUIContent.Temp(stackWithHyperlinks), _consoleWindow.position.width);
+				DrawDefaultStacktrace(stackWithHyperlinks, stacktraceHeight);
+				return stacktraceHeight;
+			}
+			catch (Exception e)
+			{
+				Debug.LogException(e);
+				var stacktraceHeight = ConsoleWindow.Constants.MessageStyle.CalcHeight(GUIContent.Temp(message), _consoleWindow.position.width);
+				DrawDefaultStacktrace(message, stacktraceHeight);
+			}
+
+			return 0;
 		}
 
 		internal static void DrawDefaultStacktrace(string stacktraceWithHyperlinks, float height)
