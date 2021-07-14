@@ -97,7 +97,7 @@ namespace Needle.Console
 		private static bool logsCountChanged, logsAdded;
 		private static int previousLogsCount, logCountDiff;
 		private static DateTime lastClickTime;
-		private static GUIStyle logStyle;
+		private static GUIStyle logStyle, rightAlignedPrefixStyle;
 
 		private static bool HasFlag(int flags) => (LogEntries.consoleFlags & (int) flags) != 0;
 		internal static bool HasMode(int mode, ConsoleWindow.Mode modeToCheck) => (uint) ((ConsoleWindow.Mode) mode & modeToCheck) > 0U;
@@ -631,6 +631,7 @@ namespace Needle.Console
 			// draw badge
 			var collapsed = IsCollapsed();
 			var isGrouped = item.collapseCount > 0;
+			var offsetRight = 10f;
 			if (collapsed || isGrouped)
 			{
 				var badgeRect = element.position;
@@ -647,7 +648,22 @@ namespace Needle.Console
 				badgeRect.yMin += ((badgeRect.yMax - badgeRect.yMin) - badgeSize.y) * 0.5f;
 				badgeRect.x -= 5f;
 				GUI.Label(badgeRect, tempContent, ConsoleWindow.Constants.CountBadge);
+
+				var w = badgeRect.width + 10;
+				if (w > offsetRight)
+				{
+					offsetRight += w - offsetRight;
+				}
 			}
+
+			if (rightAlignedPrefixStyle == null)
+			{
+				rightAlignedPrefixStyle = new GUIStyle(logStyle);
+				rightAlignedPrefixStyle.alignment = TextAnchor.MiddleRight;
+				rightAlignedPrefixStyle.normal.textColor = Color.gray;
+			}
+			strRect.width -= offsetRight;
+			// GUI.Label(strRect, "test", rightAlignedPrefixStyle);
 
 			return rect.height;
 		}
