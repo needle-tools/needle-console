@@ -103,7 +103,7 @@ namespace Needle.Console
 		internal static bool HasMode(int mode, ConsoleWindow.Mode modeToCheck) => (uint) ((ConsoleWindow.Mode) mode & modeToCheck) > 0U;
 
 		private static ConsoleWindow _consoleWindow;
-		private static bool shouldScrollToSelectedItem;
+		private static bool shouldScrollToSelectedItem, requestedAutoScrolling;
 		private static GUIContent tempContent;
 		private static Rect strRect;
 		private static ListViewElement element;
@@ -235,6 +235,15 @@ namespace Needle.Console
 			if (contentHeight > scrollArea.height)
 				width -= 13;
 			var contentSize = new Rect(0, 0, width, contentHeight);
+			
+			
+
+			if (requestedAutoScrolling)
+			{
+				logsAdded = true;
+				isAutoScrolling = true;
+				requestedAutoScrolling = false;
+			}
 
 			// scroll to bottom if logs changed and it was at the bottom previously
 			if ((!shouldScrollToSelectedItem || isAutoScrolling))
@@ -656,7 +665,8 @@ namespace Needle.Console
 
 				// auto-scroll
 				case KeyCode.B:
-					isAutoScrolling = true;
+					requestedAutoScrolling = true;
+					console.Repaint();
 					break;
 
 				case KeyCode.F:
