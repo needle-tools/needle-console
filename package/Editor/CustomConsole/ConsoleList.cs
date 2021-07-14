@@ -237,11 +237,12 @@ namespace Needle.Console
 			var contentSize = new Rect(0, 0, width, contentHeight);
 
 			// scroll to bottom if logs changed and it was at the bottom previously
-			if ((!shouldScrollToSelectedItem || isAutoScrolling) && (Event.current.type == EventType.Layout || Event.current.type == EventType.Repaint))
+			if ((!shouldScrollToSelectedItem || isAutoScrolling))
 			{
 				if (isAutoScrolling && logsAdded)
 				{
 					SetScroll(Mathf.Max(0, contentHeight - scrollAreaHeight));
+					RequestRepaint();
 				}
 				else if (contentHeight < scrollAreaHeight)
 				{
@@ -451,15 +452,15 @@ namespace Needle.Console
 			
 			if (Event.current.type == EventType.Repaint)
 			{
-				var didScrollDown = previousScrollY < scrollY;
-				if (isAutoScrolling || didScrollDown)
+				var didScrollUp = previousScrollY > scrollY;
+				if (!didScrollUp)
 				{
 					var timeSinceInteraction = (DateTime.Now - scrollEntryInteractionTime).TotalSeconds;
 					if (timeSinceInteraction > .2f)
 					{
 						var height = contentHeight - lineHeight;
-						var diffToBottom = (height - scrollAreaHeight) - scroll.y - scrollAreaBottomBuffer;
-						isAutoScrolling = diffToBottom <= (lineHeight * Mathf.Max(2, logCountDiff)) || height <= scrollAreaHeight;
+						var diffToBottom = (height - scrollAreaHeight) - scroll.y;
+						isAutoScrolling = diffToBottom <= lineHeight;
 					}
 				}
 			}
