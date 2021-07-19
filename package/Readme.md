@@ -1,9 +1,11 @@
 ﻿# Needle Console
 
-*Better stacktrace readability, syntax highlighting, log filters, functional hyperlinks and more*
+## Better stacktrace readability, syntax highlighting, log filters, functional hyperlinks and more  
 
 
-## **Feature Overview**
+---  
+
+## **Feature Overview**  
 - Improved stacktrace readability powered by [Demystifier](https://github.com/benaadams/Ben.Demystifier)
 - Syntax-highlighted stacktraces
 - Background colors by log type (e.g. warning, error, compiler error)
