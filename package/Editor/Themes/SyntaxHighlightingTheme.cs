@@ -59,7 +59,7 @@ namespace Needle.Console
 			if (editColors)
 			{
 				HandleColorEditing(theme);
-				EditorGUILayout.Space(10);
+				GUILayout.Space(10);
 			}
 
 			EditorGUILayout.LabelField("Theme Colors", EditorStyles.boldLabel);
@@ -101,11 +101,11 @@ namespace Needle.Console
 		
 		private static void DrawPreview(Theme theme, ref Highlighting style)
 		{
-			EditorGUILayout.Space(8);
+			GUILayout.Space(8);
 			themePreviewFoldout = EditorGUILayout.Foldout(themePreviewFoldout, "Theme Preview");
 			if(!themePreviewFoldout) return;
 			// style = (Highlighting) EditorGUILayout.EnumPopup("Preview Style", style); 
-			EditorGUILayout.Space(5);
+			GUILayout.Space(5);
 			
 			if(previewStyle == null)
 				previewStyle = new GUIStyle(EditorStyles.label) {richText = true, wordWrap = false};

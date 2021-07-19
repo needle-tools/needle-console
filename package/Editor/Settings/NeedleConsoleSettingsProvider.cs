@@ -60,7 +60,7 @@ namespace Needle.Console
 				DrawActivateGUI(settings);
 				DrawSyntaxGUI(settings);
 
-				EditorGUILayout.Space(10);
+				GUILayout.Space(10);
 				EditorGUILayout.LabelField("Console Options", EditorStyles.boldLabel);
 				settings.Separator = EditorGUILayout.TextField(new GUIContent("Stacktrace Separator", "Adds a separator to Console stacktrace output between each stacktrace"), settings.Separator);
 				settings.ShortenFilePaths = EditorGUILayout.Toggle(new GUIContent("Shorten File Paths", "When enabled demystify tries to shorten package paths to <package_name>@<version> <fileName><line>"), settings.ShortenFilePaths); 
@@ -111,13 +111,13 @@ namespace Needle.Console
 				if(NeedleConsoleSettings.DevelopmentMode)
 				// using(new EditorGUI.DisabledScope(!settings.DevelopmentMode))
 				{
-					EditorGUILayout.Space(10);
+					GUILayout.Space(10);
 					EditorGUILayout.LabelField("Development Settings", EditorStyles.boldLabel);
 					if (GUILayout.Button("Refresh Themes List"))
 						Themes = null;
 				}
 
-				EditorGUILayout.Space(20);
+				GUILayout.Space(20);
 			}
 
 			// GUILayout.FlexibleSpace();
@@ -146,7 +146,7 @@ namespace Needle.Console
 
 		private static void DrawSyntaxGUI(NeedleConsoleSettings settings)
 		{
-			EditorGUILayout.Space(10);
+			GUILayout.Space(10);
 			EditorGUILayout.LabelField("Syntax Highlighting", EditorStyles.boldLabel);
 			EditorGUI.BeginChangeCheck();
 			settings.SyntaxHighlighting = (Highlighting) EditorGUILayout.EnumPopup("Syntax Highlighting", settings.SyntaxHighlighting);

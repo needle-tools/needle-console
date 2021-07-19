@@ -32,7 +32,11 @@ namespace Needle.Console
 
 			if (filterButtonStyle == null)
 			{
+#if UNITY_2019_4_OR_NEWER
 				filterButtonStyle = new GUIStyle(ConsoleWindow.Constants.MiniButtonRight);
+#else
+				filterButtonStyle = new GUIStyle(ConsoleWindow.Constants.MiniButton);
+#endif
 				filterButtonStyle.alignment = TextAnchor.MiddleLeft;
 			}
 

@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 72b48b51417c2fb4390f04d9a1d34a86, type: 3}
   m_Name: Needle Console Package Config
   m_EditorClassIdentifier: 
-  items: []
+  items:
+  - {fileID: 8385607101436470782, guid: 98c76a84161041040ba0bb02667633e2, type: 3}
   compressionStrength: 5
   respectIgnoreFiles: 0

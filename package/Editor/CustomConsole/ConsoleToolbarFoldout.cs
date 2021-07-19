@@ -14,7 +14,16 @@ namespace Needle.Console
 			rect.width = EditorStyles.toolbarDropDown.CalcSize(label).x;
 			if (EditorGUI.DropdownButton(rect, label, FocusType.Keyboard, EditorStyles.toolbarDropDown))
 			{
-				PopupWindow.Show(rect, new FilterFoldoutContent(), new[] {PopupLocation.BelowAlignLeft, PopupLocation.Above});
+				var popupLocation = new[]
+				{
+#if UNITY_2019_4_OR_NEWER
+					PopupLocation.BelowAlignLeft,
+#else
+					PopupLocation.Left,
+#endif
+					PopupLocation.Above
+				};
+				PopupWindow.Show(rect, new FilterFoldoutContent(), popupLocation);
 			}
 
 			GUILayout.Space(rect.width);
