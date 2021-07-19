@@ -689,6 +689,7 @@ namespace Needle.Console
 					shouldScrollToSelectedItem = true;
 					isAutoScrolling = false;
 					RequestRepaint();
+					console.RepaintImmediately();
 					break;
 
 				case KeyCode.PageDown:
