@@ -188,6 +188,7 @@ namespace Needle.Console
 				rowDoubleClicked = -1;
 				previouslySelectedRowIndex = SelectedRowIndex;
 				// selectedRowIndex = -1;
+				
 			}
 
 
@@ -380,6 +381,8 @@ namespace Needle.Console
 									{
 										if (entry.entry.instanceID != 0)
 											EditorGUIUtility.PingObject(entry.entry.instanceID);
+										else if (entry.entry.IsCompilerError())
+											ConsoleUtils.TryPingFile(entry.entry.file);
 									}
 
 									lastClickTime = DateTime.Now;
@@ -598,7 +601,7 @@ namespace Needle.Console
 			{
 				DrawBackground(new Color(.2f, .5f, .8f, .5f));
 			}
-			else if (allowColors && HasMode(entry.mode, ConsoleWindow.Mode.ScriptCompileError | ConsoleWindow.Mode.GraphCompileError))
+			else if (allowColors && entry.IsCompilerError())
 			{
 				DrawBackground(IsOdd() ? new Color(1, 0, 1, .2f) : new Color(1, .2f, 1f, .25f));
 			}
@@ -821,14 +824,7 @@ namespace Needle.Console
 					var file = current.entry.file;
 					if (file != null && File.Exists(file))
 					{
-						menu.AddItem(new GUIContent("Ping Script"), false, () =>
-						{
-							if (ConsoleUtils.TryMakeProjectRelative(file, out file))
-							{
-								var script = AssetDatabase.LoadAssetAtPath<MonoScript>(file);
-								EditorGUIUtility.PingObject(script);
-							}
-						});
+						menu.AddItem(new GUIContent("Ping Script"), false, () => ConsoleUtils.TryPingFile(file));
 					}
 				}
 			}
