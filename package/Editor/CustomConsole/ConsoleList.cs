@@ -319,9 +319,8 @@ namespace Needle.Console
 					{
 						var entry = currentEntries[k];
 						
-						var isVisible = IsVisible(position);
-						bool IsVisible(Rect r) => r.y + r.height >= scroll.y && r.y <= scroll.y + scrollAreaHeight;
-						
+						var isVisible = IsVisible(position, scrollAreaHeight);
+
 						if (selectedRowNumber == entry.row)
 						{
 							SelectRow(k);
@@ -355,11 +354,11 @@ namespace Needle.Console
 
 							if (handledByCustomDrawer) continue;
 							RegisterRect(position);
-							position.y += DrawDefaultRow(k, position);
+							position.y += DrawDefaultRow(k, position, isVisible);
 						}
 
 						var rect = currentEntriesRects[k];
-						if (Event.current.type == EventType.MouseUp && IsVisible(rect))
+						if (Event.current.type == EventType.MouseUp && IsVisible(rect, scrollAreaHeight))
 						{
 							if (Event.current.button == 0)
 							{
@@ -389,7 +388,7 @@ namespace Needle.Console
 									break;
 								}
 							}
-							else if (Event.current.button == 1 && IsVisible(rect))
+							else if (Event.current.button == 1 && IsVisible(rect, scrollAreaHeight))
 							{
 								if (rect.Contains(Event.current.mousePosition))
 								{
@@ -519,6 +518,8 @@ namespace Needle.Console
 			return false;
 		}
 
+		private static bool IsVisible(Rect r, float scrollAreaHeight) => r.y + r.height >= scroll.y && r.y <= scroll.y + scrollAreaHeight;
+
 		private static void ScrollTo(Rect position, float contentHeight, float scrollAreaHeight)
 		{
 			shouldScrollToSelectedItem = false;
@@ -571,8 +572,10 @@ namespace Needle.Console
 			}
 		}
 
-		internal static float DrawDefaultRow(int index, Rect rect)
+		internal static float DrawDefaultRow(int index, Rect rect, bool isVisible)
 		{
+			if (!isVisible) return rect.height;
+			
 			var row = index;
 			var item = currentEntries[index];
 			var entryIsSelected = selectedRowNumber == item.row;
@@ -624,7 +627,9 @@ namespace Needle.Console
 			// draw text
 			var preview = item.str; // + " - " + item.entry.mode;
 			strRect.x = xOffset;
-			ConsoleTextPrefix.ModifyText(element, ref preview);
+			
+			if(isVisible)
+				ConsoleTextPrefix.ModifyText(element, ref preview);
 			// preview += item.entry.instanceID;
 			GUI.Label(strRect, preview, logStyle);
 
@@ -804,11 +809,6 @@ namespace Needle.Console
 			s.y = y;
 			scroll = s;
 		}
-
-		// private static bool IsVisible(float y, float scrollPos, float contentHeight)
-		// {
-		// 	return y >= scrollPos && y <= scrollPos + contentHeight;
-		// }
 
 		private static void AddConfigMenuItems(GenericMenu menu, int itemIndex)
 		{

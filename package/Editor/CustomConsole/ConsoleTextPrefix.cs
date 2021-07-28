@@ -68,11 +68,14 @@ namespace Needle.Console
 				var isInCache = cachedInfo.ContainsKey(key);
 				if (cacheEntry && isInCache)
 				{
-					text = cachedInfo[key];
-					return;
+					using (new ProfilerMarker("ConsoleList.ModifyText cached").Auto())
+					{
+						text = cachedInfo[key];
+						return;
+					}
 				}
 
-				// if (LogEntries.GetEntryInternal(element.row, tempEntry))
+				using (new ProfilerMarker("ConsoleList.ModifyText (Not in cache)").Auto())
 				{
 					try
 					{
