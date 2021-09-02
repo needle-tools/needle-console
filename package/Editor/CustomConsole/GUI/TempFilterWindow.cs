@@ -7,7 +7,7 @@ namespace Needle.Console
 {
 	public class TempFilterWindow : EditorWindow
 	{
-		[MenuItem("Tools/Needle Console/Internal/Console Filter Test Window")]
+		[MenuItem("internal:Tools/Needle Console/Console Filter Test Window")]
 		private static void Open()
 		{
 			var window = CreateWindow<TempFilterWindow>();
