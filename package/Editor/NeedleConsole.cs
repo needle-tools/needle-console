@@ -31,7 +31,7 @@ namespace Needle.Console
 					projectSettings.Save();
 					Debug.Log(
 						$"Thanks for installing Needle Console. You can find Settings under <a href=\"OpenNeedleConsoleSettings\">Edit/Preferences/Needle/Console</a>\n" +
-						$"If you discover issues please report them <a href=\"https://github.com/needle-tools/needle-console/issues\">on github</a>\n" +
+						$"If you discover issues please report them <a href=\"https://github.com/needle-tools/needle-console-issues/issues\">on github</a>\n" +
 						$"Also feel free to join <a href=\"https://discord.gg/CFZDp4b\">our discord</a>");
 				}
 
