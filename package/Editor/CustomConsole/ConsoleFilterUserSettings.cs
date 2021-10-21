@@ -50,10 +50,11 @@ namespace Needle.Console
 			yield return idFilter;
 			yield return packageFilter;
 			yield return timeFilter;
+			yield return warningsFilter;
 		}
 		
 		[SerializeField]
-		private List<FilterBase<string>.FilterEntry> messages, files, packages;
+		private List<FilterBase<string>.FilterEntry> messages, files, packages, warnings;
 		[SerializeField]
 		private List<FilterBase<int>.FilterEntry> ids;
 		[SerializeField]
@@ -67,7 +68,7 @@ namespace Needle.Console
 		private ObjectIdFilter idFilter;
 		private PackageFilter packageFilter;
 		private TimeFilter timeFilter;
-		
+		private WarningFilter warningsFilter;
 
 		private void RecreateFilters()
 		{
@@ -87,6 +88,7 @@ namespace Needle.Console
 			idFilter = new ObjectIdFilter(ref ids);
 			packageFilter = new PackageFilter(ref packages);
 			timeFilter = new TimeFilter(ref times);
+			warningsFilter = new WarningFilter(ref warnings);
 			foreach (var f in EnumerateFilter())
 			{
 				f.WillChange += OnFilterWillChange;

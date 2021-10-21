@@ -17,7 +17,7 @@ namespace Needle.Console
 			var msg = this[index];
 			var lbi = msg.IndexOf("\n", StringComparison.Ordinal);
 			if (lbi < 0) lbi = 50;
-			return msg.Substring(0, Mathf.Min(msg.Length, lbi));
+			return msg.Substring(0, Mathf.Min(msg.Length, lbi)); 
 		}
 		
 		protected override bool MatchFilter(string entry, int index, string message, int mask, int row, LogEntryInfo info)

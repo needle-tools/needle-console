@@ -68,7 +68,7 @@ namespace Needle.Console
 		}
 		#endregion
 
-		[SerializeField] public List<FilterBase<string>.FilterEntry> messages, files, packages;
+		[SerializeField] public List<FilterBase<string>.FilterEntry> messages, files, packages, warnings;
 		[SerializeField] public List<FilterBase<int>.FilterEntry> ids;
 		[SerializeField] public List<FilterBase<FileLine>.FilterEntry> lines;
 		[SerializeField] public List<FilterBase<LogTime>.FilterEntry> times;
@@ -79,6 +79,7 @@ namespace Needle.Console
 		private ObjectIdFilter idFilter;
 		private PackageFilter packageFilter;
 		private TimeFilter timeFilter;
+		private WarningFilter warningFilter;
 		private IEnumerable<IConsoleFilter> EnumerateFilter()
 		{
 			yield return timeFilter;
@@ -87,6 +88,7 @@ namespace Needle.Console
 			yield return fileFilter;
 			yield return idFilter;
 			yield return packageFilter;
+			yield return warningFilter;
 		}
 
 		private void OnEnable()
@@ -100,6 +102,8 @@ namespace Needle.Console
 			fileFilter = new FileFilter(ref files);
 			idFilter = new ObjectIdFilter(ref ids);
 			packageFilter = new PackageFilter(ref packages);
+			warningFilter = new WarningFilter(ref warnings);
+			
 
 			foreach (var f in EnumerateFilter())
 			{
