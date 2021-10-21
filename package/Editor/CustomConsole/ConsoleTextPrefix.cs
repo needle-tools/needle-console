@@ -62,7 +62,11 @@ namespace Needle.Console
 				if (!LogEntries.GetEntryInternal(element.row, tempEntry)) return;
 				
 				keyBuilder.Clear();
-				var key = keyBuilder.Append(tempEntry.file).Append(tempEntry.line).Append(text).ToString();
+				keyBuilder.Append(tempEntry.file).Append(tempEntry.line).Append(tempEntry.column);
+				#if UNITY_2021_2_OR_NEWER
+				keyBuilder.Append(tempEntry.globalLineIndex);
+				#endif
+				var key = keyBuilder.Append(text).ToString();
 				var isSelected = ConsoleList.IsSelectedRow(element.row);
 				var cacheEntry = !isSelected;
 				var isInCache = cachedInfo.ContainsKey(key);
@@ -95,7 +99,8 @@ namespace Needle.Console
 						{
 							if (!NeedleConsoleSettings.instance.ShowLogPrefix) return string.Empty;
 							keyBuilder.Clear();
-							var key2 = keyBuilder.Append(tempEntry.file).Append(tempEntry.line).Append(tempEntry.column).ToString();
+							keyBuilder.Append(tempEntry.file).Append(tempEntry.line).Append(tempEntry.column).Append(tempEntry.mode);
+							var key2 = keyBuilder.ToString();
 							if (!isSelected && cachedPrefix.TryGetValue(key2, out var cached))
 							{
 								return cached;
@@ -108,6 +113,10 @@ namespace Needle.Console
 									str = fileName;
 								else str = typeName;
 								str += "." + methodName;
+							} 
+							else if ( cachedPrefix.TryGetValue(key2, out cached))
+							{
+								return cached;
 							}
 
 							if (string.IsNullOrWhiteSpace(str))
@@ -118,10 +127,16 @@ namespace Needle.Console
 							// str = colorPrefix + "[" + str + "]" + colorPostfix;
 							// str = "<b>" + str + "</b>";
 							// str = "\t" + str;
-							str = $"{colorPrefix} {str} {colorPostfix}"; // + " |";
-							if(cacheEntry)
-								cachedPrefix.Add(key2, str);
+							str = Prefix(str); // + " |";
+							if (cacheEntry) 
+							{
+								if (!cachedPrefix.ContainsKey(key2))
+									cachedPrefix.Add(key2, str);
+								else cachedPrefix[key2] = str;
+							}
 							return str;
+
+							string Prefix(string s) => $"{colorPrefix} {s} {colorPostfix}";
 						}
 
 						var endTimeIndex = text.IndexOf("] ", StringComparison.InvariantCulture);
@@ -141,9 +156,13 @@ namespace Needle.Console
 							// LogColor.AddColor(colorKey, ref message);
 							text = $"{colorPrefix}{text.Substring(1, endTimeIndex - 1)}{colorPostfix} {colorMarker}{GetPrefix()}{message}";
 						}
-						
-						if(cacheEntry)
-							cachedInfo.Add(key, text);
+
+						if (cacheEntry)
+						{
+							if (!cachedInfo.ContainsKey(key))
+								cachedInfo.Add(key, text);
+							else cachedInfo[key] = text;
+						}
 					}
 					catch (ArgumentException)
 					{
@@ -178,7 +197,7 @@ namespace Needle.Console
 						Match match;
 						// https://regex101.com/r/qZ0cIT/1
 						using (new ProfilerMarker("Regex").Auto())
-							match = Regex.Match(line, @"(\.(?<type_name>\w+?)){0,}[\.\:](?<method_name>\w+?)\(.+\.cs(:\d{1,})?", RegexOptions.Compiled | RegexOptions.ExplicitCapture);  
+							match = Regex.Match(line, @"([ \.](?<type_name>\w+?)){0,}[\.\:](?<method_name>\w+?)\(.+\.cs(:\d{1,})?", RegexOptions.Compiled | RegexOptions.ExplicitCapture);  
 						using (new ProfilerMarker("Handle Match").Auto())
 						{
 							// var match = matches[i];
