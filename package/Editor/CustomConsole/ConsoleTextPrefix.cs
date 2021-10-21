@@ -15,20 +15,18 @@ namespace Needle.Console
 		[InitializeOnLoadMethod]
 		private static void Init()
 		{
-			cachedInfo.Clear();
-			cachedPrefix.Clear();
+			ClearCaches();
 			
 			// clear cache when colors change
-			NeedleConsoleProjectSettings.ColorSettingsChanged += () =>
-			{
-				cachedInfo.Clear();
-				cachedPrefix.Clear();
-			};
-			NeedleConsoleSettings.Changed += () =>
-			{
-				cachedInfo.Clear();
-				cachedPrefix.Clear();
-			};
+			NeedleConsoleProjectSettings.ColorSettingsChanged += ClearCaches;
+			NeedleConsoleSettings.Changed += ClearCaches;
+			EditorApplication.playModeStateChanged += mode => ClearCaches();
+		}
+
+		private static void ClearCaches()
+		{
+			cachedInfo.Clear();
+			cachedPrefix.Clear();
 		}
 		
 		private static readonly LogEntry tempEntry = new LogEntry();
@@ -57,14 +55,20 @@ namespace Needle.Console
 			using (new ProfilerMarker("ConsoleList.ModifyText").Auto())
 			{
 				var settings = NeedleConsoleSettings.instance;
-				if (!settings.ShowLogPrefix && (string.IsNullOrWhiteSpace(settings.ColorMarker) || !settings.UseColorMarker)) return;
+				if (!settings.ShowLogPrefix && (string.IsNullOrWhiteSpace(settings.ColorMarker) || !settings.UseColorMarker))
+				{
+					return;
+				}
 
-				if (!LogEntries.GetEntryInternal(element.row, tempEntry)) return;
+				if (!LogEntries.GetEntryInternal(element.row, tempEntry))
+				{
+					return;
+				}
 				
 				keyBuilder.Clear();
-				keyBuilder.Append(tempEntry.file).Append(tempEntry.line).Append(tempEntry.column);
+				keyBuilder.Append(tempEntry.file).Append(tempEntry.line).Append(tempEntry.column).Append(tempEntry.mode);
 				#if UNITY_2021_2_OR_NEWER
-				keyBuilder.Append(tempEntry.globalLineIndex);
+				keyBuilder.Append(tempEntry.identifier);
 				#endif
 				var key = keyBuilder.Append(text).ToString();
 				var isSelected = ConsoleList.IsSelectedRow(element.row);
@@ -75,6 +79,10 @@ namespace Needle.Console
 					using (new ProfilerMarker("ConsoleList.ModifyText cached").Auto())
 					{
 						text = cachedInfo[key];
+						if (NeedleConsoleSettings.DevelopmentMode)
+						{
+							text += " \t<color=#ff99ff>CacheKey: " + key + "</color>";
+						}
 						return;
 					}
 				}
@@ -100,6 +108,9 @@ namespace Needle.Console
 							if (!NeedleConsoleSettings.instance.ShowLogPrefix) return string.Empty;
 							keyBuilder.Clear();
 							keyBuilder.Append(tempEntry.file).Append(tempEntry.line).Append(tempEntry.column).Append(tempEntry.mode);
+#if UNITY_2021_2_OR_NEWER
+							keyBuilder.Append(tempEntry.identifier);
+#endif
 							var key2 = keyBuilder.ToString();
 							if (!isSelected && cachedPrefix.TryGetValue(key2, out var cached))
 							{
