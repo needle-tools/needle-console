@@ -135,6 +135,10 @@ namespace Needle.Console
 								if (string.IsNullOrEmpty(fileName)) return string.Empty;
 								str = fileName;
 							}
+
+							if (tempEntry.line > 0)
+								str += ":" + tempEntry.line;
+							
 							// str = colorPrefix + "[" + str + "]" + colorPostfix;
 							// str = "<b>" + str + "</b>";
 							// str = "\t" + str;
