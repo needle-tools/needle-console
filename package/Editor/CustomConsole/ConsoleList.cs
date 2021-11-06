@@ -110,6 +110,13 @@ namespace Needle.Console
 		private static int xOffset;
 		private static float lineHeight;
 		private static Font defaultFont, logEntryFont;
+
+		[InitializeOnLoadMethod]
+		private static void Init()
+		{
+			logEntryFont = null;
+			defaultFont = null;
+		}
 		
 		// scroll stuff
 		private static float scrollY, previousScrollY;
@@ -294,6 +301,7 @@ namespace Needle.Console
 					if (!logEntryFont || logEntryFont.name != settings.InstalledLogEntryFont)
 					{
 						logEntryFont = Font.CreateDynamicFontFromOSFont(settings.InstalledLogEntryFont, 13);
+						logEntryFont.hideFlags = HideFlags.DontSaveInEditor;
 						if (logEntryFont)
 							logEntryFont.name = settings.InstalledLogEntryFont;
 					}
@@ -302,7 +310,8 @@ namespace Needle.Console
 			}
 			if (allowCustomFont && logEntryFont)
 				logStyle.font = logEntryFont;
-			else logStyle.font = defaultFont;
+			else 
+				logStyle.font = defaultFont;
 
 			tempContent = new GUIContent();
 			var evt = Event.current;
