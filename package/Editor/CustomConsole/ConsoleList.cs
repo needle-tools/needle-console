@@ -298,7 +298,7 @@ namespace Needle.Console
 					logEntryFont = settings.CustomLogEntryFont;
 				else if (settings.InstalledLogEntryFont != null)
 				{
-					if (!logEntryFont || logEntryFont.name != settings.InstalledLogEntryFont)
+					if (!logEntryFont || logEntryFont.name != settings.InstalledLogEntryFont || !logEntryFont.material)
 					{
 						logEntryFont = Font.CreateDynamicFontFromOSFont(settings.InstalledLogEntryFont, 13);
 						logEntryFont.hideFlags = HideFlags.DontSaveInEditor;
