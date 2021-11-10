@@ -726,8 +726,13 @@ namespace Needle.Console
 
 					break;
 
-				case KeyCode.PageUp:
 				case KeyCode.A:
+					// only go up if no modifier is on e.g. when selecting all in stacktrace
+					if(Event.current.modifiers == EventModifiers.None)
+						goto case KeyCode.PageUp;
+					break;
+					
+				case KeyCode.PageUp:
 				case KeyCode.LeftArrow:
 					if (SelectedRowIndex >= 0)
 					{
