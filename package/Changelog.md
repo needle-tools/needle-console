@@ -4,6 +4,10 @@ All notable changes to this package will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## [2.3.6] - 2021-11-10
+- Recreate custom font if material is missing
+- Log prefixes use global line identifier in 2021 now if file path is missing
+- Log prefixes show line number now
 
 ## [2.3.5-pre] - 2021-10-21
 - Add compiler warning filter
