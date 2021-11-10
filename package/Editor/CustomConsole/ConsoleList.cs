@@ -604,24 +604,42 @@ namespace Needle.Console
 				GUI.color = prevCol;
 			}
 
+			bool IsError() =>
+				HasMode(entry.mode, ConsoleWindow.Mode.Assert |
+				                    ConsoleWindow.Mode.ScriptingError | ConsoleWindow.Mode.Error | ConsoleWindow.Mode.StickyError |
+				                    ConsoleWindow.Mode.AssetImportError);
+
+			bool IsWarning() => HasMode(entry.mode,
+				ConsoleWindow.Mode.ScriptingWarning | ConsoleWindow.Mode.AssetImportWarning | ConsoleWindow.Mode.ScriptCompileWarning);
+
 			bool IsOdd() => row % 2 != 0;
 			var allowColors = NeedleConsoleSettings.instance.RowColors;
 			if (entryIsSelected)
 			{
-				DrawBackground(new Color(.2f, .5f, .8f, .5f));
+				if (allowColors && entry.IsCompilerError())
+				{
+					DrawBackground(new Color(1f, .2f, 1, .4f));
+				}
+				else if (allowColors && IsError())
+				{
+					DrawBackground(new Color(1f, 0f, 0f, 0.5f));
+				}
+				else if (allowColors && IsWarning())
+				{
+					DrawBackground(new Color(.7f, .7f, .1f, .4f));
+				}
+				else
+					DrawBackground(new Color(.2f, .5f, .8f, .5f));
 			}
 			else if (allowColors && entry.IsCompilerError())
 			{
 				DrawBackground(IsOdd() ? new Color(1, 0, 1, .2f) : new Color(1, .2f, 1f, .25f));
 			}
-			else if (allowColors && HasMode(entry.mode, ConsoleWindow.Mode.Assert | 
-				ConsoleWindow.Mode.ScriptingError | ConsoleWindow.Mode.Error | ConsoleWindow.Mode.StickyError |
-				ConsoleWindow.Mode.AssetImportError))
+			else if (allowColors && IsError())
 			{
 				DrawBackground(IsOdd() ? new Color(1, 0, 0, .1f) : new Color(1, .2f, .2f, .15f));
 			}
-			else if (allowColors && HasMode(entry.mode,
-				ConsoleWindow.Mode.ScriptingWarning | ConsoleWindow.Mode.AssetImportWarning | ConsoleWindow.Mode.ScriptCompileWarning))
+			else if (allowColors && IsWarning())
 			{
 				DrawBackground(IsOdd() ? new Color(.5f, .5f, 0, .08f) : new Color(.7f, .7f, .1f, .08f));
 			}

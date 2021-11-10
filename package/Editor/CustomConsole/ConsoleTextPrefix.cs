@@ -95,7 +95,7 @@ namespace Needle.Console
 						var filePath = tempEntry.file;
 						var fileName = Path.GetFileNameWithoutExtension(filePath);
 						const string colorPrefixDefault = "<color=#888888>";
-						const string colorPrefixSelected = "<color=#cccccc>";
+						const string colorPrefixSelected = "<color=#ffffff>";
 						// const string colorPrefixSelected = "<color=#111122>";
 						var colorPrefix = isInCache && isSelected ? colorPrefixSelected : colorPrefixDefault;
 						const string colorPostfix = "</color>";
@@ -127,7 +127,7 @@ namespace Needle.Console
 								else str = typeName;
 								str += "." + methodName;
 							} 
-							else if ( cachedPrefix.TryGetValue(key2, out cached))
+							else if (!isSelected && cachedPrefix.TryGetValue(key2, out cached))
 							{
 								return cached;
 							}
