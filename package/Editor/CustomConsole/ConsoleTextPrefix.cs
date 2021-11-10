@@ -68,7 +68,8 @@ namespace Needle.Console
 				keyBuilder.Clear();
 				keyBuilder.Append(tempEntry.file).Append(tempEntry.line).Append(tempEntry.column).Append(tempEntry.mode);
 				#if UNITY_2021_2_OR_NEWER
-				keyBuilder.Append(tempEntry.identifier);
+				if(string.IsNullOrWhiteSpace(tempEntry.file))
+					keyBuilder.Append(tempEntry.identifier).Append(tempEntry.globalLineIndex);
 				#endif
 				var key = keyBuilder.Append(text).ToString();
 				var isSelected = ConsoleList.IsSelectedRow(element.row);
@@ -109,7 +110,8 @@ namespace Needle.Console
 							keyBuilder.Clear();
 							keyBuilder.Append(tempEntry.file).Append(tempEntry.line).Append(tempEntry.column).Append(tempEntry.mode);
 #if UNITY_2021_2_OR_NEWER
-							keyBuilder.Append(tempEntry.identifier);
+							if(string.IsNullOrWhiteSpace(tempEntry.file))
+								keyBuilder.Append(tempEntry.identifier).Append(tempEntry.globalLineIndex);
 #endif
 							var key2 = keyBuilder.ToString();
 							if (!isSelected && cachedPrefix.TryGetValue(key2, out var cached))
