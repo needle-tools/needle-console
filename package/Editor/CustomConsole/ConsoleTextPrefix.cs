@@ -17,7 +17,7 @@ namespace Needle.Console
 		private static void Init()
 		{
 			ClearCaches();
-			
+
 			// clear cache when colors change
 			NeedleConsoleProjectSettings.ColorSettingsChanged += ClearCaches;
 			NeedleConsoleSettings.Changed += ClearCaches;
@@ -29,9 +29,9 @@ namespace Needle.Console
 			cachedInfo.Clear();
 			cachedPrefix.Clear();
 		}
-		
+
 		private static readonly LogEntry tempEntry = new LogEntry();
-		
+
 
 		private static readonly string[] onlyUseMethodNameFromLinesWithout = new[]
 		{
@@ -52,7 +52,7 @@ namespace Needle.Console
 		{
 			// var rect = element.position;
 			// GUI.DrawTexture(rect, Texture2D.whiteTexture);//, ScaleMode.StretchToFill, true, 1, Color.red, Vector4.one, Vector4.zero);
-			
+
 			using (new ProfilerMarker("ConsoleList.ModifyText").Auto())
 			{
 				var settings = NeedleConsoleSettings.instance;
@@ -65,13 +65,13 @@ namespace Needle.Console
 				{
 					return;
 				}
-				
+
 				keyBuilder.Clear();
 				keyBuilder.Append(tempEntry.file).Append(tempEntry.line).Append(tempEntry.column).Append(tempEntry.mode);
-				#if UNITY_2021_2_OR_NEWER
+#if UNITY_2021_2_OR_NEWER
 				if(string.IsNullOrWhiteSpace(tempEntry.file))
 					keyBuilder.Append(tempEntry.identifier).Append(tempEntry.globalLineIndex);
-				#endif
+#endif
 				var key = keyBuilder.Append(text).ToString();
 				var isSelected = ConsoleList.IsSelectedRow(element.row);
 				var cacheEntry = !isSelected;
@@ -119,7 +119,7 @@ namespace Needle.Console
 							{
 								return cached;
 							}
-							
+
 							var str = default(string);
 							if (TryGetMethodName(tempEntry.message, out var typeName, out var methodName))
 							{
@@ -127,7 +127,7 @@ namespace Needle.Console
 									str = fileName;
 								else str = typeName;
 								str += "." + methodName;
-							} 
+							}
 							else if (!isSelected && cachedPrefix.TryGetValue(key2, out cached))
 							{
 								return cached;
@@ -142,12 +142,12 @@ namespace Needle.Console
 							if (tempEntry.line > 0)
 								str += ":" + tempEntry.line;
 
-							
+
 							// str = colorPrefix + "[" + str + "]" + colorPostfix;
 							// str = "<b>" + str + "</b>";
 							// str = "\t" + str;
 							str = Prefix(str); // + " |";
-							if (cacheEntry) 
+							if (cacheEntry)
 							{
 								if (!cachedPrefix.ContainsKey(key2))
 									cachedPrefix.Add(key2, str);
@@ -187,23 +187,31 @@ namespace Needle.Console
 					catch (ArgumentException)
 					{
 						// sometimes filepath contains illegal characters and is not actually a path
-						if(cacheEntry)
+						if (cacheEntry)
 							cachedInfo.Add(key, text);
 					}
 					catch (Exception e)
 					{
 						Debug.LogException(e);
-						if(cacheEntry)
+						if (cacheEntry)
 							cachedInfo.Add(key, text);
 					}
 				}
 			}
 		}
 
-		private static readonly Regex findEndOfFilePathRegex = new Regex(@"(\(\d+,\d+\):)", RegexOptions.Compiled);
+		private static readonly Regex findEndOfFilePathRegex = new Regex(@"(\(\d{1,4},\d{1,3}\):)", RegexOptions.Compiled);
+
 		private static void RemoveFilePathInCompilerErrorMessages(ref string str)
 		{
-			if (ConsoleList.HasMode(tempEntry.mode, ConsoleWindow.Mode.ScriptCompileError | ConsoleWindow.Mode.GraphCompileError))
+			const ConsoleWindow.Mode modestoRemovePath = ConsoleWindow.Mode.ScriptCompileError
+			                                         | ConsoleWindow.Mode.GraphCompileError
+			                                         | ConsoleWindow.Mode.ScriptingWarning
+			                                         | ConsoleWindow.Mode.ScriptCompileWarning 
+			                                         | ConsoleWindow.Mode.AssetImportWarning
+				;
+
+			if (ConsoleList.HasMode(tempEntry.mode, modestoRemovePath))
 			{
 				var match = findEndOfFilePathRegex.Match(str);
 				if (match.Success)
@@ -223,14 +231,15 @@ namespace Needle.Console
 					var linesRead = 0;
 					while (true)
 					{
-						var line = rd.ReadLine(); 
+						var line = rd.ReadLine();
 						if (line == null) break;
-						if (onlyUseMethodNameFromLinesWithout.Any(line.Contains)) continue; 
+						if (onlyUseMethodNameFromLinesWithout.Any(line.Contains)) continue;
 						if (!line.Contains(".cs")) continue;
 						Match match;
 						// https://regex101.com/r/qZ0cIT/1
 						using (new ProfilerMarker("Regex").Auto())
-							match = Regex.Match(line, @"([ \.](?<type_name>\w+?)){0,}[\.\:](?<method_name>\w+?)\(.+\.cs(:\d{1,})?", RegexOptions.Compiled | RegexOptions.ExplicitCapture);  
+							match = Regex.Match(line, @"([ \.](?<type_name>\w+?)){0,}[\.\:](?<method_name>\w+?)\(.+\.cs(:\d{1,})?",
+								RegexOptions.Compiled | RegexOptions.ExplicitCapture);
 						using (new ProfilerMarker("Handle Match").Auto())
 						{
 							// var match = matches[i];
@@ -239,27 +248,27 @@ namespace Needle.Console
 							{
 								typeName = type.Value.Trim();
 							}
-							
+
 							var group = match.Groups["method_name"];
 							if (group.Success)
 							{
 								methodName = group.Value.Trim();
-								
+
 								// nicify local function names
 								const string localPrefix = "g__";
 								var localStart = methodName.IndexOf(localPrefix, StringComparison.InvariantCulture);
 								if (localStart > 0)
 								{
-									var sub = methodName.Substring(localStart+localPrefix.Length);
+									var sub = methodName.Substring(localStart + localPrefix.Length);
 									var localEnd = sub.IndexOf("|", StringComparison.InvariantCulture);
 									if (localEnd > 0)
 									{
 										sub = sub.Substring(0, localEnd);
-										if(!string.IsNullOrEmpty(sub))
+										if (!string.IsNullOrEmpty(sub))
 											methodName = sub;
 									}
 								}
-								
+
 								return true;
 							}
 						}
