@@ -6,6 +6,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using Unity.Profiling;
 using UnityEditor;
+using UnityEditor.Graphs;
 using UnityEngine;
 
 namespace Needle.Console
@@ -140,6 +141,7 @@ namespace Needle.Console
 
 							if (tempEntry.line > 0)
 								str += ":" + tempEntry.line;
+
 							
 							// str = colorPrefix + "[" + str + "]" + colorPostfix;
 							// str = "<b>" + str + "</b>";
@@ -156,21 +158,22 @@ namespace Needle.Console
 							string Prefix(string s) => $"{colorPrefix} {s} {colorPostfix}";
 						}
 
-						var endTimeIndex = text.IndexOf("] ", StringComparison.InvariantCulture);
 
 						// text = element.row.ToString();
+						var endTimeIndex = text.IndexOf("] ", StringComparison.InvariantCulture);
 
 						// no time:
 						if (endTimeIndex == -1)
 						{
 							// LogColor.AddColor(colorKey, ref text);
+							RemoveFilePathInCompilerErrorMessages(ref text);
 							text = $"{colorMarker}{GetPrefix()}{text}";
 						}
 						// contains time:
 						else
 						{
 							var message = text.Substring(endTimeIndex + 1);
-							// LogColor.AddColor(colorKey, ref message);
+							RemoveFilePathInCompilerErrorMessages(ref message);
 							text = $"{colorPrefix}{text.Substring(1, endTimeIndex - 1)}{colorPostfix} {colorMarker}{GetPrefix()}{message}";
 						}
 
@@ -193,6 +196,19 @@ namespace Needle.Console
 						if(cacheEntry)
 							cachedInfo.Add(key, text);
 					}
+				}
+			}
+		}
+
+		private static readonly Regex findEndOfFilePathRegex = new Regex(@"(\(\d+,\d+\):)", RegexOptions.Compiled);
+		private static void RemoveFilePathInCompilerErrorMessages(ref string str)
+		{
+			if (ConsoleList.HasMode(tempEntry.mode, ConsoleWindow.Mode.ScriptCompileError | ConsoleWindow.Mode.GraphCompileError))
+			{
+				var match = findEndOfFilePathRegex.Match(str);
+				if (match.Success)
+				{
+					str = str.Substring(match.Index + match.Length).TrimStart();
 				}
 			}
 		}

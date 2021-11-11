@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Unity.Profiling;
 using UnityEditor;
+using UnityEngine;
 using Object = UnityEngine.Object;
 
 namespace Needle.Console
@@ -288,11 +289,13 @@ namespace Needle.Console
 						}
 					}
 
-					var allowFilter = !ConsoleList.HasMode(entry.mode, ConsoleWindow.Mode.ScriptCompileError | ConsoleWindow.Mode.GraphCompileError);
+					var isCompilerError = ConsoleList.HasMode(entry.mode, ConsoleWindow.Mode.ScriptCompileError | ConsoleWindow.Mode.GraphCompileError);
+					var allowFilter = !isCompilerError;
 
 					// else if(enabled)
-					LogEntryInfo info = new LogEntryInfo(entry);
+					var info = new LogEntryInfo(entry);
 					var skip = false;
+					
 					if (allowFilter)
 					{
 						for (var index = 0; index < registeredFilters.Count; index++)
