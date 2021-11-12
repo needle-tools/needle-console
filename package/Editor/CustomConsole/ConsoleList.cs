@@ -618,15 +618,15 @@ namespace Needle.Console
 			{
 				if (allowColors && entry.IsCompilerError())
 				{
-					DrawBackground(new Color(1f, .2f, 1, .4f));
+					DrawBackground(new Color(1f, .3f, 1, .3f));
 				}
 				else if (allowColors && IsError())
 				{
-					DrawBackground(new Color(1f, 0f, 0f, 0.5f));
+					DrawBackground(new Color(1f, .15f, .15f, 0.3f));
 				}
 				else if (allowColors && IsWarning())
 				{
-					DrawBackground(new Color(.7f, .7f, .1f, .4f));
+					DrawBackground(new Color(.7f, .7f, .11f, .3f));
 				}
 				else
 					DrawBackground(new Color(.2f, .5f, .8f, .5f));
