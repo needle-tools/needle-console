@@ -2,7 +2,7 @@
   "dependencies": {
     "com.needle.console": "file:../../../package",
     "com.needle.demystify.extras": "file:../../needle.demystify.extras",
-    "com.needle.package-tools": "file:C:\\git\\npm\\development\\pfc-packagetools",
+    "com.needle.package-tools": "0.9.2",
     "com.unity.collab-proxy": "1.7.1",
     "com.unity.ide.rider": "3.0.5",
     "com.unity.ide.visualstudio": "2.0.11",
@@ -43,7 +43,15 @@
     "com.unity.modules.wind": "1.0.0",
     "com.unity.modules.xr": "1.0.0"
   },
-  "scopedRegistries": [],
+  "scopedRegistries": [
+    {
+      "name": "needle",
+      "url": "https://packages.needle.tools",
+      "scopes": [
+        "com.needle"
+      ]
+    }
+  ],
   "testables": [],
   "enableLockFile": true,
   "resolutionStrategy": "lowest",

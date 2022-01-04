@@ -31,7 +31,7 @@ namespace Needle.Console
 			if (clickedLog.line <= 0) return;
 			var warning = TryGetWarning(preview);
 			if (warning == null) return;
-			var fl = default(string);
+			// var fl = default(string);
 			var text = warning.Substring(0, warning.Length-1);
 			text = CultureInfo.CurrentCulture.TextInfo.ToTitleCase(text);
 			AddContextMenuItem_Hide(menu, HideMenuItemPrefix + text, warning);

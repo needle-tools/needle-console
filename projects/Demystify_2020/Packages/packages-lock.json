@@ -13,12 +13,13 @@
       "dependencies": {}
     },
     "com.needle.package-tools": {
-      "version": "file:C:\\git\\npm\\development\\pfc-packagetools",
+      "version": "0.9.2",
       "depth": 0,
-      "source": "local",
+      "source": "registry",
       "dependencies": {
         "com.unity.nuget.mono-cecil": "1.10.1"
-      }
+      },
+      "url": "https://packages.needle.tools"
     },
     "com.unity.collab-proxy": {
       "version": "1.7.1",

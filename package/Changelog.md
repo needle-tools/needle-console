@@ -4,6 +4,10 @@ All notable changes to this package will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## [2.3.9-pre] - 2022-01-04
+- slightly reduced log highlight brightness
+- moved Demystify into runtime folder and enabled runtime usage
+
 ## [2.3.8] - 2021-11-11
 - Remove duplicate info (file paths) in compiler error- and warning-logs when prefix is enabled. This moves actual information to the front and file information is already shown in prefix (and stacktrace still)
 
