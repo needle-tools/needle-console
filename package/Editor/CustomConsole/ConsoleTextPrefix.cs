@@ -65,13 +65,19 @@ namespace Needle.Console
 				{
 					return;
 				}
-
 				keyBuilder.Clear();
 				keyBuilder.Append(tempEntry.file).Append(tempEntry.line).Append(tempEntry.column).Append(tempEntry.mode);
+				
 #if UNITY_2021_2_OR_NEWER
 				if(string.IsNullOrWhiteSpace(tempEntry.file))
 					keyBuilder.Append(tempEntry.identifier).Append(tempEntry.globalLineIndex);
+#else
+				if (tempEntry.file == "" && tempEntry.line == 0 && tempEntry.column == -1)
+				{
+					keyBuilder.Append(element.row);
+				}
 #endif
+				
 				var key = keyBuilder.Append(text).ToString();
 				var isSelected = ConsoleList.IsSelectedRow(element.row);
 				var cacheEntry = !isSelected;
@@ -113,6 +119,11 @@ namespace Needle.Console
 #if UNITY_2021_2_OR_NEWER
 							if(string.IsNullOrWhiteSpace(tempEntry.file))
 								keyBuilder.Append(tempEntry.identifier).Append(tempEntry.globalLineIndex);
+#else
+							if (tempEntry.file == "" && tempEntry.line == 0 && tempEntry.column == -1)
+							{
+								keyBuilder.Append(element.row);
+							}
 #endif
 							var key2 = keyBuilder.ToString();
 							if (!isSelected && cachedPrefix.TryGetValue(key2, out var cached))
@@ -236,9 +247,9 @@ namespace Needle.Console
 						if (onlyUseMethodNameFromLinesWithout.Any(line.Contains)) continue;
 						if (!line.Contains(".cs")) continue;
 						Match match;
-						// https://regex101.com/r/qZ0cIT/1
+						// https://regex101.com/r/qZ0cIT/2
 						using (new ProfilerMarker("Regex").Auto())
-							match = Regex.Match(line, @"([ \.](?<type_name>\w+?)){0,}[\.\:](?<method_name>\w+?)\(.+\.cs(:\d{1,})?",
+							match = Regex.Match(line, @"(\.(?<type_name>[\w\+]+?)){0,}[\.\:](?<method_name>\w+?)\(.+\.cs(:\d{1,})?",
 								RegexOptions.Compiled | RegexOptions.ExplicitCapture);
 						using (new ProfilerMarker("Handle Match").Auto())
 						{
