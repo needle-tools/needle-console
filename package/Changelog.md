@@ -5,6 +5,10 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 ## [2.3.9-pre] - 2022-01-04
+- added prefix fix for local methods
+- added prefix fallback for cache key when Unity doesn't give us file or line info
+
+## [2.3.9-pre] - 2022-01-04
 - slightly reduced log highlight brightness
 - moved Demystify into runtime folder and enabled runtime usage
 
