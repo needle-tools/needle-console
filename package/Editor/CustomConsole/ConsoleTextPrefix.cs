@@ -106,10 +106,6 @@ namespace Needle.Console
 						// const string colorPrefixSelected = "<color=#111122>";
 						var colorPrefix = isInCache && isSelected ? colorPrefixSelected : colorPrefixDefault;
 						const string colorPostfix = "</color>";
-						var colorKey = fileName;
-						var colorMarker = settings.UseColorMarker ? NeedleConsoleSettings.instance.ColorMarker : string.Empty; // " ▍";
-						if (settings.UseColorMarker && !string.IsNullOrWhiteSpace(colorMarker))
-							LogColor.CalcLogColor(colorKey, ref colorMarker);
 
 						string GetPrefix()
 						{
@@ -172,20 +168,26 @@ namespace Needle.Console
 
 						// text = element.row.ToString();
 						var endTimeIndex = text.IndexOf("] ", StringComparison.InvariantCulture);
+						var prefix = GetPrefix();
+
+						var colorKey = string.IsNullOrWhiteSpace(fileName) ? prefix : fileName;
+						var colorMarker = settings.UseColorMarker ? NeedleConsoleSettings.instance.ColorMarker : string.Empty; // " ▍";
+						if (settings.UseColorMarker && !string.IsNullOrWhiteSpace(colorMarker))
+							LogColor.CalcLogColor(colorKey, ref colorMarker);
 
 						// no time:
 						if (endTimeIndex == -1)
 						{
 							// LogColor.AddColor(colorKey, ref text);
 							RemoveFilePathInCompilerErrorMessages(ref text);
-							text = $"{colorMarker}{GetPrefix()}{text}";
+							text = $"{colorMarker}{prefix}{text}";
 						}
 						// contains time:
 						else
 						{
 							var message = text.Substring(endTimeIndex + 1);
 							RemoveFilePathInCompilerErrorMessages(ref message);
-							text = $"{colorPrefix}{text.Substring(1, endTimeIndex - 1)}{colorPostfix} {colorMarker}{GetPrefix()}{message}";
+							text = $"{colorPrefix}{text.Substring(1, endTimeIndex - 1)}{colorPostfix} {colorMarker}{prefix}{message}";
 						}
 
 						if (cacheEntry)
