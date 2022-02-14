@@ -67,7 +67,11 @@ namespace Needle.Console
 		{
 			if (allPackages == null)
 			{
+#if UNITY_2022_1_OR_NEWER
+				allPackages = PackageInfo.GetAllRegisteredPackages();
+#else
 				allPackages = PackageInfo.GetAll();
+#endif
 				if (allPackages == null)
 				{
 					package = null;
