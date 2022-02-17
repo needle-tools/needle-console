@@ -1,8 +1,6 @@
-﻿#nullable enable
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
-using JetBrains.Annotations;
 using UnityEditor;
 
 namespace Needle.Console
@@ -38,7 +36,7 @@ namespace Needle.Console
 			AddContextMenuItem_Solo(menu, SoloMenuItemPrefix + text, warning);
 		}
 
-		private string? TryGetWarning(string text)
+		private string TryGetWarning(string text)
 		{
 			const string marker = "warning CS"; 
 			var begin = text.IndexOf(marker, StringComparison.Ordinal);
