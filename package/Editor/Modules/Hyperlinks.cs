@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel;
+using System.Text;
 using System.Text.RegularExpressions;
 using UnityEngine;
 
@@ -10,12 +11,18 @@ namespace Needle.Console
 		private static readonly Regex hyperlinks = new Regex(@"((?<brackets>\))?(?<prefix> in) (?<file>.*?):line (?<line>\d+)(?<post>.*))",
 			RegexOptions.Compiled | RegexOptions.Multiline);
 
+		private static readonly StringBuilder stacktraceBuilder = new StringBuilder();
+		private static readonly StringBuilder fixStacktraceBuilder = new StringBuilder();
+
 		public static void FixStacktrace(ref string stacktrace)
 		{
 			var lines = stacktrace.Split(new []{'\n'}, StringSplitOptions.RemoveEmptyEntries);
-			stacktrace = string.Empty;
+			
+			stacktraceBuilder.Clear();
+			
 			foreach (var t in lines)
 			{
+				fixStacktraceBuilder.Clear();
 				var line = t;
 				// hyperlinks capture 
 				var path = Fix(ref line);
@@ -28,16 +35,21 @@ namespace Needle.Console
 					else
 					{
 						path = path.Replace("\n", "");
-						line += ")" + path;
+						fixStacktraceBuilder.Append(")").Append(path);
+						line = fixStacktraceBuilder.ToString();// ")" + path;
 						Filepaths.TryMakeRelative(ref line);
 					}
 					
 				}
-
-				stacktrace += line + "\n";
+				
+				stacktraceBuilder.Append(line).Append("\n");
 			}
+
+			stacktrace = stacktraceBuilder.ToString();
 		}
 
+		private static readonly StringBuilder lineBuilder = new StringBuilder();
+		
 		/// <summary>
 		/// parse demystify path format and reformat to unity hyperlink format
 		/// </summary>
@@ -46,6 +58,7 @@ namespace Needle.Console
 		public static string Fix(ref string line)
 		{
 			var match = hyperlinks.Match(line);
+			lineBuilder.Clear();
 			if (match.Success)
 			{
 				var file = match.Groups["file"];
@@ -55,11 +68,13 @@ namespace Needle.Console
 				var post = match.Groups["post"];
 
 				var end = line.Substring(match.Index, line.Length - match.Index);
-				line = line.Remove(match.Index, end.Length) + brackets;
-				var newString = " (at " + file + ":" + lineNr + ")\n";
-				if (post.Success)
-					newString += post;
-				return newString;
+				fixStacktraceBuilder.Append(line.Remove(match.Index, end.Length)).Append(brackets);
+				// line = line.Remove(match.Index, end.Length) + brackets;
+
+				lineBuilder.Append(" (at ").Append(file).Append(":").Append(lineNr).Append(")\n");
+				if (post.Success) 
+					lineBuilder.Append(post);
+				return lineBuilder.ToString();
 			}
 
 			return string.Empty;
@@ -70,7 +85,7 @@ namespace Needle.Console
 		{
 			if (string.IsNullOrEmpty(stacktrace)) return;
 			var str = stacktrace;
-			const string pattern = @"(?<open>\(at )(?<pre><a href=.*?>)(?<path>.*)(?<post><\/a>)(?<close>\))";
+			const string pattern = @"(?<open>\(at )(?<pre><a	href=.*?>)(?<path>.*)(?<post><\/a>)(?<close>\))";
 			str = Regex.Replace(str, pattern, m =>
 				{
 					if (m.Success && SyntaxHighlighting.CurrentTheme.TryGetValue("link", out var col))
