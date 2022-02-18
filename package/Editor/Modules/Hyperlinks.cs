@@ -35,7 +35,7 @@ namespace Needle.Console
 					else
 					{
 						// path = path.Replace("\n", "");
-						fixStacktraceBuilder.Append(path).Append(lineNumber).Append(")");
+						fixStacktraceBuilder.Append(path).Append(lineNumber);
 						line = fixStacktraceBuilder.ToString();
 						Filepaths.TryMakeRelative(ref line);
 					}
@@ -70,7 +70,7 @@ namespace Needle.Console
 			lineNumber = line.Substring(lineStart, line.Length - lineStart);
 			var path = line.Substring(begin, pathLength);
 			line = line.Substring(0, begin - START.Length);
-			lineBuilder.Append(line).Append(") (at ");
+			lineBuilder.Append(line).Append(" in ");
 			return path;
 			
 			

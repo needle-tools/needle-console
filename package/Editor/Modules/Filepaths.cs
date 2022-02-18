@@ -10,7 +10,7 @@ namespace Needle.Console
 	internal static class Filepaths
 	{
 		// pattern: match absolute disc path for cs files
-		private const string Pattern = @" \(at (?<filepath>\w{1}\:\/.*\.cs)\:\d{1,}";
+		private const string Pattern = @" in (?<filepath>\w{1}\:\/.*\.cs)\:\d{1,}";
 		private static readonly Regex Regex = new Regex(Pattern, RegexOptions.Compiled);
 
 		private static readonly Dictionary<string, string> pathsCache = new Dictionary<string, string>();
