@@ -202,7 +202,12 @@ namespace Needle.Console
 				line = highlight[pattern].Replace(line, Eval);
 				if (link.Success)
 				{
-					line += link.Value;
+					if (colorDict.TryGetValue("link", out var col))
+					{
+						line += $"<color={col}>{link.Value}</color>";
+					}
+					else
+						line += link.Value;
 				}
 			}
 			

@@ -36,7 +36,7 @@ namespace Needle.Console
 					{
 						path = path.Replace("\n", "");
 						fixStacktraceBuilder.Append(")").Append(path);
-						line = fixStacktraceBuilder.ToString();// ")" + path;
+						line = fixStacktraceBuilder.ToString();
 						Filepaths.TryMakeRelative(ref line);
 					}
 					
@@ -67,10 +67,17 @@ namespace Needle.Console
 				if (string.IsNullOrEmpty(brackets)) brackets = ")";
 				var post = match.Groups["post"];
 
-				var end = line.Substring(match.Index, line.Length - match.Index);
-				fixStacktraceBuilder.Append(line.Remove(match.Index, end.Length)).Append(brackets);
+				// var end = line.Substring(match.Index, line.Length - match.Index);
 				// line = line.Remove(match.Index, end.Length) + brackets;
+				// var newString = " (at " + file + ":" + lineNr + ")\n";
+				// if (post.Success)
+				// 	newString += post;
+				// return newString;
 
+				var end = line.Substring(match.Index, line.Length - match.Index);
+				line = line.Remove(match.Index, end.Length);
+				fixStacktraceBuilder.Append(line).Append(brackets);
+				
 				lineBuilder.Append(" (at ").Append(file).Append(":").Append(lineNr).Append(")\n");
 				if (post.Success) 
 					lineBuilder.Append(post);
