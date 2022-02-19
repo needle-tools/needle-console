@@ -251,7 +251,7 @@ namespace Needle.Console
 						Match match;
 						// https://regex101.com/r/qZ0cIT/2
 						using (new ProfilerMarker("Regex").Auto())
-							match = Regex.Match(line, @"(\.(?<type_name>[\w\+]+?)){0,}[\.\:](?<method_name>\w+?)\(.+\.cs(:\d{1,})?",
+							match = Regex.Match(line, @"([\. ](?<type_name>[\w\+]+?)){0,}[\.\:](?<method_name>\w+?)\(.+\.cs(:\d{1,})?",
 								RegexOptions.Compiled | RegexOptions.ExplicitCapture);
 						using (new ProfilerMarker("Handle Match").Auto())
 						{
