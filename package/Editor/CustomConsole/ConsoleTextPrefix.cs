@@ -109,9 +109,11 @@ namespace Needle.Console
 
 						string GetPrefix()
 						{
+							if (fileName == "Debug.bindings") return "";
 							if (!NeedleConsoleSettings.instance.ShowLogPrefix) return string.Empty;
 							keyBuilder.Clear();
 							keyBuilder.Append(tempEntry.file).Append(tempEntry.line).Append(tempEntry.column).Append(tempEntry.mode);
+							keyBuilder.Append(tempEntry.message);
 #if UNITY_2021_2_OR_NEWER
 							if(string.IsNullOrWhiteSpace(tempEntry.file))
 								keyBuilder.Append(tempEntry.identifier).Append(tempEntry.globalLineIndex);
