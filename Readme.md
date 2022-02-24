@@ -1,5 +1,9 @@
 ﻿# Needle Console
  
+## License
+Needle Console is [available on the Asset Store](https://assetstore.unity.com/packages/tools/utilities/needle-console-194002) for commercial use.  
+Other versions are only allowed to be used non-commercially and only if you're entitled to use Unity Personal (the same restrictions apply).
+ 
 ## **Feature Overview**
 - Improved stacktrace readability
 - Syntax highlight stacktraces
