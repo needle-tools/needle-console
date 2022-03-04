@@ -67,6 +67,7 @@ namespace Needle.Console
 				__result = trace.ToString();
 				Hyperlinks.FixStacktrace(ref __result);
 				StacktraceMarkerUtil.AddMarker(ref __result);
+				__result = __result.TrimEnd('\r').TrimEnd('\n');
 				return false;
 			}
 		}

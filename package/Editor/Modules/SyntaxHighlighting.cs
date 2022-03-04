@@ -115,8 +115,8 @@ namespace Needle.Console
 			AddSyntaxHighlighting(pattern, colorDict, ref line);
 		}
 
-		private const string linkPrefix = " in ";
-		private static readonly Regex hyperlink = new Regex(@" in (?<hyperlink>.+)\:(?<line>.+)", RegexOptions.Compiled | RegexOptions.ExplicitCapture);
+		private const string linkPrefix = " (at ";
+		private static readonly Regex hyperlink = new Regex(@" \(at (?<hyperlink>.+)\:(?<line>.+)\)", RegexOptions.Compiled | RegexOptions.ExplicitCapture);
 		private static readonly Dictionary<string, Regex> highlight = new Dictionary<string, Regex>();
 		
 		public static void AddSyntaxHighlighting(string pattern, Dictionary<string, string> colorDict, ref string line, bool trim = true)
@@ -203,7 +203,8 @@ namespace Needle.Console
 					// https://github.com/Unity-Technologies/UnityCsReference/blob/98cc8a97afc8cb990bc0c89165bdb276cbcc8ec4/Editor/Mono/ConsoleWindow.cs#L864
 					if (colorDict.TryGetValue("link", out var col))
 					{
-						line += $"<a href=\"{link.Groups["hyperlink"].Value}\" line=\"{link.Groups["line"].Value}\"><color={col}>{link.Value}</color></a>";
+						var displayUrl = link.Value.Substring(linkPrefix.Length).TrimEnd(')');
+						line += $"<a href=\"{link.Groups["hyperlink"].Value}\" line=\"{link.Groups["line"].Value}\"><color={col}> in {displayUrl}</color></a>";
 					}
 					else
 						line += link.Value;
