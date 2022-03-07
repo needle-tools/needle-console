@@ -69,6 +69,6 @@ Unity 2019.4 until 2021.1
 [@marcel_wiessler](https://twitter.com/marcel_wiessler) • 
 [@hybridherbst](https://twitter.com/hybridherbst)
 
-[![discord online](https://img.shields.io/discord/717429793926283276?label=Needle&logo=discord&style=social)](https://discord.gg/CFZDp4b)
+[![discord online](https://img.shields.io/discord/717429793926283276?label=Needle&logo=discord&style=social)](https://discord.gg/rYbtPgPRYg)
 
 
