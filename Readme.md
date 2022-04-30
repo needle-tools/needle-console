@@ -1,4 +1,6 @@
-﻿# Needle Console
+<img src="package/Documentation~/filter-log-solo.gif" align="middle" width="3000"/>
+
+# Needle Console
  
 ## License
 Needle Console is [available on the Asset Store](https://assetstore.unity.com/packages/tools/utilities/needle-console-194002) for commercial use.  
