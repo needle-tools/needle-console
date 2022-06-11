@@ -68,7 +68,7 @@ namespace Needle.Console
 #elif UNITY_2020_1_OR_NEWER
 					if (index == 189)
 #else // 2019
-					if (index == 148)
+					if (index == -1)
 #endif
 					{
 						yield return CodeInstruction.Call(typeof(ConsoleToolbarFoldout), nameof(ConsoleToolbarFoldout.OnDrawFoldouts)); 
@@ -83,7 +83,7 @@ namespace Needle.Console
 #elif UNITY_2020_1_OR_NEWER
 					if (index == 317)
 #else // 2019
-					if (index == 313)
+					if (index == -1)
 #endif
 					{
 						yield return CodeInstruction.Call(typeof(ConsoleToolbarIcon), nameof(ConsoleToolbarIcon.OnDrawToolbar));
@@ -98,7 +98,7 @@ namespace Needle.Console
 #elif UNITY_2020_1_OR_NEWER
 					if (index == 318)
 #else // 2019
-					if (index == 315)
+					if (index == -1)
 #endif
 					{
 						yield return new CodeInstruction(OpCodes.Ldarg_0);
