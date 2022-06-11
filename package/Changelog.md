@@ -4,6 +4,10 @@ All notable changes to this package will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## [2.3.11] - 2022-06-11
+- update minimum supported version to 2020.3
+- fix for Unity 2022.1.2
+
 ## [2.3.10] - 2022-03-04
 - fix log double click to open file
 
