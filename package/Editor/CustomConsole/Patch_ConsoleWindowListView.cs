@@ -61,7 +61,9 @@ namespace Needle.Console
 					
 					// this is before "GUILayout.FlexibleSpace"
 					// https://github.com/Unity-Technologies/UnityCsReference/blob/61f92bd79ae862c4465d35270f9d1d57befd1761/Editor/Mono/ConsoleWindow.cs#L539
-#if UNITY_2021_1_OR_NEWER
+#if UNITY_2022_1_OR_NEWER
+					if (index == 241)
+#elif UNITY_2021_1_OR_NEWER
 					if (index == 172)
 #elif UNITY_2020_1_OR_NEWER
 					if (index == 189)
@@ -73,7 +75,10 @@ namespace Needle.Console
 					}
 					
 					// this is before "EndHorizontal"
-#if UNITY_2021_1_OR_NEWER
+					// https://github.com/Unity-Technologies/UnityCsReference/blob/4d031e55aeeb51d36bd94c7f20182978d77807e4/Editor/Mono/ConsoleWindow.cs#L600
+#if UNITY_2022_1_OR_NEWER
+					if (index == 349)
+#elif UNITY_2021_1_OR_NEWER
 					if (index == 329)
 #elif UNITY_2020_1_OR_NEWER
 					if (index == 317)
@@ -86,7 +91,9 @@ namespace Needle.Console
 
 					// TODO: properly search for the right spots
 					// this is right before  SplitterGUILayout.BeginVerticalSplit(spl);
-#if UNITY_2021_1_OR_NEWER
+#if UNITY_2022_1_OR_NEWER
+					if (index == 382)
+#elif UNITY_2021_1_OR_NEWER
 					if (index == 330)
 #elif UNITY_2020_1_OR_NEWER
 					if (index == 318)
