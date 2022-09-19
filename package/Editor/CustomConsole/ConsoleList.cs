@@ -550,7 +550,12 @@ namespace Needle.Console
 			try
 			{
 #if UNITY_CONSOLE_STACKTRACE_TWO_PARAMETERS
+#if UNITY_2022_2_OR_NEWER
+				// mode doesn't matter when shouldStripCallstack is false
+				var stackWithHyperlinks = ConsoleWindow.StacktraceWithHyperlinks(message, 0, false, ConsoleWindow.Mode.Log);
+#else
 				var stackWithHyperlinks = ConsoleWindow.StacktraceWithHyperlinks(message, 0);
+#endif
 #else
 				var stackWithHyperlinks = ConsoleWindow.StacktraceWithHyperlinks(message);
 #endif
