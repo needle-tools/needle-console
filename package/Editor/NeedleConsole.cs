@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Unity.Profiling;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.Profiling;
 
 namespace Needle.Console
 {
@@ -84,6 +85,8 @@ namespace Needle.Console
 			{
 				using (new ProfilerMarker("Demystify.Apply").Auto())
 				{
+					if(Profiler.enabled) return;
+					
 					string[] lines = null;
 					using (new ProfilerMarker("Split Lines").Auto())
 						lines = stacktrace.Split('\n');
