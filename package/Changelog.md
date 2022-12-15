@@ -4,6 +4,11 @@ All notable changes to this package will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## [2.3.13] - 2022-12-15
+- change: disable stacktrace highlighting while profiling
+- change: enable custom console for >= 2020.3.36
+- fix: stacktrace highlighting for 2022
+
 ## [2.3.12] - 2022-09-19
 - fix for Unity 2022.2+ and 2023.1
 - workaround for custom drawing being broken on `[2020.3.34f1,2021.1)`
