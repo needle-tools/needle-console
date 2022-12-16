@@ -1,7 +1,7 @@
 {
   "displayName": "Needle Console",
   "name": "com.needle.console",
-  "version": "2.3.13",
+  "version": "2.3.14",
   "unity": "2020.3",
   "description": "Better Unity console featuring improved stacktrace readability using Ben.Demystifier, filtering of log entries, collapsing of individual logs",
   "keywords": [

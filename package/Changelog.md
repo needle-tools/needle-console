@@ -4,6 +4,9 @@ All notable changes to this package will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## [2.3.14] - 2022-12-16
+- fix: stacktrace drawing in 2020.3.38 and later
+
 ## [2.3.13] - 2022-12-15
 - change: disable stacktrace highlighting while profiling
 - change: enable custom console for >= 2020.3.36
