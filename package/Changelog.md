@@ -4,6 +4,9 @@ All notable changes to this package will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## [2.3.15] - 2022-03-11
+- change: remove AssetProcessor [issue 19](https://github.com/needle-tools/needle-console/issues/19)
+
 ## [2.3.14] - 2022-12-16
 - fix: stacktrace drawing in 2020.3.38 and later
 
