@@ -285,14 +285,5 @@ namespace Needle.Console
 				ThemeEditedOrChanged?.Invoke();
 			}
 		}
-
-		private class AssetProcessor : AssetPostprocessor
-		{
-			private void OnPreprocessAsset()
-			{
-				ThemeNames = null;
-				Themes = null;
-			}
-		}
 	}
 }
