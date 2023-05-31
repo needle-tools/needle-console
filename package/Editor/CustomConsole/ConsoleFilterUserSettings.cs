@@ -20,6 +20,7 @@ namespace Needle.Console
 			Apply(ids, preset.ids);
 			Apply(lines, preset.lines);
 			Apply(times, preset.times);
+			Apply(@namespace, preset.namespaces);
 			RecreateFilters();
 			Save(true);
 		}
@@ -34,6 +35,10 @@ namespace Needle.Console
 			Apply(preset.ids, ids);
 			Apply(preset.lines, lines);
 			Apply(preset.times, times);
+			Apply(preset.namespaces, @namespace);
+			
+			EditorUtility.SetDirty(preset);
+			AssetDatabase.SaveAssetIfDirty(preset);
 		}
 
 		private static void Apply<T>(List<T> self, List<T> other)
@@ -51,10 +56,11 @@ namespace Needle.Console
 			yield return packageFilter;
 			yield return timeFilter;
 			yield return warningsFilter;
+			yield return namespaceFilter;
 		}
 		
 		[SerializeField]
-		private List<FilterBase<string>.FilterEntry> messages, files, packages, warnings;
+		private List<FilterBase<string>.FilterEntry> messages, files, packages, warnings, @namespace;
 		[SerializeField]
 		private List<FilterBase<int>.FilterEntry> ids;
 		[SerializeField]
@@ -69,6 +75,7 @@ namespace Needle.Console
 		private PackageFilter packageFilter;
 		private TimeFilter timeFilter;
 		private WarningFilter warningsFilter;
+		private NamespaceFilter namespaceFilter;
 
 		private void RecreateFilters()
 		{
@@ -89,6 +96,7 @@ namespace Needle.Console
 			packageFilter = new PackageFilter(ref packages);
 			timeFilter = new TimeFilter(ref times);
 			warningsFilter = new WarningFilter(ref warnings);
+			namespaceFilter = new NamespaceFilter(ref @namespace);
 			foreach (var f in EnumerateFilter())
 			{
 				f.WillChange += OnFilterWillChange;

@@ -36,12 +36,21 @@ namespace Needle.Console
 		}
 
 		[SerializeField] private List<FilterEntry> entries;
+		public List<FilterEntry> GetEntries() => entries;
+		
 		private List<int> excludedCountPerFilter;
 
 		public int GetExcluded(int index)
 		{
 			if (index >= 0 && index < excludedCountPerFilter.Count) return excludedCountPerFilter[index];
 			return 0;
+		}
+
+		public void SortAlphabetically()
+		{
+			//Cannot use sort as we use "indexOf" while sorting, which would change indexes while sorting
+			var sortedList = entries.OrderBy(x => GetLabel(entries.IndexOf(x)));
+			entries = sortedList.ToList();
 		}
 
 		protected FilterBase()
@@ -365,27 +374,34 @@ namespace Needle.Console
 			}
 		}
 
-		protected void AddContextMenuItem_Hide(GenericMenu menu, string text, T element)
+		protected void AddContextMenuItem_Hide(GenericMenu menu, string text, T element, bool clickable = true)
 		{
 			var active = TryGetIndex(element, out var index);
 			if (active) active = IsActiveAtIndex(index);
 
-			menu.AddItem(new GUIContent(text), active, () =>
+			if (clickable)
 			{
-				if (!active)
+				menu.AddItem(new GUIContent(text), active, () =>
 				{
-					Add(element);
-				}
-				else
-				{
-					ConsoleFilter.enabled = true;
-					SetActiveAtIndex(index, true);
-					SetSoloAtIndex(index, false);
-				}
-			});
+					if (!active)
+					{
+						Add(element);
+					}
+					else
+					{
+						ConsoleFilter.enabled = true;
+						SetActiveAtIndex(index, true);
+						SetSoloAtIndex(index, false);
+					}
+				});
+			}
+			else
+			{
+				menu.AddDisabledItem(new GUIContent(text));
+			}
 		}
 
-		protected void AddContextMenuItem_Solo(GenericMenu menu, string text, T element)
+		protected void AddContextMenuItem_Solo(GenericMenu menu, string text, T element, bool clickable = true)
 		{
 			var found = TryGetIndex(element, out var index);
 
@@ -395,17 +411,24 @@ namespace Needle.Console
 				solo = IsSoloAtIndex(index);
 			}
 
-			menu.AddItem(new GUIContent(text), solo, () =>
+			if (clickable)
 			{
-				if (!solo)
+				menu.AddItem(new GUIContent(text), solo, () =>
 				{
-					Add(element, false, true);
-				}
-				else
-				{
-					SetSoloAtIndex(index, !solo);
-				}
-			});
+					if (!solo)
+					{
+						Add(element, false, true);
+					}
+					else
+					{
+						SetSoloAtIndex(index, !solo);
+					}
+				});
+			}
+			else
+			{
+				menu.AddDisabledItem(new GUIContent(text));
+			}
 		}
 	}
 }

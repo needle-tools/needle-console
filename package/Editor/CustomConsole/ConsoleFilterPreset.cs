@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using UnityEditor;
@@ -68,7 +69,7 @@ namespace Needle.Console
 		}
 		#endregion
 
-		[SerializeField] public List<FilterBase<string>.FilterEntry> messages, files, packages, warnings;
+		[SerializeField] public List<FilterBase<string>.FilterEntry> messages, files, packages, warnings, namespaces;
 		[SerializeField] public List<FilterBase<int>.FilterEntry> ids;
 		[SerializeField] public List<FilterBase<FileLine>.FilterEntry> lines;
 		[SerializeField] public List<FilterBase<LogTime>.FilterEntry> times;
@@ -80,6 +81,7 @@ namespace Needle.Console
 		private PackageFilter packageFilter;
 		private TimeFilter timeFilter;
 		private WarningFilter warningFilter;
+		private NamespaceFilter namespaceFilter;
 		private IEnumerable<IConsoleFilter> EnumerateFilter()
 		{
 			yield return timeFilter;
@@ -89,6 +91,7 @@ namespace Needle.Console
 			yield return idFilter;
 			yield return packageFilter;
 			yield return warningFilter;
+			yield return namespaceFilter;
 		}
 
 		private void OnEnable()
@@ -103,6 +106,7 @@ namespace Needle.Console
 			idFilter = new ObjectIdFilter(ref ids);
 			packageFilter = new PackageFilter(ref packages);
 			warningFilter = new WarningFilter(ref warnings);
+			namespaceFilter = new NamespaceFilter(ref namespaces);
 			
 
 			foreach (var f in EnumerateFilter())
@@ -150,9 +154,14 @@ namespace Needle.Console
 			{
 				var t = (ConsoleFilterPreset) target;
 
-				if (GUILayout.Button(nameof(Apply), GUILayout.Height(30)))
+				if (GUILayout.Button("Apply this filter", GUILayout.Height(30)))
 				{
 					t.Apply();
+				}
+				if (GUILayout.Button("Save", GUILayout.Height(30)))
+				{
+					EditorUtility.SetDirty(target);
+					AssetDatabase.SaveAssetIfDirty(target);
 				}
 
 				GUILayout.Space(10);
@@ -166,6 +175,28 @@ namespace Needle.Console
 			EditorGUILayout.HelpBox(
 				"You haven't filtered any logs yet. Context click a log message for options",
 				MessageType.Info);
+		}
+
+		[ContextMenu("Sort Alphabetically")]
+		public void SortAlphabetically()
+		{
+			timeFilter.SortAlphabetically();
+			messageFilter.SortAlphabetically();
+			lineFilter.SortAlphabetically();
+			fileFilter.SortAlphabetically();
+			idFilter.SortAlphabetically();
+			packageFilter.SortAlphabetically();
+			warningFilter.SortAlphabetically();
+			namespaceFilter.SortAlphabetically();
+
+			times = timeFilter.GetEntries();
+			messages = messageFilter.GetEntries();
+			lines = lineFilter.GetEntries();
+			files = fileFilter.GetEntries();
+			ids = idFilter.GetEntries();
+			packages = packageFilter.GetEntries();
+			warnings = warningFilter.GetEntries();
+			namespaces = namespaceFilter.GetEntries();
 		}
 	}
 }
