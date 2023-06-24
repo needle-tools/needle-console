@@ -4,6 +4,12 @@ All notable changes to this package will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## [2.4.0] - 2023-06-24
+- add: namespace filter (thanks [TheXRMonk](https://github.com/needle-tools/needle-console/pull/23))
+
+## [2.3.16] - 2022-05-04
+- fix: compiler error in Unity 2021.3.24 (thanks [clandais](https://github.com/needle-tools/needle-console/pull/22))
+
 ## [2.3.15] - 2022-03-11
 - change: remove AssetProcessor [issue 19](https://github.com/needle-tools/needle-console/issues/19)
 
