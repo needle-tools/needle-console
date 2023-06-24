@@ -20,8 +20,5 @@
     "url": "https://needle.tools"
   },
   "category": "Libraries",
-  "type": "tool",
-  "publishConfig": {
-    "registry": "https://package.openupm.com"
-  }
+  "type": "tool"
 }
