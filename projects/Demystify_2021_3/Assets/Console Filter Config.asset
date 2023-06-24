@@ -18,5 +18,8 @@ MonoBehaviour:
   - Element: com.needle.demystify
     Active: 1
     Solo: 0
+  warnings: []
+  namespaces: []
   ids: []
   lines: []
+  times: []
