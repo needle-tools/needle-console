@@ -103,7 +103,7 @@ namespace Needle.Console
 					.Where(match => match.Success)
 					.Select(match => match.Groups[1].Value).ToArray();
 			}
-			catch(Exception e)
+			catch (Exception)
 			{
 				@namespace = "Failed to load file " + fileName;
 				return false;

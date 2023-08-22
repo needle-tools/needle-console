@@ -80,7 +80,11 @@ namespace Needle
 				{
 					if (typeof(Object).IsAssignableFrom(t))
 					{
+#if UNITY_2023_1_OR_NEWER
+						var instances = Object.FindObjectsByType(t, FindObjectsSortMode.None);
+#else
 						var instances = Object.FindObjectsOfType(t);
+#endif
 						foreach (var inst in instances)
 							RegisterClickedCallback(inst as IHyperlinkCallbackReceiver);
 					}
