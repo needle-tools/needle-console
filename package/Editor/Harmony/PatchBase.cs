@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Reflection;
 using HarmonyLib;
 using UnityEngine;
@@ -34,13 +35,20 @@ namespace Needle.Console
 				var postfix = AccessTools.Method(t, "Postfix");
 				var transpiler = AccessTools.Method(t, "Transpiler");
 				var finalizer = AccessTools.Method(t, "Finalizer");
-				var patch = harmony.Patch(m,
-					prefix != null ? new HarmonyMethod(prefix) : null,
-					postfix != null ? new HarmonyMethod(postfix) : null,
-					transpiler != null ? new HarmonyMethod(transpiler) : null,
-					finalizer != null ? new HarmonyMethod(finalizer) : null
-				);
-				patches.Add((m, patch)); 
+				try
+				{
+					var patch = harmony.Patch(m,
+						prefix != null ? new HarmonyMethod(prefix) : null,
+						postfix != null ? new HarmonyMethod(postfix) : null,
+						transpiler != null ? new HarmonyMethod(transpiler) : null,
+						finalizer != null ? new HarmonyMethod(finalizer) : null
+					);
+					patches.Add((m, patch));
+				}
+				catch (Exception e)
+				{
+					Debug.LogError($"Method patching failed from {this} ({this.GetType()}). Please report a bug and note your Unity and package versions.\n{e}");
+				}
 			}
 		}
 
