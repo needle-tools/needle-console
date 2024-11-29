@@ -66,10 +66,7 @@ namespace Needle
 		
 		private static void OpenWithDefaultProgram(string path)
 		{
-			var proc = new Process();
-			proc.StartInfo.FileName = "explorer";
-			proc.StartInfo.Arguments = "\"" + path + "\"";
-			proc.Start();
+			EditorUtility.OpenWithDefaultApp(path);
 		}
 	}
 }
