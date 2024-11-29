@@ -4,6 +4,9 @@ All notable changes to this package will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## [2.4.2] - 2024-11-29
+- fix: opening hyperlinks from Console didn't work on Mac
+
 ## [2.4.1] - 2023-08-22
 - fix: catch patching exceptions
 - fix: disable patching on Apple Silicon (unsupported, see https://github.com/pardeike/Harmony/issues/424)
