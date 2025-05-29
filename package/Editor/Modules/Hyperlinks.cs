@@ -13,7 +13,7 @@ namespace Needle.Console
 
 		private static readonly StringBuilder stacktraceBuilder = new StringBuilder();
 		private static readonly StringBuilder fixStacktraceBuilder = new StringBuilder();
-
+		
 		public static void FixStacktrace(ref string stacktrace)
 		{
 			var lines = stacktrace.Split(new []{'\n'}, StringSplitOptions.RemoveEmptyEntries);
@@ -28,24 +28,43 @@ namespace Needle.Console
 				var path = Fix(line, fixStacktraceBuilder, out var lineNumber);
 				if (!string.IsNullOrEmpty(path))
 				{
-					// dont append path to editor only lines to force unity to open the previous file path
-					if (line.Contains("DebugEditor.Log"))
-					{
-					}
-					else
-					{
+					if (ShouldInclude(line)) {
 						// path = path.Replace("\n", "");
 						fixStacktraceBuilder.Append(path).Append(lineNumber).Append(")");
 						line = fixStacktraceBuilder.ToString();
 						Filepaths.TryMakeRelative(ref line);
 					}
-					
 				}
 				
 				stacktraceBuilder.Append(line).Append("\n");
 			}
 
 			stacktrace = stacktraceBuilder.ToString();
+			
+			return;
+			
+			// dont append path to editor only lines to force unity to open the previous file path
+			bool ShouldInclude(string line)
+			{
+				// Lines to exclude from stacktrace, since it's comming from a logger
+				const string[] LinesToSkip = new string[]
+				{
+					"DebugEditor.Log",
+					"Logger",
+					".Log",
+				};
+				
+				foreach (var toSkip in LinesToSkip)
+				{
+					if (line.Contains(toSkip))
+					{
+						return false;
+						break;
+					}
+				}
+				
+				return true;
+			}
 		}
 
 		private static readonly StringBuilder lineBuilder = new StringBuilder();
