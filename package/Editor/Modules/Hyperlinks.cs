@@ -46,21 +46,11 @@ namespace Needle.Console
 			// dont append path to editor only lines to force unity to open the previous file path
 			bool ShouldInclude(string line)
 			{
-				// Lines to exclude from stacktrace, since it's comming from a logger
-				const string[] LinesToSkip = new string[]
+				// Lines to exclude from stacktrace, since it's coming from a logger
+				if (line.Contains("DebugEditor.Log")) return false;
+				if (line.Contains("UnityEngine.Logger."))
 				{
-					"DebugEditor.Log",
-					"Logger",
-					".Log",
-				};
-				
-				foreach (var toSkip in LinesToSkip)
-				{
-					if (line.Contains(toSkip))
-					{
-						return false;
-						break;
-					}
+					if (line.Contains(".Log")) return false;
 				}
 				
 				return true;
