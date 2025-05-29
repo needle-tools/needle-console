@@ -4,6 +4,10 @@ All notable changes to this package will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## [2.4.3] - 2025-05-29
+- fix: ignore 'UnityEngine.Logger' logs in stacktrace
+- fix: compiler error for Unity 'Editor Assemblies Compatibility Level' set to .NET Standard
+
 ## [2.4.2] - 2024-11-29
 - fix: opening hyperlinks from Console didn't work on Mac
 
