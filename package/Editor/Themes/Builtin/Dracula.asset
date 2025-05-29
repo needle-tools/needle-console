@@ -11,7 +11,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: ea2a77b76b0b3544bb244979f10aa448, type: 3}
   m_Name: Dracula
-  m_EditorClassIdentifier: 
+  m_EditorClassIdentifier: Needle.Console.SyntaxHighlightingTheme, Needle.Console.Editor
   theme:
     Name: Dracula
     Entries:
