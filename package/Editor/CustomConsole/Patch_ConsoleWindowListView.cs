@@ -1,11 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
 using HarmonyLib;
 using UnityEditor;
-using UnityEngine;
+
 
 // ReSharper disable UnusedType.Global
 // ReSharper disable UnusedMember.Local
@@ -22,6 +21,7 @@ namespace Needle.Console
 
 			private static IEnumerable<CodeInstruction> Transpiler(MethodBase method, ILGenerator il, IEnumerable<CodeInstruction> instructions)
 			{
+#if !NETSTANDARD
 				var skipLabel = il.DefineLabel();
 				var arr = instructions.ToArray();
 				var loadListViewElementIndex = -1;
@@ -110,6 +110,14 @@ namespace Needle.Console
 					
 					yield return inst;
 				}
+#else
+				if (SessionState.GetBool("NeedleConsole:NetStandardIsUnsupportedWarning", false) == false)
+				{
+					SessionState.SetBool("NeedleConsole:NetStandardIsUnsupportedWarning", true);
+					UnityEngine.Debug.LogWarning("Needle Console does currently not support .NET Standard ('Project Settings/Player/Editor Assemblies Compatibility Level') set to : https://github.com/needle-tools/needle-console/issues/27");
+				}
+				return instructions;
+#endif
 			}
 			
 			
