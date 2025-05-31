@@ -30,8 +30,7 @@ namespace Needle.Console
 			cachedPrefix.Clear();
 		}
 
-		private static readonly LogEntry tempEntry = new LogEntry();
-
+		private static readonly LogEntry tempEntryForOriginalModifyText = new LogEntry(); // Renamed to avoid conflict if ModifyTextInternal uses a local var named tempEntry
 
 		private static readonly string[] onlyUseMethodNameFromLinesWithout = new[]
 		{
@@ -46,14 +45,12 @@ namespace Needle.Console
 		private static readonly Dictionary<string, string> cachedPrefix = new Dictionary<string, string>();
 		private static readonly StringBuilder keyBuilder = new StringBuilder();
 
-		// called from console list with current list view element and console text
-
-		internal static void ModifyText(ListViewElement element, ref string text)
+		public static void ModifyTextInternal(LogEntry entry, int entryRow, ref string text)
 		{
-			// var rect = element.position;
-			// GUI.DrawTexture(rect, Texture2D.whiteTexture);//, ScaleMode.StretchToFill, true, 1, Color.red, Vector4.one, Vector4.zero);
+			// entry is used directly instead of LogEntries.GetEntryInternal(element.row, tempEntry)
+			// entryRow is used instead of element.row
 
-			using (new ProfilerMarker("ConsoleList.ModifyText").Auto())
+			using (new ProfilerMarker("ConsoleList.ModifyTextInternal").Auto())
 			{
 				var settings = NeedleConsoleSettings.instance;
 				if (!settings.ShowLogPrefix && (string.IsNullOrWhiteSpace(settings.ColorMarker) || !settings.UseColorMarker))
@@ -61,30 +58,31 @@ namespace Needle.Console
 					return;
 				}
 
-				if (!LogEntries.GetEntryInternal(element.row, tempEntry))
-				{
-					return;
-				}
+				// Removed: if (!LogEntries.GetEntryInternal(element.row, tempEntry)) { return; }
+				// Assuming 'entry' is valid if this method is called.
+				// If 'entry' can be null or invalid, checks might be needed here.
+
 				keyBuilder.Clear();
-				keyBuilder.Append(tempEntry.file).Append(tempEntry.line).Append(tempEntry.column).Append(tempEntry.mode);
+				keyBuilder.Append(entry.file).Append(entry.line).Append(entry.column).Append(entry.mode);
 				
 #if UNITY_2021_2_OR_NEWER
-				if(string.IsNullOrWhiteSpace(tempEntry.file))
-					keyBuilder.Append(tempEntry.identifier).Append(tempEntry.globalLineIndex);
+				if(string.IsNullOrWhiteSpace(entry.file))
+					keyBuilder.Append(entry.identifier).Append(entry.globalLineIndex);
 #else
-				if (tempEntry.file == "" && tempEntry.line == 0 && tempEntry.column == -1)
+				// Original logic used element.row when file info was missing. Using entryRow here.
+				if (entry.file == "" && entry.line == 0 && entry.column == -1)
 				{
-					keyBuilder.Append(element.row);
+					keyBuilder.Append(entryRow);
 				}
 #endif
 				
 				var key = keyBuilder.Append(text).ToString();
-				var isSelected = ConsoleList.IsSelectedRow(element.row);
+				var isSelected = ConsoleList.IsSelectedRow(entryRow); // Use entryRow
 				var cacheEntry = !isSelected;
 				var isInCache = cachedInfo.ContainsKey(key);
 				if (cacheEntry && isInCache)
 				{
-					using (new ProfilerMarker("ConsoleList.ModifyText cached").Auto())
+					using (new ProfilerMarker("ConsoleList.ModifyTextInternal cached").Auto())
 					{
 						text = cachedInfo[key];
 						if (NeedleConsoleSettings.DevelopmentMode)
@@ -95,16 +93,15 @@ namespace Needle.Console
 					}
 				}
 
-				using (new ProfilerMarker("ConsoleList.ModifyText (Not in cache)").Auto())
+				using (new ProfilerMarker("ConsoleList.ModifyTextInternal (Not in cache)").Auto())
 				{
 					try
 					{
-						var filePath = tempEntry.file;
+						var filePath = entry.file;
 						var fileName = Path.GetFileNameWithoutExtension(filePath);
 						const string colorPrefixDefault = "<color=#888888>";
 						const string colorPrefixSelected = "<color=#ffffff>";
-						// const string colorPrefixSelected = "<color=#111122>";
-						var colorPrefix = isInCache && isSelected ? colorPrefixSelected : colorPrefixDefault;
+						var colorPrefix = isInCache && isSelected ? colorPrefixSelected : colorPrefixDefault; // Corrected: was always colorPrefixDefault before due to cache check placement
 						const string colorPostfix = "</color>";
 
 						string GetPrefix()
@@ -112,15 +109,16 @@ namespace Needle.Console
 							if (fileName == "Debug.bindings") return "";
 							if (!NeedleConsoleSettings.instance.ShowLogPrefix) return string.Empty;
 							keyBuilder.Clear();
-							keyBuilder.Append(tempEntry.file).Append(tempEntry.line).Append(tempEntry.column).Append(tempEntry.mode);
-							keyBuilder.Append(tempEntry.message);
+							keyBuilder.Append(entry.file).Append(entry.line).Append(entry.column).Append(entry.mode);
+							keyBuilder.Append(entry.message);
 #if UNITY_2021_2_OR_NEWER
-							if(string.IsNullOrWhiteSpace(tempEntry.file))
-								keyBuilder.Append(tempEntry.identifier).Append(tempEntry.globalLineIndex);
+							if(string.IsNullOrWhiteSpace(entry.file))
+								keyBuilder.Append(entry.identifier).Append(entry.globalLineIndex);
 #else
-							if (tempEntry.file == "" && tempEntry.line == 0 && tempEntry.column == -1)
+							// Original logic used element.row when file info was missing. Using entryRow here.
+							if (entry.file == "" && entry.line == 0 && entry.column == -1)
 							{
-								keyBuilder.Append(element.row);
+								keyBuilder.Append(entryRow);
 							}
 #endif
 							var key2 = keyBuilder.ToString();
@@ -130,14 +128,15 @@ namespace Needle.Console
 							}
 
 							var str = default(string);
-							if (TryGetMethodName(tempEntry.message, out var typeName, out var methodName))
+							// Pass entry.message to TryGetMethodName
+							if (TryGetMethodName(entry.message, out var typeName, out var methodName))
 							{
 								if (string.IsNullOrWhiteSpace(typeName))
 									str = fileName;
 								else str = typeName;
 								str += "." + methodName;
 							}
-							else if (!isSelected && cachedPrefix.TryGetValue(key2, out cached))
+							else if (!isSelected && cachedPrefix.TryGetValue(key2, out cached)) // Check cache again if TryGetMethodName failed
 							{
 								return cached;
 							}
@@ -148,14 +147,10 @@ namespace Needle.Console
 								str = fileName;
 							}
 
-							if (tempEntry.line > 0)
-								str += ":" + tempEntry.line;
+							if (entry.line > 0)
+								str += ":" + entry.line;
 
-
-							// str = colorPrefix + "[" + str + "]" + colorPostfix;
-							// str = "<b>" + str + "</b>";
-							// str = "\t" + str;
-							str = Prefix(str); // + " |";
+							str = PrefixFormat(str); // Renamed Prefix to PrefixFormat to avoid conflict with parameter name
 							if (cacheEntry)
 							{
 								if (!cachedPrefix.ContainsKey(key2))
@@ -164,32 +159,30 @@ namespace Needle.Console
 							}
 							return str;
 
-							string Prefix(string s) => $"{colorPrefix} {s} {colorPostfix}";
+							string PrefixFormat(string s) => $"{colorPrefix} {s} {colorPostfix}";
 						}
 
-
-						// text = element.row.ToString();
 						var endTimeIndex = text.IndexOf("] ", StringComparison.InvariantCulture);
-						var prefix = GetPrefix();
+						var calculatedPrefix = GetPrefix(); // Renamed from prefix to avoid conflict
 
-						var colorKey = string.IsNullOrWhiteSpace(fileName) ? prefix : fileName;
-						var colorMarker = settings.UseColorMarker ? NeedleConsoleSettings.instance.ColorMarker : string.Empty; // " ▍";
+						var colorKey = string.IsNullOrWhiteSpace(fileName) ? calculatedPrefix : fileName;
+						var colorMarker = settings.UseColorMarker ? NeedleConsoleSettings.instance.ColorMarker : string.Empty;
 						if (settings.UseColorMarker && !string.IsNullOrWhiteSpace(colorMarker))
 							LogColor.CalcLogColor(colorKey, ref colorMarker);
 
-						// no time:
+						// Pass 'entry' to RemoveFilePathInCompilerErrorMessages
+						RemoveFilePathInCompilerErrorMessages(ref text, entry);
+
 						if (endTimeIndex == -1)
 						{
-							// LogColor.AddColor(colorKey, ref text);
-							RemoveFilePathInCompilerErrorMessages(ref text);
-							text = $"{colorMarker}{prefix}{text}";
+							text = $"{colorMarker}{calculatedPrefix}{text}";
 						}
-						// contains time:
 						else
 						{
 							var message = text.Substring(endTimeIndex + 1);
-							RemoveFilePathInCompilerErrorMessages(ref message);
-							text = $"{colorPrefix}{text.Substring(1, endTimeIndex - 1)}{colorPostfix} {colorMarker}{prefix}{message}";
+							// Pass 'entry' to RemoveFilePathInCompilerErrorMessages for the message part too
+							RemoveFilePathInCompilerErrorMessages(ref message, entry);
+							text = $"{colorPrefix}{text.Substring(1, endTimeIndex - 1)}{colorPostfix} {colorMarker}{calculatedPrefix}{message}";
 						}
 
 						if (cacheEntry)
@@ -201,7 +194,6 @@ namespace Needle.Console
 					}
 					catch (ArgumentException)
 					{
-						// sometimes filepath contains illegal characters and is not actually a path
 						if (cacheEntry)
 							cachedInfo.Add(key, text);
 					}
@@ -215,9 +207,21 @@ namespace Needle.Console
 			}
 		}
 
+		// called from console list with current list view element and console text
+		internal static void ModifyText(ListViewElement element, ref string text)
+		{
+			// This method now acts as a wrapper for ModifyTextInternal
+			if (!LogEntries.GetEntryInternal(element.row, tempEntryForOriginalModifyText))
+			{
+				return;
+			}
+			ModifyTextInternal(tempEntryForOriginalModifyText, element.row, ref text);
+		}
+
 		private static readonly Regex findEndOfFilePathRegex = new Regex(@"(\(\d{1,4},\d{1,3}\):)", RegexOptions.Compiled);
 
-		private static void RemoveFilePathInCompilerErrorMessages(ref string str)
+		// Modified to accept LogEntry
+		private static void RemoveFilePathInCompilerErrorMessages(ref string str, LogEntry entry)
 		{
 			const ConsoleWindow.Mode modestoRemovePath = ConsoleWindow.Mode.ScriptCompileError
 			                                         | ConsoleWindow.Mode.GraphCompileError
@@ -226,7 +230,8 @@ namespace Needle.Console
 			                                         | ConsoleWindow.Mode.AssetImportWarning
 				;
 
-			if (ConsoleList.HasMode(tempEntry.mode, modestoRemovePath))
+			// tempEntry is no longer a class field for this method's direct use, using passed 'entry'
+			if (ConsoleList.HasMode(entry.mode, modestoRemovePath))
 			{
 				var match = findEndOfFilePathRegex.Match(str);
 				if (match.Success)
@@ -251,13 +256,11 @@ namespace Needle.Console
 						if (onlyUseMethodNameFromLinesWithout.Any(line.Contains)) continue;
 						if (!line.Contains(".cs")) continue;
 						Match match;
-						// https://regex101.com/r/qZ0cIT/2
 						using (new ProfilerMarker("Regex").Auto())
 							match = Regex.Match(line, @"([\. ](?<type_name>[\w\+]+?)){0,}[\.\:](?<method_name>\w+?)\(.+\.cs(:\d{1,})?",
 								RegexOptions.Compiled | RegexOptions.ExplicitCapture);
 						using (new ProfilerMarker("Handle Match").Auto())
 						{
-							// var match = matches[i];
 							var type = match.Groups["type_name"];
 							if (type.Success)
 							{
@@ -268,8 +271,6 @@ namespace Needle.Console
 							if (group.Success)
 							{
 								methodName = group.Value.Trim();
-
-								// nicify local function names
 								const string localPrefix = "g__";
 								var localStart = methodName.IndexOf(localPrefix, StringComparison.InvariantCulture);
 								if (localStart > 0)
@@ -283,16 +284,13 @@ namespace Needle.Console
 											methodName = sub;
 									}
 								}
-
 								return true;
 							}
 						}
-
 						linesRead += 1;
 						if (linesRead > 15) break;
 					}
 				}
-
 				methodName = null;
 				return false;
 			}

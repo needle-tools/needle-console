@@ -15,113 +15,121 @@ namespace Needle.Console
 		{
 			protected override IEnumerable<MethodBase> GetPatches()
 			{
-				var method = Patch_Console.ConsoleWindowType.GetMethod("OnGUI", BindingFlags.NonPublic | BindingFlags.Instance);
-				yield return method;
-			}
-
-			private static IEnumerable<CodeInstruction> Transpiler(MethodBase method, ILGenerator il, IEnumerable<CodeInstruction> instructions)
-			{
-#if !NETSTANDARD
-				var skipLabel = il.DefineLabel();
-				var arr = instructions.ToArray();
-				var loadListViewElementIndex = -1;
-
-				for (var index = 0; index < arr.Length; index++)
+				// For the Prefix on SplitterGUILayout.BeginVerticalSplit
+				var splitterGUILayoutType = typeof(Editor).Assembly.GetType("UnityEditor.SplitterGUILayout");
+				if (splitterGUILayoutType != null)
 				{
-					var inst = arr[index];
-					
-					// Debug.Log("<color=grey>" + index + ": " + inst + "</color>"); 
-
-					// get local index for current list view element
-					if (loadListViewElementIndex == -1 || inst.IsStloc() && inst.operand is LocalBuilder)
+					var splitterStateType = typeof(Editor).Assembly.GetType("UnityEditor.SplitterState");
+					if (splitterStateType != null)
 					{
-						var loc = inst.operand as LocalBuilder;
-						if (loc?.LocalType == typeof(ListViewElement))
-							loadListViewElementIndex = loc.LocalIndex;
-					}
+						// Targetting public static void BeginVerticalSplit(SplitterState state, params GUILayoutOption[] options)
+						var beginVerticalSplitMethod = AccessTools.Method(splitterGUILayoutType, "BeginVerticalSplit", new[] { splitterStateType, typeof(GUILayoutOption[]) });
 
-					if (inst.opcode == OpCodes.Call && inst.operand is MethodInfo m) 
-					{
-						if (m.DeclaringType == typeof(LogEntries) && m.Name == "GetLinesAndModeFromEntryInternal")
+						if (beginVerticalSplitMethod != null)
 						{
-							yield return inst;
-							// load text is one element before
-							var ldStr = arr[index - 1];
-							yield return new CodeInstruction(OpCodes.Ldloc, loadListViewElementIndex);
-							yield return ldStr;
-							yield return CodeInstruction.Call(typeof(ConsoleTextPrefix), nameof(ConsoleTextPrefix.ModifyText));
-							continue;
+							yield return beginVerticalSplitMethod;
+						}
+						else
+						{
+							UnityEngine.Debug.LogError("Needle Console: Could not find SplitterGUILayout.BeginVerticalSplit(SplitterState, GUILayoutOption[]) method to patch for DrawListPrefix.");
 						}
 					}
-
-					if (inst.opcode == OpCodes.Ret)
+					else
 					{
-						inst.labels.Add(skipLabel);
+						UnityEngine.Debug.LogError("Needle Console: Could not find UnityEditor.SplitterState type.");
 					}
-					
-					// this is before "GUILayout.FlexibleSpace"
-					// https://github.com/Unity-Technologies/UnityCsReference/blob/61f92bd79ae862c4465d35270f9d1d57befd1761/Editor/Mono/ConsoleWindow.cs#L539
-#if UNITY_2022_1_OR_NEWER
-					if (index == 241)
-#elif UNITY_2021_1_OR_NEWER
-					if (index == 172)
-#elif UNITY_2020_1_OR_NEWER
-					if (index == 189)
-#else // 2019
-					if (index == -1)
-#endif
-					{
-						yield return CodeInstruction.Call(typeof(ConsoleToolbarFoldout), nameof(ConsoleToolbarFoldout.OnDrawFoldouts)); 
-					}
-					
-					// this is before "EndHorizontal"
-					// https://github.com/Unity-Technologies/UnityCsReference/blob/4d031e55aeeb51d36bd94c7f20182978d77807e4/Editor/Mono/ConsoleWindow.cs#L600
-#if UNITY_2022_1_OR_NEWER
-					if (index == 349)
-#elif UNITY_2021_1_OR_NEWER
-					if (index == 329)
-#elif UNITY_2020_1_OR_NEWER
-					if (index == 317)
-#else // 2019
-					if (index == -1)
-#endif
-					{
-						yield return CodeInstruction.Call(typeof(ConsoleToolbarIcon), nameof(ConsoleToolbarIcon.OnDrawToolbar));
-					}
-
-					// TODO: properly search for the right spots
-					// this is right before  SplitterGUILayout.BeginVerticalSplit(spl);
-#if UNITY_2022_1_OR_NEWER
-					if (index == 382)
-#elif UNITY_2021_1_OR_NEWER
-					if (index == 330)
-#elif UNITY_2020_3_38_OR_NEWER
-					if (index == 323)
-#elif UNITY_2020_1_OR_NEWER
-					if (index == 318)
-#else // 2019
-					if (index == -1)
-#endif
-					{
-						yield return new CodeInstruction(OpCodes.Ldarg_0);
-						yield return CodeInstruction.Call(typeof(ConsoleList), nameof(ConsoleList.OnDrawList));
-						yield return new CodeInstruction(OpCodes.Brfalse, skipLabel);
-					}
-					
-					yield return inst;
 				}
-#else
-				if (SessionState.GetBool("NeedleConsole:NetStandardIsUnsupportedWarning", false) == false)
+				else
 				{
-					SessionState.SetBool("NeedleConsole:NetStandardIsUnsupportedWarning", true);
-					UnityEngine.Debug.LogWarning("Needle Console does currently not support .NET Standard ('Project Settings/Player/Editor Assemblies Compatibility Level') set to : https://github.com/needle-tools/needle-console/issues/27");
+					UnityEngine.Debug.LogError("Needle Console: Could not find UnityEditor.SplitterGUILayout type.");
 				}
-				return instructions;
-#endif
-			}
-			
-			
 
+				// For Postfix on GUILayout.FlexibleSpace
+				var guilayoutType = typeof(UnityEngine.GUILayout);
+				var flexibleSpaceMethod = AccessTools.Method(guilayoutType, "FlexibleSpace", new System.Type[] { });
+				if (flexibleSpaceMethod != null)
+				{
+					yield return flexibleSpaceMethod;
+				}
+				else
+				{
+					UnityEngine.Debug.LogError("Needle Console: Could not find GUILayout.FlexibleSpace() method to patch for DrawFoldoutsPostfix.");
+				}
+
+				// For Postfix on GUILayout.EndHorizontal
+				var endHorizontalMethod = AccessTools.Method(guilayoutType, "EndHorizontal", new System.Type[] { });
+				if (endHorizontalMethod != null)
+				{
+					yield return endHorizontalMethod;
+				}
+				else
+				{
+					UnityEngine.Debug.LogError("Needle Console: Could not find GUILayout.EndHorizontal() method to patch for DrawToolbarIconPostfix.");
+				}
+
+				// For Postfix on LogEntries.GetLinesAndModeFromEntryInternal
+				var logEntriesType = typeof(LogEntries);
+				var getLinesAndModeMethod = AccessTools.Method(logEntriesType, "GetLinesAndModeFromEntryInternal", new[]
+				{
+					typeof(LogEntry), // entry
+					typeof(int),      // row
+					typeof(int),      // totalRows
+					typeof(string).MakeByRefType(), // outString
+					typeof(int).MakeByRefType()     // outMode
+				});
+
+				if (getLinesAndModeMethod != null)
+				{
+					yield return getLinesAndModeMethod;
+				}
+				else
+				{
+					UnityEngine.Debug.LogError("Needle Console: Could not find LogEntries.GetLinesAndModeFromEntryInternal method to patch for ModifyTextPostfix.");
+				}
+			}
+
+			[HarmonyPrefix]
+			private static bool DrawListPrefix()
+			{
+				var consoleWindow = EditorWindow.GetWindow(Patch_Console.ConsoleWindowType);
+				if (consoleWindow == null)
+				{
+					return true;
+				}
+
+				if (!ConsoleList.OnDrawList(consoleWindow))
+				{
+					return false; // Skip original method (BeginVerticalSplit)
+				}
+				return true; // Proceed with original method
+			}
+
+			[HarmonyPostfix]
+			private static void DrawFoldoutsPostfix()
+			{
+				ConsoleToolbarFoldout.OnDrawFoldouts();
+			}
+
+			[HarmonyPostfix]
+			private static void DrawToolbarIconPostfix()
+			{
+				ConsoleToolbarIcon.OnDrawToolbar();
+			}
+
+			[HarmonyPostfix]
+			private static void ModifyTextPostfix(
+				[HarmonyArgument(0)] LogEntry entry,
+				[HarmonyArgument(1)] int row,
+				[HarmonyArgument(3)] ref string outString)
+			{
+				// The original method is LogEntries.GetLinesAndModeFromEntryInternal(LogEntry entry, int row, int totalRows, out string outString, out int outMode)
+				// entry is argument 0
+				// row is argument 1
+				// outString is argument 3
+				if (entry == null) return;
+				Needle.Console.ConsoleTextPrefix.ModifyTextInternal(entry, row, ref outString);
+			}
+			// Original commented out code follows...
 			// private class Instructor
 			// {
 			// 	public List<Func<CodeInstruction, bool>> List = new List<Func<CodeInstruction, bool>>();
