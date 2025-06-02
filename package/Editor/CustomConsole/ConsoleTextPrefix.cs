@@ -45,7 +45,7 @@ namespace Needle.Console
 		private static readonly Dictionary<string, string> cachedPrefix = new Dictionary<string, string>();
 		private static readonly StringBuilder keyBuilder = new StringBuilder();
 
-		public static void ModifyTextInternal(LogEntry entry, int entryRow, ref string text)
+		internal static void ModifyTextInternal(LogEntry entry, int entryRow, ref string text)
 		{
 			// entry is used directly instead of LogEntries.GetEntryInternal(element.row, tempEntry)
 			// entryRow is used instead of element.row
@@ -59,7 +59,7 @@ namespace Needle.Console
 				}
 
 				// Removed: if (!LogEntries.GetEntryInternal(element.row, tempEntry)) { return; }
-				// Assuming 'entry' is valid if this method is called.
+				// Assuming 'entry' is valid if this method is called. 
 				// If 'entry' can be null or invalid, checks might be needed here.
 
 				keyBuilder.Clear();
@@ -70,7 +70,7 @@ namespace Needle.Console
 					keyBuilder.Append(entry.identifier).Append(entry.globalLineIndex);
 #else
 				// Original logic used element.row when file info was missing. Using entryRow here.
-				if (entry.file == "" && entry.line == 0 && entry.column == -1)
+				if (entry.file == "" && entry.line == 0 && entry.column == -1) 
 				{
 					keyBuilder.Append(entryRow);
 				}
@@ -110,7 +110,7 @@ namespace Needle.Console
 							if (!NeedleConsoleSettings.instance.ShowLogPrefix) return string.Empty;
 							keyBuilder.Clear();
 							keyBuilder.Append(entry.file).Append(entry.line).Append(entry.column).Append(entry.mode);
-							keyBuilder.Append(entry.message);
+							keyBuilder.Append(entry.message); 
 #if UNITY_2021_2_OR_NEWER
 							if(string.IsNullOrWhiteSpace(entry.file))
 								keyBuilder.Append(entry.identifier).Append(entry.globalLineIndex);
@@ -118,7 +118,7 @@ namespace Needle.Console
 							// Original logic used element.row when file info was missing. Using entryRow here.
 							if (entry.file == "" && entry.line == 0 && entry.column == -1)
 							{
-								keyBuilder.Append(entryRow);
+								keyBuilder.Append(entryRow); 
 							}
 #endif
 							var key2 = keyBuilder.ToString();
@@ -149,7 +149,7 @@ namespace Needle.Console
 
 							if (entry.line > 0)
 								str += ":" + entry.line;
-
+							
 							str = PrefixFormat(str); // Renamed Prefix to PrefixFormat to avoid conflict with parameter name
 							if (cacheEntry)
 							{
@@ -161,7 +161,7 @@ namespace Needle.Console
 
 							string PrefixFormat(string s) => $"{colorPrefix} {s} {colorPostfix}";
 						}
-
+						
 						var endTimeIndex = text.IndexOf("] ", StringComparison.InvariantCulture);
 						var calculatedPrefix = GetPrefix(); // Renamed from prefix to avoid conflict
 
@@ -169,10 +169,10 @@ namespace Needle.Console
 						var colorMarker = settings.UseColorMarker ? NeedleConsoleSettings.instance.ColorMarker : string.Empty;
 						if (settings.UseColorMarker && !string.IsNullOrWhiteSpace(colorMarker))
 							LogColor.CalcLogColor(colorKey, ref colorMarker);
-
+						
 						// Pass 'entry' to RemoveFilePathInCompilerErrorMessages
-						RemoveFilePathInCompilerErrorMessages(ref text, entry);
-
+						RemoveFilePathInCompilerErrorMessages(ref text, entry); 
+						
 						if (endTimeIndex == -1)
 						{
 							text = $"{colorMarker}{calculatedPrefix}{text}";
@@ -231,7 +231,7 @@ namespace Needle.Console
 				;
 
 			// tempEntry is no longer a class field for this method's direct use, using passed 'entry'
-			if (ConsoleList.HasMode(entry.mode, modestoRemovePath))
+			if (ConsoleList.HasMode(entry.mode, modestoRemovePath)) 
 			{
 				var match = findEndOfFilePathRegex.Match(str);
 				if (match.Success)

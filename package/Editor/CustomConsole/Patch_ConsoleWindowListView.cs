@@ -43,10 +43,10 @@ namespace Needle.Console
 				{
 					UnityEngine.Debug.LogError("Needle Console: Could not find UnityEditor.SplitterGUILayout type.");
 				}
-
+				
 				// For Postfix on GUILayout.FlexibleSpace
 				var guilayoutType = typeof(UnityEngine.GUILayout);
-				var flexibleSpaceMethod = AccessTools.Method(guilayoutType, "FlexibleSpace", new System.Type[] { });
+				var flexibleSpaceMethod = AccessTools.Method(guilayoutType, "FlexibleSpace", new System.Type[] { }); 
 				if (flexibleSpaceMethod != null)
 				{
 					yield return flexibleSpaceMethod;
@@ -92,12 +92,12 @@ namespace Needle.Console
 			private static bool DrawListPrefix()
 			{
 				var consoleWindow = EditorWindow.GetWindow(Patch_Console.ConsoleWindowType);
-				if (consoleWindow == null)
+				if (consoleWindow == null) 
 				{
-					return true;
+					return true; 
 				}
 
-				if (!ConsoleList.OnDrawList(consoleWindow))
+				if (!ConsoleList.OnDrawList(consoleWindow)) 
 				{
 					return false; // Skip original method (BeginVerticalSplit)
 				}
@@ -126,7 +126,7 @@ namespace Needle.Console
 				// entry is argument 0
 				// row is argument 1
 				// outString is argument 3
-				if (entry == null) return;
+				if (entry == null) return; 
 				Needle.Console.ConsoleTextPrefix.ModifyTextInternal(entry, row, ref outString);
 			}
 			// Original commented out code follows...
