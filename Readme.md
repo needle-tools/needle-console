@@ -50,7 +50,7 @@ You can also add it directly from GitHub on Unity 2019.4+. Note that you won't b
 - open Package Manager
 - click <kbd>+</kbd>
 - select <kbd>Add from Git URL</kbd>
-- paste `https://github.com/needle-tools/console.git?path=/package`
+- paste `https://github.com/needle-tools/needle-console.git?path=/package`
 - click <kbd>Add</kbd>
 </details>
 
