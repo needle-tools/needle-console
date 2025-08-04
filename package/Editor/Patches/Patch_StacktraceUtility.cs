@@ -18,9 +18,15 @@ namespace Needle.Console
 			}
 
 			// will append Unity side of stacktrace to exceptions
-			private static bool Prefix(StackTrace stackTrace, ref string __result)
+			// NOTE: Unity changed the parameter name in StackTraceUtility.ExtractFormattedStackTrace
+			// between Unity 6000.0.51f1 and 6000.0.54f1:
+			// - Unity 6000.0.51f1 and earlier: parameter named "stackTrace" 
+			// - Unity 6000.0.54f1 and later: parameter named "stackFrames"
+			// Using __0 (first parameter) to work regardless of the parameter name
+			// See: https://github.com/needle-tools/needle-console/issues/33
+			private static bool Prefix(StackTrace __0, ref string __result)
 			{
-				__result = new EnhancedStackTrace(stackTrace).ToString();
+				__result = new EnhancedStackTrace(__0).ToString();
 				Hyperlinks.FixStacktrace(ref __result);
 				StacktraceMarkerUtil.AddMarker(ref __result);
 				return false;
