@@ -30,7 +30,7 @@ namespace Needle.Console
 				{
 					var inst = arr[index];
 					
-					// Debug.Log("<color=grey>" + index + ": " + inst + "</color>"); 
+					UnityEngine.Debug.Log("<color=grey>" + index + ": " + inst + "</color>"); 
 
 					// get local index for current list view element
 					if (loadListViewElementIndex == -1 || inst.IsStloc() && inst.operand is LocalBuilder)
@@ -61,8 +61,10 @@ namespace Needle.Console
 					
 					// this is before "GUILayout.FlexibleSpace"
 					// https://github.com/Unity-Technologies/UnityCsReference/blob/61f92bd79ae862c4465d35270f9d1d57befd1761/Editor/Mono/ConsoleWindow.cs#L539
-#if UNITY_2022_1_OR_NEWER
-					if (index == 241)
+#if UNITY_6000_2_OR_NEWER
+					if (index == 233)
+#elif UNITY_2022_1_OR_NEWER
+					if (index == 30)
 #elif UNITY_2021_1_OR_NEWER
 					if (index == 172)
 #elif UNITY_2020_1_OR_NEWER
@@ -76,8 +78,10 @@ namespace Needle.Console
 					
 					// this is before "EndHorizontal"
 					// https://github.com/Unity-Technologies/UnityCsReference/blob/4d031e55aeeb51d36bd94c7f20182978d77807e4/Editor/Mono/ConsoleWindow.cs#L600
-#if UNITY_2022_1_OR_NEWER
-					if (index == 349)
+#if UNITY_6000_2_OR_NEWER
+					if (index == 342)
+#elif UNITY_2022_1_OR_NEWER
+					if (index == 200)
 #elif UNITY_2021_1_OR_NEWER
 					if (index == 329)
 #elif UNITY_2020_1_OR_NEWER
@@ -91,8 +95,10 @@ namespace Needle.Console
 
 					// TODO: properly search for the right spots
 					// this is right before  SplitterGUILayout.BeginVerticalSplit(spl);
-#if UNITY_2022_1_OR_NEWER
-					if (index == 382)
+#if UNITY_6000_2_OR_NEWER
+					if (index == 374)
+#elif UNITY_2022_1_OR_NEWER
+					if (index == 2)
 #elif UNITY_2021_1_OR_NEWER
 					if (index == 330)
 #elif UNITY_2020_3_38_OR_NEWER
