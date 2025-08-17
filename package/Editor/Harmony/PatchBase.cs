@@ -28,7 +28,7 @@ namespace Needle.Console
 			{
 				if (m == null)
 				{
-					Debug.LogError($"Null method returned from {this} ({this.GetType()}). Please report a bug and note your Unity and package versions.");
+					Debug.LogError($"Null method returned from {this} ({this.GetType()}). Please report a bug including your Unity and Needle Console package version.");
 					continue;
 				}
 				var prefix = AccessTools.Method(t, "Prefix");
@@ -47,7 +47,7 @@ namespace Needle.Console
 				}
 				catch (Exception e)
 				{
-					Debug.LogError($"Method patching failed from {this} ({this.GetType()}). Please report a bug and note your Unity and package versions.\n{e}");
+					Debug.LogError($"Method patching failed of {m} in {this}. <b>Please report a bug</b> including your Unity, Needle Console package version and the full error message:\n{e}");
 				}
 			}
 		}
