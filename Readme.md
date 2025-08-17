@@ -3,9 +3,8 @@
 <img src="package/Documentation~/filter-log-solo.gif" align="middle"/>
 
 ## License
-Needle Console is [available on the Asset Store](https://assetstore.unity.com/packages/tools/utilities/needle-console-194002) for commercial use.  
-Other versions are only allowed to be used non-commercially and only if you're entitled to use Unity Personal (the same restrictions apply).
- 
+Needle Console is [available on the Asset Store](https://assetstore.unity.com/packages/tools/utilities/needle-console-194002) for commercial use (and to support development).  
+
 ## **Feature Overview**
 - Improved stacktrace readability
 - Syntax highlight stacktraces
@@ -63,7 +62,7 @@ Settings can be configured under ``Edit > Preferences > Needle > Console``.
 Please open the <a href="https://github.com/needle-tools/demystify/blob/main/package/Readme.md">Package Readme</a> for more information.
 
 ## Supported Versions
-Unity 2019.4 until 2021.1
+Unity 2019.4 until 6000
 
 ## Contact ✒️
 <b>[🌵 needle — tools for unity](https://needle.tools)</b> • 
