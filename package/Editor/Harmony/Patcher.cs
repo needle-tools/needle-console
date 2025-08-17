@@ -24,11 +24,11 @@ namespace Needle.Console
 			// Harmony is not supported on Apple Silicon right now; see
 			// https://github.com/pardeike/Harmony/issues/424
 			// blocked by https://github.com/MonoMod/MonoMod/issues/90
-			var isAppleSilicon = RuntimeInformation.ProcessArchitecture == Architecture.Arm64
-				&& RuntimeInformation.IsOSPlatform(OSPlatform.OSX);
-
-			if (isAppleSilicon)
-				return;
+			// var isAppleSilicon = RuntimeInformation.ProcessArchitecture == Architecture.Arm64
+			// 	&& RuntimeInformation.IsOSPlatform(OSPlatform.OSX);
+			//
+			// if (isAppleSilicon)
+			// 	return;
 			
 			if (patches == null)
 			{
