@@ -11,16 +11,16 @@ using UnityEditor;
 
 namespace Needle.Console
 {
-		internal class Patch_ConsoleWindowListView : PatchBase
+	internal class Patch_ConsoleWindowListView : PatchBase
+	{
+		protected override IEnumerable<MethodBase> GetPatches()
 		{
-			protected override IEnumerable<MethodBase> GetPatches()
-			{
-				var method = Patch_Console.ConsoleWindowType.GetMethod("OnGUI", BindingFlags.NonPublic | BindingFlags.Instance);
-				yield return method;
-			}
+			var method = Patch_Console.ConsoleWindowType.GetMethod("OnGUI", BindingFlags.NonPublic | BindingFlags.Instance);
+			yield return method;
+		}
 
-			private static IEnumerable<CodeInstruction> Transpiler(MethodBase method, ILGenerator il, IEnumerable<CodeInstruction> instructions)
-			{
+		private static IEnumerable<CodeInstruction> Transpiler(MethodBase method, ILGenerator il, IEnumerable<CodeInstruction> instructions)
+		{
 #if !NETSTANDARD
 				var skipLabel = il.DefineLabel();
 				var arr = instructions.ToArray();
@@ -63,6 +63,8 @@ namespace Needle.Console
 					// https://github.com/Unity-Technologies/UnityCsReference/blob/61f92bd79ae862c4465d35270f9d1d57befd1761/Editor/Mono/ConsoleWindow.cs#L539
 #if UNITY_6000_2_OR_NEWER
 					if (index == 233)
+#elif UNITY_6000_0_OR_NEWER
+					if (index == 240)
 #elif UNITY_2022_1_OR_NEWER
 					if (index == 30)
 #elif UNITY_2021_1_OR_NEWER
@@ -80,6 +82,8 @@ namespace Needle.Console
 					// https://github.com/Unity-Technologies/UnityCsReference/blob/4d031e55aeeb51d36bd94c7f20182978d77807e4/Editor/Mono/ConsoleWindow.cs#L600
 #if UNITY_6000_2_OR_NEWER
 					if (index == 342)
+#elif UNITY_6000_0_OR_NEWER
+					if (index == 349)
 #elif UNITY_2022_1_OR_NEWER
 					if (index == 200)
 #elif UNITY_2021_1_OR_NEWER
@@ -97,10 +101,12 @@ namespace Needle.Console
 					// this is right before  SplitterGUILayout.BeginVerticalSplit(spl);
 #if UNITY_6000_2_OR_NEWER
 					if (index == 374)
+#elif UNITY_6000_0_OR_NEWER
+					if (index == 382)
 #elif UNITY_2022_1_OR_NEWER
 					if (index == 2)
 #elif UNITY_2021_1_OR_NEWER
-					if (index == 330)
+					if (index == 330) 
 #elif UNITY_2020_3_38_OR_NEWER
 					if (index == 323)
 #elif UNITY_2020_1_OR_NEWER
@@ -117,37 +123,37 @@ namespace Needle.Console
 					yield return inst;
 				}
 #else
-				if (SessionState.GetBool("NeedleConsole:NetStandardIsUnsupportedWarning", false) == false)
-				{
-					SessionState.SetBool("NeedleConsole:NetStandardIsUnsupportedWarning", true);
-					UnityEngine.Debug.LogWarning("Needle Console does currently not support .NET Standard ('Project Settings/Player/Editor Assemblies Compatibility Level') set to : https://github.com/needle-tools/needle-console/issues/27");
-				}
-				return instructions;
-#endif
+			if (SessionState.GetBool("NeedleConsole:NetStandardIsUnsupportedWarning", false) == false)
+			{
+				SessionState.SetBool("NeedleConsole:NetStandardIsUnsupportedWarning", true);
+				UnityEngine.Debug.LogWarning("Needle Console does currently not support .NET Standard ('Project Settings/Player/Editor Assemblies Compatibility Level') set to : https://github.com/needle-tools/needle-console/issues/27");
 			}
-			
-			
-
-			// private class Instructor
-			// {
-			// 	public List<Func<CodeInstruction, bool>> List = new List<Func<CodeInstruction, bool>>();
-			// 	public Func<CodeInstruction, bool> OnFound;
-			//
-			// 	private int currentListIndex;
-			// 	private int firstIndex;
-			// 	
-			// 	public void Check(CodeInstruction inst, int index)
-			// 	{
-			// 		var check = List[currentListIndex];
-			// 		if (check(inst))
-			// 		{
-			// 			currentListIndex += 1;
-			// 			if (currentListIndex >= List.Count)
-			// 			{
-			// 				OnFound?.Invoke()
-			// 			}
-			// 		}
-			// 	}
-			// }
+			return instructions;
+#endif
 		}
+
+
+
+		// private class Instructor
+		// {
+		// 	public List<Func<CodeInstruction, bool>> List = new List<Func<CodeInstruction, bool>>();
+		// 	public Func<CodeInstruction, bool> OnFound;
+		//
+		// 	private int currentListIndex;
+		// 	private int firstIndex;
+		// 	
+		// 	public void Check(CodeInstruction inst, int index)
+		// 	{
+		// 		var check = List[currentListIndex];
+		// 		if (check(inst))
+		// 		{
+		// 			currentListIndex += 1;
+		// 			if (currentListIndex >= List.Count)
+		// 			{
+		// 				OnFound?.Invoke()
+		// 			}
+		// 		}
+		// 	}
+		// }
+	}
 }

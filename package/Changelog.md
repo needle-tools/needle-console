@@ -4,6 +4,9 @@ All notable changes to this package will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## [2.5.1] - 2025-09-01
+- fix: injection error for Unity 6000
+
 ## [2.5.0] - 2025-08-18
 - add: support for Apple Silicon
 - add: support for Unity 6000.2
