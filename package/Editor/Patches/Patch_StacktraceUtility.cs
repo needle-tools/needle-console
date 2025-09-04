@@ -49,23 +49,29 @@ namespace Needle.Console
 
 				var skipCalls = 0;
 				var rawStacktrace = new StackTrace();
+				// var debug_string = "";
 				for (var i = 0; i < rawStacktrace.FrameCount; i++)
 				{
 					var frame = rawStacktrace.GetFrame(i);
-					var method = frame.GetMethod(); 
+					var method = frame.GetMethod();
 					if (method == null) break;
+
+					// debug_string += "\n" + method.DeclaringType?.Name;
+
 					if (method.DeclaringType == typeof(Patch_StacktraceUtility)
-					    || method.DeclaringType == typeof(StackTraceUtility)
-					    || method.DeclaringType == typeof(Debug)
-					    || method.DeclaringType?.Name == "DebugLogHandler"
-					    || method.Name == nameof(Prefix)
-					    )
+						|| method.DeclaringType == typeof(StackTraceUtility)
+						|| method.DeclaringType == typeof(Debug)
+						|| method.DeclaringType?.Name == "DebugLogHandler"
+						|| method.DeclaringType?.Name == "DynamicMethodDefinition"
+						|| method.Name == nameof(Prefix)
+						)
 					{
+						// debug_string += " (skipped)";
 						skipCalls += 1;
 						continue;
 					}
 
-					break;
+					if(skipCalls > 0) break;
 				}
 
 				var trace = new StackTrace(baseSkip + skipCalls, true);
@@ -74,6 +80,7 @@ namespace Needle.Console
 				Hyperlinks.FixStacktrace(ref __result);
 				StacktraceMarkerUtil.AddMarker(ref __result);
 				__result = __result.TrimEnd('\r').TrimEnd('\n');
+				// __result =  __result + "\n" + debug_string;
 				return false;
 			}
 		}
