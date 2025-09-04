@@ -30,7 +30,7 @@ namespace Needle.Console
 				{
 					var inst = arr[index];
 					
-					UnityEngine.Debug.Log("<color=grey>" + index + ": " + inst + "</color>"); 
+					//UnityEngine.Debug.Log("<color=grey>" + index + ": " + inst + "</color>"); 
 
 					// get local index for current list view element
 					if (loadListViewElementIndex == -1 || inst.IsStloc() && inst.operand is LocalBuilder)
