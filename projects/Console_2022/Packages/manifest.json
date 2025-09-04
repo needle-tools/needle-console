@@ -1,7 +1,8 @@
 {
   "dependencies": {
     "com.needle.console": "file:../../../package",
-    "com.unity.ide.rider": "3.0.17",
+    "com.needle.demystify.extras": "file:../../needle.demystify.extras",
+    "com.unity.ide.rider": "3.0.36",
     "com.unity.modules.ai": "1.0.0",
     "com.unity.modules.androidjni": "1.0.0",
     "com.unity.modules.animation": "1.0.0",
@@ -32,7 +33,6 @@
     "com.unity.modules.video": "1.0.0",
     "com.unity.modules.vr": "1.0.0",
     "com.unity.modules.wind": "1.0.0",
-    "com.unity.modules.xr": "1.0.0",
-    "com.needle.demystify.extras": "file:../../needle.demystify.extras"
+    "com.unity.modules.xr": "1.0.0"
   }
 }
