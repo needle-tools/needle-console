@@ -13,34 +13,40 @@ namespace Needle.Console
 
 		private static readonly StringBuilder stacktraceBuilder = new StringBuilder();
 		private static readonly StringBuilder fixStacktraceBuilder = new StringBuilder();
+		private static readonly object lockStacktraceBuilder = new object();
+		
 		
 		public static void FixStacktrace(ref string stacktrace)
 		{
 			var lines = stacktrace.Split(new []{'\n'}, StringSplitOptions.RemoveEmptyEntries);
-			
-			stacktraceBuilder.Clear();
-			
-			foreach (var t in lines)
+
+			lock (lockStacktraceBuilder)
 			{
-				fixStacktraceBuilder.Clear();
-				var line = t;
-				// hyperlinks capture 
-				var path = Fix(line, fixStacktraceBuilder, out var lineNumber);
-				if (!string.IsNullOrEmpty(path))
+				stacktraceBuilder.Clear();
+
+				foreach (var t in lines)
 				{
-					if (ShouldInclude(line)) {
-						// path = path.Replace("\n", "");
-						fixStacktraceBuilder.Append(path).Append(lineNumber).Append(")");
-						line = fixStacktraceBuilder.ToString();
-						Filepaths.TryMakeRelative(ref line);
+					fixStacktraceBuilder.Clear();
+					var line = t;
+					// hyperlinks capture 
+					var path = Fix(line, fixStacktraceBuilder, out var lineNumber);
+					if (!string.IsNullOrEmpty(path))
+					{
+						if (ShouldInclude(line))
+						{
+							// path = path.Replace("\n", "");
+							fixStacktraceBuilder.Append(path).Append(lineNumber).Append(")");
+							line = fixStacktraceBuilder.ToString();
+							Filepaths.TryMakeRelative(ref line);
+						}
 					}
+
+					stacktraceBuilder.Append(line).Append("\n");
 				}
-				
-				stacktraceBuilder.Append(line).Append("\n");
+
+				stacktrace = stacktraceBuilder.ToString();
 			}
 
-			stacktrace = stacktraceBuilder.ToString();
-			
 			return;
 			
 			// dont append path to editor only lines to force unity to open the previous file path
