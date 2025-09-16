@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Needle.Editors;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -54,6 +55,9 @@ namespace Needle.Console
 
 			EditorGUI.BeginChangeCheck();
 
+			
+			Assets.DrawGUIFullLogo();
+			
 			using (var s = new EditorGUILayout.ScrollViewScope(scroll))
 			{
 				scroll = s.scrollPosition;

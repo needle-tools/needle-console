@@ -1,4 +1,5 @@
 ﻿using System;
+using Needle.Editors;
 using UnityEditor;
 using UnityEngine;
 
@@ -42,7 +43,8 @@ namespace Needle.Console
 
 			var width = count < 100 ? new[] { GUILayout.MinWidth(52) } : Array.Empty<GUILayoutOption>();
 			ConsoleFilter.enabled = !GUILayout.Toggle(!ConsoleFilter.enabled, content, filterButtonStyle, width);
-			
+
+			Assets.DrawGUILogo();
 			// var rect = GUILayoutUtility.GetLastRect();
 			// rect.x += rect.width;
 			// rect.width = 50;
