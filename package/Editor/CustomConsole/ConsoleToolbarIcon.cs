@@ -44,7 +44,7 @@ namespace Needle.Console
 			var width = count < 10 ? new[] { GUILayout.MinWidth(40) } : count < 100 ? new[] { GUILayout.MinWidth(50) } : Array.Empty<GUILayoutOption>();
 			ConsoleFilter.enabled = !GUILayout.Toggle(!ConsoleFilter.enabled, content, filterButtonStyle, width);
 
-			Assets.DrawGUILogo();
+			//Assets.DrawGUILogo();
 			// var rect = GUILayoutUtility.GetLastRect();
 			// rect.x += rect.width;
 			// rect.width = 50;
