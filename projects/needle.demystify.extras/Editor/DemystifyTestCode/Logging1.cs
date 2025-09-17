@@ -60,7 +60,7 @@ namespace Demystify._Tests
 			for (var i = 0; i < 50; i++)
 			{
 				var str = string.Empty;
-				for (var k = 0; k < 2 + (int) Random.value; k++)
+				for (var k = 0; k < 2 + (int) (Random.value * 50); k++)
 				{
 					str += words[Mathf.FloorToInt(Random.value * words.Length)] + " ";
 				}

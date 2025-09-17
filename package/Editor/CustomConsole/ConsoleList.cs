@@ -561,12 +561,17 @@ namespace Needle.Console
 			return 0;
 		}
 
+		private static GUIStyle customMessageStyle;
+		
 		internal static void DrawDefaultStacktrace(string stacktraceWithHyperlinks, float height)
 		{
 			try
 			{
+				if (customMessageStyle == null) customMessageStyle = new GUIStyle(ConsoleWindow.Constants.MessageStyle);
+				customMessageStyle.wordWrap = NeedleConsoleSettings.instance.StacktraceWrap;
+				
 				EditorGUILayout.SelectableLabel(stacktraceWithHyperlinks,
-					ConsoleWindow.Constants.MessageStyle,
+					customMessageStyle,
 					GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true),
 					GUILayout.MinHeight(height + EditorGUIUtility.singleLineHeight * 2));
 			}

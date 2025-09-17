@@ -67,8 +67,9 @@ namespace Needle.Console
 				GUILayout.Space(10);
 				EditorGUILayout.LabelField("Console Options", EditorStyles.boldLabel);
 				settings.Separator = EditorGUILayout.TextField(new GUIContent("Stacktrace Separator", "Adds a separator to Console stacktrace output between each stacktrace"), settings.Separator);
-				settings.ShortenFilePaths = EditorGUILayout.Toggle(new GUIContent("Shorten File Paths", "When enabled demystify tries to shorten package paths to <package_name>@<version> <fileName><line>"), settings.ShortenFilePaths); 
-				settings.ShowLogPrefix = EditorGUILayout.Toggle(new GUIContent("Show Filename", "When enabled demystify will prefix console log entries with the file name of the log source"), settings.ShowLogPrefix); 
+				settings.ShortenFilePaths = EditorGUILayout.Toggle(new GUIContent("Shorten File Paths", "When enabled Needle Console tries to shorten package paths to <package_name>@<version> <fileName><line>"), settings.ShortenFilePaths); 
+				settings.ShowLogPrefix = EditorGUILayout.Toggle(new GUIContent("Show Filename", "When enabled Needle Console will prefix console log entries with the file name of the log source"), settings.ShowLogPrefix); 
+				settings.StacktraceWrap = EditorGUILayout.Toggle(new GUIContent("Stacktrace Wrap", "When enabled logs in the stacktrace will not word-wrap - meaning very long stacktrace lines will not wrap around making it sometimes easier to read."), settings.StacktraceWrap); 
 				
 				EditorGUILayout.Space();
 				EditorGUILayout.LabelField("Experimental", EditorStyles.boldLabel);

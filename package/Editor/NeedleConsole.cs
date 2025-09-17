@@ -83,7 +83,7 @@ namespace Needle.Console
 		{
 			try
 			{
-				using (new ProfilerMarker("Demystify.Apply").Auto())
+				using (new ProfilerMarker("Needle Console.Apply").Auto())
 				{
 					if(Profiler.enabled) return;
 					

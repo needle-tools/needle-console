@@ -96,6 +96,7 @@ namespace Needle.Console
 
 		public bool ShortenFilePaths = true;
 		[FormerlySerializedAs("ShowFileName")] public bool ShowLogPrefix = true;
+		public bool StacktraceWrap = true;
 		public bool UseColorMarker = true;
 		public string ColorMarker = "┃";// "┃";
 		
