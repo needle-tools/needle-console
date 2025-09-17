@@ -41,7 +41,7 @@ namespace Needle.Console
 				filterButtonStyle.alignment = TextAnchor.MiddleLeft;
 			}
 
-			var width = count < 100 ? new[] { GUILayout.MinWidth(52) } : Array.Empty<GUILayoutOption>();
+			var width = count < 10 ? new[] { GUILayout.MinWidth(40) } : count < 100 ? new[] { GUILayout.MinWidth(50) } : Array.Empty<GUILayoutOption>();
 			ConsoleFilter.enabled = !GUILayout.Toggle(!ConsoleFilter.enabled, content, filterButtonStyle, width);
 
 			Assets.DrawGUILogo();
