@@ -28,6 +28,12 @@ namespace Needle.Console
 				{
 					fixStacktraceBuilder.Clear();
 					var line = t;
+
+					if (line.Contains("/Users/bokken/build") || line.Contains("Tasks.SynchronizationContextAwaitTaskContinuation") || line.Contains("CompilerServices.AsyncMethodBuilderCore"))
+					{
+						continue;
+					}
+					
 					// hyperlinks capture 
 					var path = Fix(line, fixStacktraceBuilder, out var lineNumber);
 					if (!string.IsNullOrEmpty(path))

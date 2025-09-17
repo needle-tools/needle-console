@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.Diagnostics.Eventing.Reader;
 using System.IO;
+using System.Threading.Tasks;
 using UnityEditor;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
@@ -33,6 +34,13 @@ namespace Demystify._Tests
 		private static void Exception()
 		{
 			Debug.LogException(new Exception("An exception log", new Exception("a inner exception")));
+		}
+		
+		[MenuItem("Test/LogAsync")]
+		private static async void LogAsync()
+		{
+			await Task.Delay(100);
+			Debug.Log("A log from async method");
 		}
 
 		// [InitializeOnLoadMethod]
@@ -67,7 +75,8 @@ namespace Demystify._Tests
 			Log,
 			Log,
 			Log,
-			Warning
+			Warning,
+			LogWithLongerStacktrace
 		};
 
 		[MenuItem("Test/Log Random")]
@@ -75,6 +84,21 @@ namespace Demystify._Tests
 		{
 			for (var i = 0; i < 5; i++)
 				randomLogMethods[Mathf.FloorToInt(randomLogMethods.Length * Random.value)]();
+		}
+
+		[MenuItem("Test/Log Long Stacktrace")]
+		private static void LogWithLongerStacktrace()
+		{
+			LogWithLongerStacktraceInternal(0);
+		}
+
+		private static void LogWithLongerStacktraceInternal(int level = 0)
+		{
+			if (level > 10 || Random.value > .9)
+			{				
+				randomLogMethods[Mathf.FloorToInt(randomLogMethods.Length * Random.value)]();
+			}
+			else LogWithLongerStacktraceInternal(level + 1);
 		}
 		
 		
