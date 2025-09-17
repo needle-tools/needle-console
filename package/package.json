@@ -1,14 +1,16 @@
 {
   "displayName": "Needle Console",
   "name": "com.needle.console",
-  "version": "2.5.3",
+  "version": "2.5.4",
   "unity": "2020.3",
-  "description": "Better Unity console featuring improved stacktrace readability using Ben.Demystifier, filtering of log entries, collapsing of individual logs",
+  "description": "Better Unity console featuring improved stacktrace readability using Ben.Demystifier, filtering of log entries, collapsing of individual logs. No code changes are needed - this package integrates directly into the native Unity console.",
   "keywords": [
     "Editor",
     "Console",
     "Stacktrace",
-    "Filter"
+    "Filter",
+    "Debug", 
+    "Programming"
   ],
   "repository": {
     "type": "git",
