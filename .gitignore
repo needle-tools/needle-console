@@ -107,3 +107,4 @@ Ankh.NoLoad
 *.sln
 projects/*/UserSettings
 projects/**/builds-webgl
+projects/*/.vscode

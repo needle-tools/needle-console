@@ -30,7 +30,7 @@ namespace Needle.Console
 				{
 					var inst = arr[index];
 					
-					//UnityEngine.Debug.Log("<color=grey>" + index + ": " + inst + "</color>"); 
+					// UnityEngine.Debug.Log("<color=grey>" + index + ": " + inst + "</color>"); 
 
 					// get local index for current list view element
 					if (loadListViewElementIndex == -1 || inst.IsStloc() && inst.operand is LocalBuilder)
@@ -100,7 +100,8 @@ namespace Needle.Console
 					// TODO: properly search for the right spots
 					// this is right before  SplitterGUILayout.BeginVerticalSplit(spl);
 #if UNITY_6000_2_OR_NEWER
-					if (index == 374)
+					if (index == 380)
+					// if (index == 374) // Unity < 6000.2.6
 #elif UNITY_6000_0_OR_NEWER || UNITY_2022_3_OR_NEWER
 					if (index == 382)
 #elif UNITY_2022_1_OR_NEWER
