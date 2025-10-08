@@ -30,6 +30,12 @@ namespace Needle.Console
 					NeedleConsoleSettings.instance.IndividualCollapse = !NeedleConsoleSettings.instance.IndividualCollapse;
 					ConsoleFilter.MarkDirty();
 				}, null);
+			menu.AddItem(new GUIContent(prefix + "Stacktrace: Wrap Lines"), NeedleConsoleSettings.instance.StacktraceWrap,
+				data => { NeedleConsoleSettings.instance.StacktraceWrap = !NeedleConsoleSettings.instance.StacktraceWrap; }, null);
+
+			menu.AddSeparator(prefix);
+			menu.AddItem(new GUIContent(prefix + "Open Settings"), false,
+				data => { SettingsService.OpenProjectSettings("Preferences/Needle Console"); }, null);
 		}
 	}
 }

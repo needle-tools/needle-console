@@ -29,6 +29,11 @@ namespace Needle.Console
 			set => SessionState.SetBool("Needle.Console.DevelopmentMode", value);
 		}
 
+		/// <summary>
+		/// If true, internal stacktrace entries (like System.Threading.Tasks) will be hidden
+		/// </summary>
+		public bool HideInternalStacktrace = true;
+
 		public Highlighting SyntaxHighlighting = Highlighting.Simple;
 		public bool UseSyntaxHighlighting => SyntaxHighlighting != Highlighting.None;
 
@@ -99,6 +104,7 @@ namespace Needle.Console
 		public bool StacktraceWrap = true;
 		public bool UseColorMarker = true;
 		public string ColorMarker = "┃";// "┃";
+		public static string DefaultColorMarker = "┃";
 		
 		[FormerlySerializedAs("CustomList")] public bool CustomConsole = true;
 		public bool RowColors = true;

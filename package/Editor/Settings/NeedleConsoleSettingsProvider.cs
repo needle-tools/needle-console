@@ -55,9 +55,9 @@ namespace Needle.Console
 
 			EditorGUI.BeginChangeCheck();
 
-			
+
 			Assets.DrawGUIFullLogo();
-			
+
 			using (var s = new EditorGUILayout.ScrollViewScope(scroll))
 			{
 				scroll = s.scrollPosition;
@@ -67,10 +67,44 @@ namespace Needle.Console
 				GUILayout.Space(10);
 				EditorGUILayout.LabelField("Console Options", EditorStyles.boldLabel);
 				settings.Separator = EditorGUILayout.TextField(new GUIContent("Stacktrace Separator", "Adds a separator to Console stacktrace output between each stacktrace"), settings.Separator);
-				settings.ShortenFilePaths = EditorGUILayout.Toggle(new GUIContent("Shorten File Paths", "When enabled Needle Console tries to shorten package paths to <package_name>@<version> <fileName><line>"), settings.ShortenFilePaths); 
-				settings.ShowLogPrefix = EditorGUILayout.Toggle(new GUIContent("Show Filename", "When enabled Needle Console will prefix console log entries with the file name of the log source"), settings.ShowLogPrefix); 
-				settings.StacktraceWrap = EditorGUILayout.Toggle(new GUIContent("Stacktrace Wrap", "When enabled logs in the stacktrace will not word-wrap - meaning very long stacktrace lines will not wrap around making it sometimes easier to read."), settings.StacktraceWrap); 
-				
+				settings.ShortenFilePaths = EditorGUILayout.Toggle(new GUIContent("Short File Paths", "When enabled Needle Console tries to shorten package paths to <package_name>@<version> <fileName><line>"), settings.ShortenFilePaths);
+				settings.ShowLogPrefix = EditorGUILayout.Toggle(new GUIContent("Show Filename", "When enabled Needle Console will prefix console log entries with the file name of the log source"), settings.ShowLogPrefix);
+				settings.HideInternalStacktrace = EditorGUILayout.Toggle(new GUIContent("Clean Stacktrace", "When enabled internal stacktrace elements will not be shown (e.g. System.Tasks or internal UnityEngine method calls). Changes will take effect for new logs (already logged items will not be updates)"), settings.HideInternalStacktrace);
+
+				EditorGUILayout.Space();
+				using (new GUILayout.HorizontalScope())
+				{
+					EditorGUILayout.PrefixLabel(new GUIContent("Custom Console", "The custom list replaces the console log drawing with a custom implementation that allows for advanced features such like very custom log filtering via context menus"), EditorStyles.boldLabel, EditorStyles.boldLabel);
+					GUILayout.Space(2);
+					settings.CustomConsole = EditorGUILayout.Toggle(settings.CustomConsole);
+				}
+				using (new EditorGUI.DisabledScope(!settings.CustomConsole))
+				{
+					settings.RowColors = EditorGUILayout.Toggle(new GUIContent("Row Colors", "Allow custom list to tint row background for warnings and errors"), settings.RowColors);
+
+					settings.StacktraceWrap = EditorGUILayout.Toggle(new GUIContent("Stacktrace: Line-Wrap", "When enabled logs in the stacktrace will word-wrap - meaning very long stacktrace lines will not wrap around making it sometimes easier to read."), settings.StacktraceWrap);
+
+
+					settings.IndividualCollapse = EditorGUILayout.Toggle(new GUIContent("Allow Individual Collapse", "When enabled the log context menu allows to collapse individual logs. To add log messages for individual collapse simply right click on a message in the console window and select the 'Collapse' menu item (this action can be undone at any time)"), settings.IndividualCollapse);
+					using (new EditorGUI.DisabledScope(!settings.IndividualCollapse))
+					{
+						EditorGUI.indentLevel++;
+						settings.IndividualCollapsePreserveContext = EditorGUILayout.Toggle(new GUIContent("Keep Log Context", "When enabled collapsing will be interupted by other log messages. Disable this if you want exactly one log message for selected lines."), settings.IndividualCollapsePreserveContext);
+						EditorGUI.indentLevel--;
+					}
+
+					settings.UseCustomFont = EditorGUILayout.Toggle(new GUIContent("Use Custom Font", "Allow using a custom font. Specify a font name that you have installed below"), settings.UseCustomFont);
+					using (new EditorGUI.DisabledScope(!settings.UseCustomFont))
+					{
+						EditorGUI.indentLevel++;
+						var fontOptions = Font.GetOSInstalledFontNames();
+						var selectedFont = EditorGUILayout.Popup(new GUIContent("Installed Fonts"), fontOptions.IndexOf(f => f == settings.InstalledLogEntryFont), fontOptions);
+						if (selectedFont >= 0 && selectedFont < fontOptions.Length) settings.InstalledLogEntryFont = fontOptions[selectedFont];
+						settings.CustomLogEntryFont = (Font)EditorGUILayout.ObjectField(new GUIContent("Custom Font", "Will override installed font"), settings.CustomLogEntryFont, typeof(Font), false);
+						EditorGUI.indentLevel--;
+					}
+				}
+
 				EditorGUILayout.Space();
 				EditorGUILayout.LabelField("Experimental", EditorStyles.boldLabel);
 				settings.AllowCodePreview = EditorGUILayout.Toggle(new GUIContent("Code Preview", "Show code context in popup window when hovering over console log line with file path"), settings.AllowCodePreview);
@@ -82,38 +116,19 @@ namespace Needle.Console
 				using (var _scope = new EditorGUI.ChangeCheckScope())
 				{
 					settings.UseColorMarker = EditorGUILayout.Toggle(new GUIContent("Draw Color Marker"), settings.UseColorMarker);
-					settings.ColorMarker = EditorGUILayout.TextField(new GUIContent("Color Marker", "Colored marker added before console log"), settings.ColorMarker);
-					if(_scope.changed) NeedleConsoleProjectSettings.RaiseColorsChangedEvent();
-				}
-				
-				settings.CustomConsole = EditorGUILayout.Toggle(new GUIContent("Custom Console", "The custom list replaces the console log drawing with a custom implementation that allows for advanced features such like very custom log filtering via context menus"), settings.CustomConsole);
-				using (new EditorGUI.DisabledScope(!settings.CustomConsole))
-				{
-					EditorGUI.indentLevel++;
-					settings.RowColors = EditorGUILayout.Toggle(new GUIContent("Row Colors", "Allow custom list to tint row background for warnings and errors"), settings.RowColors);
-				
-					settings.IndividualCollapse = EditorGUILayout.Toggle(new GUIContent("Individual Collapse", "When enabled the log context menu allows to collapse individual logs"), settings.IndividualCollapse);
-					using (new EditorGUI.DisabledScope(!settings.IndividualCollapse))
+
+					using (new EditorGUI.DisabledScope(!settings.UseColorMarker))
+					using (new GUILayout.HorizontalScope())
 					{
-						EditorGUI.indentLevel++;
-						settings.IndividualCollapsePreserveContext = EditorGUILayout.Toggle(new GUIContent("Keep Context", "When enabled collapsing will be interupted by other log messages"), settings.IndividualCollapsePreserveContext);
-						EditorGUI.indentLevel--;
+						settings.ColorMarker = EditorGUILayout.TextField(new GUIContent("Color Marker", "Colored marker added before console log"), settings.ColorMarker);
+						if (settings.ColorMarker != NeedleConsoleSettings.DefaultColorMarker && GUILayout.Button("Reset", GUILayout.Width(50)))
+							settings.ColorMarker = NeedleConsoleSettings.DefaultColorMarker; ;
+
 					}
-				
-					settings.UseCustomFont = EditorGUILayout.Toggle(new GUIContent("Use Custom Font", "Allow using a custom font. Specify a font name that you have installed below"), settings.UseCustomFont);
-					using (new EditorGUI.DisabledScope(!settings.UseCustomFont))
-					{
-						EditorGUI.indentLevel++;
-						var fontOptions = Font.GetOSInstalledFontNames();
-						var selectedFont = EditorGUILayout.Popup(new GUIContent("Installed Fonts"), fontOptions.IndexOf(f => f == settings.InstalledLogEntryFont), fontOptions);
-						if (selectedFont >= 0 && selectedFont < fontOptions.Length) settings.InstalledLogEntryFont = fontOptions[selectedFont];
-						settings.CustomLogEntryFont = (Font) EditorGUILayout.ObjectField(new GUIContent("Custom Font", "Will override installed font" ), settings.CustomLogEntryFont, typeof(Font), false);
-						EditorGUI.indentLevel--;
-					}
-					EditorGUI.indentLevel--;
+					if (_scope.changed) NeedleConsoleProjectSettings.RaiseColorsChangedEvent();
 				}
-				
-				if(NeedleConsoleSettings.DevelopmentMode)
+
+				if (NeedleConsoleSettings.DevelopmentMode)
 				// using(new EditorGUI.DisabledScope(!settings.DevelopmentMode))
 				{
 					GUILayout.Space(10);

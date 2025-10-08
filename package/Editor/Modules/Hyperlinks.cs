@@ -29,9 +29,21 @@ namespace Needle.Console
 					fixStacktraceBuilder.Clear();
 					var line = t;
 
-					if (line.Contains("/Users/bokken/build") || line.Contains("Tasks.SynchronizationContextAwaitTaskContinuation") || line.Contains("CompilerServices.AsyncMethodBuilderCore"))
+					if (NeedleConsoleSettings.instance.HideInternalStacktrace)
 					{
-						continue;
+						if (line.Contains("/Users/bokken/build", StringComparison.OrdinalIgnoreCase)
+						|| line.Contains("UnityEngine.UnitySynchronizationContext+", StringComparison.OrdinalIgnoreCase)
+						|| line.Contains("UnityEngine.UnitySynchronizationContext.Exec(", StringComparison.OrdinalIgnoreCase)
+						|| line.Contains("System.Threading.Tasks.Task", StringComparison.OrdinalIgnoreCase)
+						|| line.Contains("System.Threading.Tasks.Await", StringComparison.OrdinalIgnoreCase)
+						|| line.Contains("System.Threading.Tasks.SynchronizationContextAwaitTaskContinuation", StringComparison.OrdinalIgnoreCase)
+						|| line.Contains("System.Runtime.CompilerServices.AsyncMethodBuilderCore", StringComparison.OrdinalIgnoreCase)
+						|| line.Contains("System.Runtime.CompilerServices.AsyncMethodBuilder", StringComparison.OrdinalIgnoreCase)
+						|| line.Contains("System.Runtime.CompilerServices.AsyncTaskMethodBuilder", StringComparison.OrdinalIgnoreCase)
+						)
+						{
+							continue;
+						}
 					}
 					
 					// hyperlinks capture 
