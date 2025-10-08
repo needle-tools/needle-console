@@ -35,7 +35,7 @@ namespace Needle.Console
 
 			menu.AddSeparator(prefix);
 			menu.AddItem(new GUIContent(prefix + "Open Settings"), false,
-				data => { SettingsService.OpenProjectSettings("Preferences/Needle Console"); }, null);
+				data => { SettingsService.OpenUserPreferences(NeedleConsoleSettingsProvider.SettingsPath); }, null);
 		}
 	}
 }

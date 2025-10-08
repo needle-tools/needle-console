@@ -4,6 +4,11 @@ All notable changes to this package will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## [2.5.6] - 2025-10-08
+- add: option to show full stacktrace (including internal system entries)
+- improve: async log stacktraces
+- improve: Needle Console menus
+
 ## [2.5.5] - 2025-09-29
 - fix: Unity 6000.2.6 compatibility
 
