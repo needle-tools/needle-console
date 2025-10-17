@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using UnityEditor;
 using UnityEditorInternal;
@@ -118,6 +119,9 @@ namespace Needle.Console
 		public bool UseCustomFont = false;
 		public string InstalledLogEntryFont = "Arial";
 		public Font CustomLogEntryFont;
+
+		public bool UseStacktraceIgnoreFilters = true;
+		public string[] StacktraceIgnoreFilters = new string[] { };
 	}
 	
 }

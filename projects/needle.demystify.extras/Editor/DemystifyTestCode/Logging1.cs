@@ -35,7 +35,7 @@ namespace Demystify._Tests
 		{
 			Debug.LogException(new Exception("An exception log", new Exception("a inner exception")));
 		}
-		
+
 		[MenuItem("Test/LogAsync")]
 		private static async void LogAsync()
 		{
@@ -56,11 +56,11 @@ namespace Demystify._Tests
 		[MenuItem("Test/Log Many")]
 		private static void LogMany()
 		{
-			var words = new[] {"Unity", "Console", "Log", "this", "is", "hello", "Ok", "does", "like", "repeat", "random"};
+			var words = new[] { "Unity", "Console", "Log", "this", "is", "hello", "Ok", "does", "like", "repeat", "random" };
 			for (var i = 0; i < 50; i++)
 			{
 				var str = string.Empty;
-				for (var k = 0; k < 2 + (int) (Random.value * 50); k++)
+				for (var k = 0; k < 2 + (int)(Random.value * 50); k++)
 				{
 					str += words[Mathf.FloorToInt(Random.value * words.Length)] + " ";
 				}
@@ -95,13 +95,13 @@ namespace Demystify._Tests
 		private static void LogWithLongerStacktraceInternal(int level = 0)
 		{
 			if (level > 10 || Random.value > .9)
-			{				
+			{
 				randomLogMethods[Mathf.FloorToInt(randomLogMethods.Length * Random.value)]();
 			}
 			else LogWithLongerStacktraceInternal(level + 1);
 		}
-		
-		
+
+
 		// Taken from https://docs.unity3d.com/6000.0/Documentation/ScriptReference/Logger.html
 		public class MyLogHandler : ILogHandler
 		{
@@ -121,6 +121,24 @@ namespace Demystify._Tests
 		{
 			var myLogger = new Logger(new MyLogHandler());
 			myLogger.Log("MyGameTag", "MyGameClass Start.");
+		}
+
+		[MenuItem("Test/My Console Log")]
+		private static void LogWithMyConsole()
+		{
+			Console.MyConsole.Log("MyGameClass Start.");
+		}
+	}
+
+}
+
+namespace Console
+{
+	public static class MyConsole
+	{
+		public static void Log(string message)
+		{
+			Debug.Log("[MyConsole] " + message);
 		}
 	}
 }

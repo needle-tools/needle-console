@@ -31,10 +31,17 @@ namespace Needle.Console
 		{
 		}
 
+		private SerializedObject serializedObject;
 		public override void OnActivate(string searchContext, VisualElement rootElement)
 		{
 			base.OnActivate(searchContext, rootElement);
 			ThemeNames = null;
+			var settings = NeedleConsoleSettings.instance;
+			if (serializedObject == null || serializedObject.targetObject != settings)
+			{
+				serializedObject = new SerializedObject(settings);
+				serializedObject.targetObject.hideFlags = HideFlags.None; // Ensure it's editable
+			}
 		}
 
 		[MenuItem("Tools/Needle Console/Enable Development Mode", true)]
@@ -52,6 +59,8 @@ namespace Needle.Console
 		{
 			base.OnGUI(searchContext);
 			var settings = NeedleConsoleSettings.instance;
+
+			serializedObject.Update();
 
 			EditorGUI.BeginChangeCheck();
 
@@ -128,6 +137,30 @@ namespace Needle.Console
 					if (_scope.changed) NeedleConsoleProjectSettings.RaiseColorsChangedEvent();
 				}
 
+
+				// using (new GUILayout.HorizontalScope())
+				{
+					GUILayout.Space(10);
+					settings.UseStacktraceIgnoreFilters = EditorGUILayout.Toggle(new GUIContent("Stacktrace Line Filters", "Enable filtering of stacktrace lines based on user defined filters. The stacktrace lines that match any of the given strings will not contain the log path. This is useful if you have custom Console.Log methods but when clicking on a stacktrace line you want to see the original log location."), settings.UseStacktraceIgnoreFilters);
+
+					using (new EditorGUI.DisabledScope(!settings.UseStacktraceIgnoreFilters))
+					using (var check = new EditorGUI.ChangeCheckScope())
+					{
+						var property = serializedObject.FindProperty(nameof(NeedleConsoleSettings.StacktraceIgnoreFilters));
+						EditorGUILayout.PropertyField(property, new GUIContent("Stacktrace Line String Filters (Advanced)", "Any line in the stacktrace that matches any of these strings will not be used for opening the file location. This is useful if you have custom Console.Log methods but when clicking on a stacktrace line you want to see the original log location.\n\nIt is recommended to enter the full namespace e.g. 'MyNamespace.MyLogger.Log'. All lines in the stacktrace will be checked for any occurrences.\n\nNote: Only new logs will be affected by this."), true);
+						if (check.changed)
+						{
+							serializedObject.ApplyModifiedProperties();
+							settings.Save();
+						}
+						if (settings.StacktraceIgnoreFilters.Any(e => string.IsNullOrWhiteSpace(e) || e.Length < 4))
+						{
+							EditorGUILayout.HelpBox("Some stacktrace line filters are very short or empty strings which may lead to unwanted filtering of stacktrace lines. It is recommended to use more specific filter strings. Filters shorter than 4 characters will be ignored.", MessageType.Warning);
+						}
+					}
+				}
+
+
 				if (NeedleConsoleSettings.DevelopmentMode)
 				// using(new EditorGUI.DisabledScope(!settings.DevelopmentMode))
 				{
@@ -162,14 +195,14 @@ namespace Needle.Console
 
 		public static event Action ThemeEditedOrChanged;
 
-		private static readonly string[] AlwaysInclude = new[] {"keywords", "link", "string_literal", "comment"};
+		private static readonly string[] AlwaysInclude = new[] { "keywords", "link", "string_literal", "comment" };
 
 		private static void DrawSyntaxGUI(NeedleConsoleSettings settings)
 		{
 			GUILayout.Space(10);
 			EditorGUILayout.LabelField("Syntax Highlighting", EditorStyles.boldLabel);
 			EditorGUI.BeginChangeCheck();
-			settings.SyntaxHighlighting = (Highlighting) EditorGUILayout.EnumPopup("Syntax Highlighting", settings.SyntaxHighlighting);
+			settings.SyntaxHighlighting = (Highlighting)EditorGUILayout.EnumPopup("Syntax Highlighting", settings.SyntaxHighlighting);
 			if (EditorGUI.EndChangeCheck())
 			{
 				SyntaxHighlighting.OnSyntaxHighlightingModeHasChanged();
@@ -191,7 +224,7 @@ namespace Needle.Console
 						theme.SetActive();
 						ThemeEditedOrChanged?.Invoke();
 					}
-			
+
 				}
 			}
 		}
@@ -203,7 +236,7 @@ namespace Needle.Console
 			{
 				var entry = theme.Entries[index];
 				var usedByCurrentRegex = AlwaysInclude.Contains(entry.Key) || (currentPattern?.Any(e => e.Contains("?<" + entry.Key)) ?? true);
-				if (skipUnused  && !usedByCurrentRegex) continue;
+				if (skipUnused && !usedByCurrentRegex) continue;
 				// using(new EditorGUI.DisabledScope(!usedByCurrentRegex))
 				{
 					var col = GUI.color;
@@ -228,9 +261,9 @@ namespace Needle.Console
 					NeedleConsole.Disable();
 			}
 		}
-		
-		
-		
+
+
+
 		/// <summary>
 		/// this is just for internal use and "visualizing" via GUI
 		/// </summary>
@@ -271,7 +304,7 @@ namespace Needle.Console
 					Themes[index] = asset.theme;
 				}
 			}
-			else if(ThemeNames != null && Themes != null && ThemeNames.Length == Themes.Length)
+			else if (ThemeNames != null && Themes != null && ThemeNames.Length == Themes.Length)
 			{
 				for (var index = 0; index < Themes.Length; index++)
 				{
@@ -284,20 +317,20 @@ namespace Needle.Console
 		private static int ActiveThemeIndex()
 		{
 			var active = NeedleConsoleSettings.instance.CurrentTheme;
-			for (var index = 0; index < Themes.Length; index++) 
+			for (var index = 0; index < Themes.Length; index++)
 			{
 				var theme = Themes[index];
-				if (theme.Equals(active) || theme.Name == active.Name) return index; 
+				if (theme.Equals(active) || theme.Name == active.Name) return index;
 			}
 			return -1;
 		}
 
 		private static void DrawThemePopup()
 		{
-			EnsureThemeOptions(); 
-			EditorGUI.BeginChangeCheck(); 
+			EnsureThemeOptions();
+			EditorGUI.BeginChangeCheck();
 			var selected = EditorGUILayout.Popup("Theme", ActiveThemeIndex(), ThemeNames);
-			if(selected >= 0 && selected < Themes.Length)
+			if (selected >= 0 && selected < Themes.Length)
 				NeedleConsoleSettings.instance.CurrentTheme = Themes[selected];
 			if (EditorGUI.EndChangeCheck())
 			{

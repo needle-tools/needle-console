@@ -14,11 +14,11 @@ namespace Needle.Console
 		private static readonly StringBuilder stacktraceBuilder = new StringBuilder();
 		private static readonly StringBuilder fixStacktraceBuilder = new StringBuilder();
 		private static readonly object lockStacktraceBuilder = new object();
-		
-		
+
+
 		public static void FixStacktrace(ref string stacktrace)
 		{
-			var lines = stacktrace.Split(new []{'\n'}, StringSplitOptions.RemoveEmptyEntries);
+			var lines = stacktrace.Split(new[] { '\n' }, StringSplitOptions.RemoveEmptyEntries);
 
 			lock (lockStacktraceBuilder)
 			{
@@ -45,18 +45,23 @@ namespace Needle.Console
 							continue;
 						}
 					}
-					
+
 					// hyperlinks capture 
 					var path = Fix(line, fixStacktraceBuilder, out var lineNumber);
 					if (!string.IsNullOrEmpty(path))
 					{
-						if (ShouldInclude(line))
+						if (ShouldInclude(line, out var filteredByUserList))
 						{
 							// path = path.Replace("\n", "");
 							fixStacktraceBuilder.Append(path).Append(lineNumber).Append(")");
 							line = fixStacktraceBuilder.ToString();
 							Filepaths.TryMakeRelative(ref line);
 						}
+						else if(filteredByUserList)
+						{
+							// For custom user filters we just remove the path completely. This is not really necessary for functionality but keeps the stacktrace cleaner.
+                            RemovePath(ref line);
+                        }
 					}
 
 					stacktraceBuilder.Append(line).Append("\n");
@@ -66,23 +71,54 @@ namespace Needle.Console
 			}
 
 			return;
-			
+
+
 			// dont append path to editor only lines to force unity to open the previous file path
-			bool ShouldInclude(string line)
+			bool ShouldInclude(string line, out bool filteredByUserList)
 			{
+				filteredByUserList = false;
+
 				// Lines to exclude from stacktrace, since it's coming from a logger
 				if (line.Contains("DebugEditor.Log")) return false;
 				if (line.Contains("UnityEngine.Logger."))
 				{
 					if (line.Contains(".Log")) return false;
 				}
-				
+
+				if (NeedleConsoleSettings.instance?.UseStacktraceIgnoreFilters == true)
+				{
+					foreach (var filter in NeedleConsoleSettings.instance.StacktraceIgnoreFilters)
+					{
+						if (string.IsNullOrWhiteSpace(filter) || filter.Length < 4) continue;
+						if (line.Contains(filter))
+						{
+							filteredByUserList = true;
+							return false;
+						}
+					}
+				}
+
 				return true;
+			}
+			
+			void RemovePath(ref string line)
+			{
+				const string START = " in ";
+				const string END = "line ";
+				var begin = line.LastIndexOf(START, StringComparison.Ordinal);
+				var end = line.LastIndexOf(END, StringComparison.Ordinal);
+				if (begin < 0 || end < 0) return;
+				begin += START.Length;
+				var pathLength = end - begin;
+				var lineStart = end + END.Length;
+				// var lineNumber = line.Substring(lineStart, line.Length - lineStart).TrimEnd('\r');
+				// var path = line.Substring(begin, pathLength);
+				line = line.Substring(0, begin - START.Length);
 			}
 		}
 
 		private static readonly StringBuilder lineBuilder = new StringBuilder();
-		
+
 		/// <summary>
 		/// parse demystify path format and reformat to unity hyperlink format
 		/// </summary>
@@ -91,7 +127,7 @@ namespace Needle.Console
 		private static string Fix(string line, StringBuilder lineBuilder, out string lineNumber)
 		{
 			lineNumber = string.Empty;
-			
+
 			const string START = " in ";
 			const string END = "line ";
 			var begin = line.LastIndexOf(START, StringComparison.Ordinal);
@@ -105,8 +141,8 @@ namespace Needle.Console
 			line = line.Substring(0, begin - START.Length);
 			lineBuilder.Append(line).Append(" (at ");
 			return path;
-			
-			
+
+
 			// var match = hyperlinks.Match(line);
 			// Hyperlinks.lineBuilder.Clear();
 			// if (match.Success)
@@ -166,7 +202,7 @@ namespace Needle.Console
 		}
 
 		private static readonly Regex capturePackageNameInPath = new Regex(@".+[/\\](?<packageName>\w+\...+?)[/\\](.*)?[/\\](?<fileName>.*)$", RegexOptions.Compiled);
-		
+
 		private static void ModifyFilePath(ref string path)
 		{
 			if (NeedleConsoleSettings.instance.ShortenFilePaths == false) return;

@@ -4,6 +4,9 @@ All notable changes to this package will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## [2.6.0-alpha] - 2025-10-17
+- add: option to ignore stacktrace lines based on user-defined string filters. These lines will then be ignored for opening file locations when clicking on stacktrace entries.
+
 ## [2.5.6] - 2025-10-08
 - add: option to show full stacktrace (including internal system entries)
 - improve: async log stacktraces
