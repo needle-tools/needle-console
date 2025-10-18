@@ -18,5 +18,18 @@ namespace Needle.Console
 				GUI.DrawTexture(new Rect(0, y, 10000, 1), Texture2D.whiteTexture);
 			}
 		}
+
+		internal static void DrawHorizontal(float x, float y)
+		{
+			DrawHorizontal(x, y, Color);
+		}
+		
+		internal static void DrawHorizontal(float x, float y, Color color)
+		{
+			using (new GUIColorScope(color))
+			{
+				GUI.DrawTexture(new Rect(x, y, 1, 10000), Texture2D.whiteTexture);
+			}
+		}
 	}
 }

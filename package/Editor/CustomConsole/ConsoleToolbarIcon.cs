@@ -9,6 +9,7 @@ namespace Needle.Console
 	{
 		private static bool filterTextureInit;
 		private static Texture2D filterIcon, filterIconDisabled;
+		private static Texture2D orientationVerticalIcon, orientationHorizontalIcon, orientationAutoIcon;
 		private static GUIStyle filterButtonStyle;
 
 		internal static void OnDrawToolbar()
@@ -20,6 +21,9 @@ namespace Needle.Console
 				filterTextureInit = true;
 				filterIcon = EditorGUIUtility.FindTexture("animationvisibilitytoggleoff");
 				filterIconDisabled = EditorGUIUtility.FindTexture("animationvisibilitytoggleon");
+				orientationVerticalIcon = EditorGUIUtility.FindTexture("HorizontalSplit");
+				orientationHorizontalIcon = EditorGUIUtility.FindTexture("VerticalSplit");
+				orientationAutoIcon = EditorGUIUtility.FindTexture("BuildSettings.N3DS.Small");
 			}
 
 			var count = ConsoleFilter.HiddenCount;
@@ -43,6 +47,13 @@ namespace Needle.Console
 
 			var width = count < 10 ? new[] { GUILayout.MinWidth(40) } : count < 100 ? new[] { GUILayout.MinWidth(50) } : Array.Empty<GUILayoutOption>();
 			ConsoleFilter.enabled = !GUILayout.Toggle(!ConsoleFilter.enabled, content, filterButtonStyle, width);
+			NeedleConsoleSettings.instance.StacktraceOrientation = (NeedleConsoleSettings.StacktraceOrientations)
+				EditorGUILayout.CycleButton((int) NeedleConsoleSettings.instance.StacktraceOrientation, new GUIContent[]
+				{
+					new(orientationVerticalIcon, "Stacktrace orientation: Vertical"),
+					new(orientationHorizontalIcon, "Stacktrace orientation: Horizontal"),
+					new(orientationAutoIcon, "Stacktrace orientation: Auto"),
+				}, filterButtonStyle);
 
 			//Assets.DrawGUILogo();
 			// var rect = GUILayoutUtility.GetLastRect();

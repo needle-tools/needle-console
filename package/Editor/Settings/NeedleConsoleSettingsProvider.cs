@@ -137,6 +137,13 @@ namespace Needle.Console
 					if (_scope.changed) NeedleConsoleProjectSettings.RaiseColorsChangedEvent();
 				}
 
+				settings.StacktraceOrientation = (NeedleConsoleSettings.StacktraceOrientations)EditorGUILayout.EnumPopup("Stacktrace Orientation", settings.StacktraceOrientation);
+				using (new EditorGUI.DisabledScope(settings.StacktraceOrientation != NeedleConsoleSettings.StacktraceOrientations.Auto))
+				{
+					EditorGUI.indentLevel++;
+					settings.StacktraceOrientationAutoHeight = EditorGUILayout.FloatField(new GUIContent("Auto Height", "The height at which the stacktrace orientation will switch from Vertical to Horizontal when Stacktrace Orientation is set to Auto."), settings.StacktraceOrientationAutoHeight);
+					EditorGUI.indentLevel--;
+				}
 
 				// using (new GUILayout.HorizontalScope())
 				{

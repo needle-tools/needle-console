@@ -38,7 +38,7 @@ namespace Needle.Console
 			GUILayout.Space(height);
 
 			// GUILayout.Space(graphHeight + EditorGUIUtility.singleLineHeight);
-			ConsoleList.DrawDefaultStacktrace(log.entry.message);
+			ConsoleList.DrawDefaultStacktrace(log.entry.message, rect.width);
 			return true;
 		}
 

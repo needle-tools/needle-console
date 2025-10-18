@@ -11,6 +11,14 @@ namespace Needle.Console
 	[FilePath("Preferences/NeedleConsoleSettings.asset", FilePathAttribute.Location.PreferencesFolder)]
 	internal class NeedleConsoleSettings : ScriptableSingleton<NeedleConsoleSettings>
 	{
+		[Serializable]
+		internal enum StacktraceOrientations
+		{
+			Vertical,
+			Horizontal,
+			Auto,
+		}
+
 		[SerializeField]
 		internal bool Enabled = true;
 		
@@ -120,6 +128,8 @@ namespace Needle.Console
 		public string InstalledLogEntryFont = "Arial";
 		public Font CustomLogEntryFont;
 
+		public StacktraceOrientations StacktraceOrientation = StacktraceOrientations.Vertical;
+		public float StacktraceOrientationAutoHeight = 200;
 		public bool UseStacktraceIgnoreFilters = true;
 		public string[] StacktraceIgnoreFilters = new string[] { };
 	}
