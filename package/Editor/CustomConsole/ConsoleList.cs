@@ -52,13 +52,19 @@ namespace Needle.Console
 		private static readonly List<CachedConsoleInfo> currentEntries = new List<CachedConsoleInfo>();
 		private static readonly List<Rect> currentEntriesRects = new List<Rect>();
 
-		private static Vector2 SplitterSize
+		private static Vector2 SplitterSizeVetical
 		{
-			get => SessionState.GetVector3("NeedleConsole-Splitter", new Vector2(70, 30));
-			set => SessionState.SetVector3("NeedleConsole-Splitter", value);
+			get => SessionState.GetVector3("NeedleConsole-Splitter-Vertical", new Vector2(70, 30));
+			set => SessionState.SetVector3("NeedleConsole-Splitter-Vertical", value);
+		}
+		private static Vector2 SplitterSizeHorizontal
+		{
+			get => SessionState.GetVector3("NeedleConsole-Splitter-Horizontal", new Vector2(70, 30));
+			set => SessionState.SetVector3("NeedleConsole-Splitter-Horizontal", value);
 		}
 
-		private static SplitterState spl;
+		private static SplitterState verticalSplitterState;
+		private static SplitterState horizontalSplitterState;
 
 		private static int SelectedRowIndex
 		{
@@ -187,19 +193,45 @@ namespace Needle.Console
 			}
 
 
-			if (spl == null)
+			if (verticalSplitterState == null)
 			{
-				var size = SplitterSize;
+				var size = SplitterSizeVetical;
 				
 				#if UNITY_2020_1_OR_NEWER
-				spl = SplitterState.FromRelative(new[] {size.x, size.y}, new float[] {32, 32}, null);
+				verticalSplitterState = SplitterState.FromRelative(new[] {size.x, size.y}, new float[] {32, 32}, null);
 				#else
-				spl = new SplitterState(new[] {size.x, size.y}, new int[] {32, 32}, (int[]) null, 0);
+				verticalSplitterState = new SplitterState(new[] {size.x, size.y}, new int[] {32, 32}, (int[]) null, 0);
+				#endif
+			}
+			if (horizontalSplitterState == null)
+			{
+				var size = SplitterSizeHorizontal;
+				
+				#if UNITY_2020_1_OR_NEWER
+				horizontalSplitterState = SplitterState.FromRelative(new[] {size.x, size.y}, new float[] {32, 32}, null);
+				#else
+				horizontalSplitterState = new SplitterState(new[] {size.x, size.y}, new int[] {32, 32}, (int[]) null, 0);
 				#endif
 			}
 
-			SplitterGUILayout.BeginVerticalSplit(spl);
-			SplitterSize = new Vector2(spl.relativeSizes[0], spl.relativeSizes[1]);
+			var orientation = NeedleConsoleSettings.instance.StacktraceOrientation == NeedleConsoleSettings.StacktraceOrientations.Auto
+				? console.position.height >= NeedleConsoleSettings.instance.StacktraceOrientationAutoHeight
+					? NeedleConsoleSettings.StacktraceOrientations.Vertical : NeedleConsoleSettings.StacktraceOrientations.Horizontal
+				: NeedleConsoleSettings.instance.StacktraceOrientation;
+			SplitterState spl;
+
+			if (orientation == NeedleConsoleSettings.StacktraceOrientations.Vertical)
+			{
+				spl = verticalSplitterState;
+				SplitterGUILayout.BeginVerticalSplit(spl);
+				SplitterSizeVetical = new Vector2(spl.relativeSizes[0], spl.relativeSizes[1]);
+			}
+			else
+			{
+				spl = horizontalSplitterState;
+				SplitterGUILayout.BeginHorizontalSplit(spl);
+				SplitterSizeHorizontal = new Vector2(spl.relativeSizes[0], spl.relativeSizes[1]);
+			}
 
 			var lineCount = ConsoleWindow.Constants.LogStyleLineCount;
 			xOffset = ConsoleWindow.Constants.LogStyleLineCount == 1 ? 2 : 14;
@@ -207,7 +239,13 @@ namespace Needle.Console
 			lineHeight = EditorGUIUtility.singleLineHeight * lineCount + 3;
 			count = currentEntries.Count;
 			const int scrollAreaBottomBuffer = 21;
-			var scrollAreaHeight = console.position.height - spl.realSizes[1] - scrollAreaBottomBuffer;
+			var scrollAreaWidth = orientation == NeedleConsoleSettings.StacktraceOrientations.Vertical
+				? console.position.width - 3
+				: spl.realSizes[0];
+			var scrollAreaHeight = orientation == NeedleConsoleSettings.StacktraceOrientations.Vertical
+				? console.position.height - spl.realSizes[1] - scrollAreaBottomBuffer
+				: console.position.height - scrollAreaBottomBuffer - 2;
+			var splitPosition = scrollAreaWidth;
 
 			var contentHeight = count * lineHeight;
 			if (Event.current.type == EventType.Repaint)
@@ -226,11 +264,10 @@ namespace Needle.Console
 				}
 			}
 
-			var scrollArea = new Rect(0, yTop, console.position.width - 3, scrollAreaHeight);
-			var width = console.position.width - 3;
+			var scrollArea = new Rect(0, yTop, scrollAreaWidth, scrollAreaHeight);
 			if (contentHeight > scrollArea.height)
-				width -= 13;
-			var contentSize = new Rect(0, 0, width, contentHeight);
+				scrollAreaWidth -= 13;
+			var contentSize = new Rect(0, 0, scrollAreaWidth, contentHeight);
 			
 			
 
@@ -267,7 +304,7 @@ namespace Needle.Console
 				scrollY = scroll.y;
 			}
 
-			var position = new Rect(0, 0, width, lineHeight);
+			var position = new Rect(0, 0, scrollAreaWidth, lineHeight);
 			element = new ListViewElement();
 			
 			if (logStyle == null)
@@ -476,13 +513,22 @@ namespace Needle.Console
 			// Display active text (We want word wrapped text with a vertical scrollbar)
 			var tempScrollAreaHeight = scrollAreaHeight + 2;
 			GUILayout.Space(tempScrollAreaHeight);
-			SeparatorLine.Draw(tempScrollAreaHeight + EditorGUIUtility.singleLineHeight);
+			if (orientation == NeedleConsoleSettings.StacktraceOrientations.Vertical)
+			{
+				SeparatorLine.Draw(tempScrollAreaHeight + EditorGUIUtility.singleLineHeight);
+			}
+			else
+			{
+				SeparatorLine.DrawHorizontal(splitPosition, yTop);
+			}
 			scrollStacktrace = GUILayout.BeginScrollView(scrollStacktrace, ConsoleWindow.Constants.Box);
 
 			var didDrawStacktrace = false;
 			var text = selectedText ?? string.Empty;
 			tempScrollAreaHeight += 1;
-			var stacktraceContentRect = new Rect(0, tempScrollAreaHeight, width, console.position.height - tempScrollAreaHeight);
+			var stacktraceContentRect = orientation == NeedleConsoleSettings.StacktraceOrientations.Vertical
+				? new Rect(0, tempScrollAreaHeight, console.position.width, console.position.height - tempScrollAreaHeight)
+				: new Rect(0, tempScrollAreaHeight, console.position.width - scrollAreaWidth, console.position.height);
 			try
 			{
 				foreach (var drawer in customDrawers)
@@ -501,11 +547,18 @@ namespace Needle.Console
 
 			if (!didDrawStacktrace)
 			{
-				DrawDefaultStacktrace(text);
+				DrawDefaultStacktrace(text, stacktraceContentRect.width);
 			}
 
 			GUILayout.EndScrollView();
-			SplitterGUILayout.EndVerticalSplit();
+			if (orientation == NeedleConsoleSettings.StacktraceOrientations.Vertical)
+			{
+				SplitterGUILayout.EndVerticalSplit();
+			}
+			else
+			{
+				SplitterGUILayout.EndHorizontalSplit();
+			}
 			
 			// Copy & Paste selected item
 			if ((evt.type == EventType.ValidateCommand || evt.type == EventType.ExecuteCommand) && evt.commandName == EventCommandNames.Copy && tempContent != null)
@@ -533,7 +586,7 @@ namespace Needle.Console
 			RequestRepaint();
 		}
 
-		internal static float DrawDefaultStacktrace(string message)
+		internal static float DrawDefaultStacktrace(string message, float width)
 		{
 			try
 			{
@@ -547,15 +600,15 @@ namespace Needle.Console
 #else
 				var stackWithHyperlinks = ConsoleWindow.StacktraceWithHyperlinks(message);
 #endif
-				var stacktraceHeight = ConsoleWindow.Constants.MessageStyle.CalcHeight(GUIContent.Temp(stackWithHyperlinks), _consoleWindow.position.width);
-				DrawDefaultStacktrace(stackWithHyperlinks, stacktraceHeight);
+				var stacktraceHeight = ConsoleWindow.Constants.MessageStyle.CalcHeight(GUIContent.Temp(stackWithHyperlinks), width);
+				DrawDefaultStacktrace(stackWithHyperlinks, width, stacktraceHeight);
 				return stacktraceHeight;
 			}
 			catch (Exception e)
 			{
 				Debug.LogException(e);
-				var stacktraceHeight = ConsoleWindow.Constants.MessageStyle.CalcHeight(GUIContent.Temp(message), _consoleWindow.position.width);
-				DrawDefaultStacktrace(message, stacktraceHeight);
+				var stacktraceHeight = ConsoleWindow.Constants.MessageStyle.CalcHeight(GUIContent.Temp(message), width);
+				DrawDefaultStacktrace(message, width, stacktraceHeight);
 			}
 
 			return 0;
@@ -563,7 +616,7 @@ namespace Needle.Console
 
 		private static GUIStyle customMessageStyle;
 		
-		internal static void DrawDefaultStacktrace(string stacktraceWithHyperlinks, float height)
+		internal static void DrawDefaultStacktrace(string stacktraceWithHyperlinks, float width, float height)
 		{
 			try
 			{
