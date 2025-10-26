@@ -178,6 +178,27 @@ namespace Needle.Console
 		{
 			if (string.IsNullOrEmpty(stacktrace)) return;
 			var str = stacktrace;
+			#if UNITY_EDITOR_OSX
+			// https://regex101.com/r/C13Nan/1
+			const string pattern = @"in (?<path>.*?):\d+";		
+			str = Regex.Replace(str, pattern, m =>
+				{
+					if (m.Success && SyntaxHighlighting.CurrentTheme.TryGetValue("link", out var col))
+					{
+						var path = m.Groups["path"].Value;
+						ModifyFilePath(ref path);
+						var col_0 = $"<color={col}>";
+						var col_1 = "</color>";
+						var newPath = $"{col_0}{path}{col_1}";
+						// replace match with new path in m.Value
+						var res = m.Value.Replace(m.Groups["path"].Value, newPath);
+						return res;
+					}
+
+					return m.Value;
+				},
+				RegexOptions.Compiled);
+			#else
 			const string pattern = @"(?<open>\(at )(?<pre><a	href=.*?>)(?<path>.*)(?<post><\/a>)(?<close>\))";
 			str = Regex.Replace(str, pattern, m =>
 				{
@@ -198,6 +219,7 @@ namespace Needle.Console
 					return m.Value;
 				},
 				RegexOptions.Compiled);
+			#endif
 			stacktrace = str;
 		}
 
@@ -213,7 +235,7 @@ namespace Needle.Console
 			// var fileNameIndexStart = path.LastIndexOf('/');
 			// if (fileNameIndexStart > 0)
 			// 	path = path.Substring(fileNameIndexStart + 1);
-
+			
 			var isPackageCache = path.Contains("PackageCache");
 			var match = capturePackageNameInPath.Match(path);
 			if (match.Success)
@@ -226,7 +248,16 @@ namespace Needle.Console
 					if (isPackageCache) path = "PackageCache/" + path;
 				}
 			}
-
+			// else
+			// {
+				// var pathSegments = path.Split(new[] { '/', '\\' }, StringSplitOptions.RemoveEmptyEntries);
+				// if (pathSegments.Length >= 2)
+				// {
+				// 	var fileName = pathSegments[^1];
+				// 	var parentFolder = pathSegments[^2];
+				// 	path = parentFolder + "/" + fileName;
+				// }
+			// }
 		}
 	}
 }
