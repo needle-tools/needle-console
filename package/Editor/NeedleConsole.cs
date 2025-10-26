@@ -123,7 +123,8 @@ namespace Needle.Console
 						if (foundPrefix && settings.UseSyntaxHighlighting)
 							SyntaxHighlighting.AddSyntaxHighlighting(ref line);
 
-						var l = line.Trim();
+						// Indent wrapped lines.
+						var l = "<indent=2em><line-indent=-2em>" + line.Trim() + "</line-indent></indent>";
 						if (!string.IsNullOrEmpty(l))
 						{
 							if (!l.EndsWith("\n"))
