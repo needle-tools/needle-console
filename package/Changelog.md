@@ -4,6 +4,10 @@ All notable changes to this package will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## [2.6.0-beta] - 2025-10-26
+- add: options for vertical, horizontal or automatic stacktrace orientation. For smaller console windows (height below 300px) the stacktrace can automatically orient to the right.
+- fix: OSX shorten paths feature where paths in the console window will not render the full path but be project relative
+
 ## [2.6.0-alpha] - 2025-10-17
 - add: option to ignore stacktrace lines based on user-defined string filters. These lines will then be ignored for opening file locations when clicking on stacktrace entries.
 
