@@ -249,9 +249,22 @@ namespace Needle.Console
 				{
 					var col = GUI.color;
 					GUI.color = !usedByCurrentRegex || Theme.Ignored(entry.Color) ? Color.gray : col;
-					entry.Color = EditorGUILayout.ColorField(entry.Key, entry.Color);
+					var name = ToDisplayName(entry.Key);
+					entry.Color = EditorGUILayout.ColorField(name, entry.Color);
 					GUI.color = col;
 				}
+			}
+
+			string ToDisplayName(string str)
+			{
+				// replace _ with " " and make first letters uppercase
+				var parts = str.Split('_');
+				for (var i = 0; i < parts.Length; i++)
+				{
+					if (parts[i].Length > 0)
+						parts[i] = char.ToUpper(parts[i][0]) + parts[i].Substring(1);
+				}
+				return string.Join(" ", parts);
 			}
 		}
 
