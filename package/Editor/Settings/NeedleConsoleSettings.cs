@@ -129,7 +129,7 @@ namespace Needle.Console
 		public Font CustomLogEntryFont;
 
 		public StacktraceOrientations StacktraceOrientation = StacktraceOrientations.Vertical;
-		public float StacktraceOrientationAutoHeight = 200;
+		public float StacktraceOrientationAutoHeight = 300;
 		public bool UseStacktraceIgnoreFilters = true;
 		public string[] StacktraceIgnoreFilters = new string[] { };
 	}

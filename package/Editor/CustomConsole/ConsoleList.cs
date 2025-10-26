@@ -214,23 +214,27 @@ namespace Needle.Console
 				#endif
 			}
 
-			var orientation = NeedleConsoleSettings.instance.StacktraceOrientation == NeedleConsoleSettings.StacktraceOrientations.Auto
-				? console.position.height >= NeedleConsoleSettings.instance.StacktraceOrientationAutoHeight
-					? NeedleConsoleSettings.StacktraceOrientations.Vertical : NeedleConsoleSettings.StacktraceOrientations.Horizontal
-				: NeedleConsoleSettings.instance.StacktraceOrientation;
-			SplitterState spl;
-
-			if (orientation == NeedleConsoleSettings.StacktraceOrientations.Vertical)
+			// determine stacktrace orientation
+			var orientation = NeedleConsoleSettings.instance.StacktraceOrientation;
+			if (orientation == NeedleConsoleSettings.StacktraceOrientations.Auto)
 			{
-				spl = verticalSplitterState;
-				SplitterGUILayout.BeginVerticalSplit(spl);
-				SplitterSizeVetical = new Vector2(spl.relativeSizes[0], spl.relativeSizes[1]);
+				orientation = console.position.height >= NeedleConsoleSettings.instance.StacktraceOrientationAutoHeight
+					? NeedleConsoleSettings.StacktraceOrientations.Vertical
+					: NeedleConsoleSettings.StacktraceOrientations.Horizontal;
 			}
-			else
+			
+			SplitterState spl;
+			if (orientation == NeedleConsoleSettings.StacktraceOrientations.Horizontal)
 			{
 				spl = horizontalSplitterState;
 				SplitterGUILayout.BeginHorizontalSplit(spl);
 				SplitterSizeHorizontal = new Vector2(spl.relativeSizes[0], spl.relativeSizes[1]);
+			}
+			else
+			{
+				spl = verticalSplitterState;
+				SplitterGUILayout.BeginVerticalSplit(spl);
+				SplitterSizeVetical = new Vector2(spl.relativeSizes[0], spl.relativeSizes[1]);
 			}
 
 			var lineCount = ConsoleWindow.Constants.LogStyleLineCount;

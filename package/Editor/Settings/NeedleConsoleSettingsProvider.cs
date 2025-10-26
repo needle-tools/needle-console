@@ -140,8 +140,9 @@ namespace Needle.Console
 				settings.StacktraceOrientation = (NeedleConsoleSettings.StacktraceOrientations)EditorGUILayout.EnumPopup("Stacktrace Orientation", settings.StacktraceOrientation);
 				using (new EditorGUI.DisabledScope(settings.StacktraceOrientation != NeedleConsoleSettings.StacktraceOrientations.Auto))
 				{
+					var windowHeight = Math.Max(300, Screen.height);
 					EditorGUI.indentLevel++;
-					settings.StacktraceOrientationAutoHeight = EditorGUILayout.FloatField(new GUIContent("Auto Height", "The height at which the stacktrace orientation will switch from Vertical to Horizontal when Stacktrace Orientation is set to Auto."), settings.StacktraceOrientationAutoHeight);
+					settings.StacktraceOrientationAutoHeight = EditorGUILayout.IntSlider(new GUIContent("Auto Height (in pixel)", "The height at which the stacktrace orientation will switch from Vertical to Horizontal when Stacktrace Orientation is set to Auto."), (int)settings.StacktraceOrientationAutoHeight, 100, windowHeight);
 					EditorGUI.indentLevel--;
 				}
 
