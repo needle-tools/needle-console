@@ -67,7 +67,7 @@ namespace Needle.Console
 				configsFoldout = EditorGUILayout.BeginFoldoutHeaderGroup(configsFoldout, "Presets", null, r =>
 				{
 					var menu = new GenericMenu();
-					menu.AddItem(new GUIContent("New"), false, () => ConsoleFilterPreset.CreateAsset());
+					menu.AddItem(new GUIContent("New Filter Preset"), false, () => ConsoleFilterPreset.CreateAsset());
 					menu.DropDown(r);
 				});
 				if (configsFoldout)
@@ -81,14 +81,28 @@ namespace Needle.Console
 							using (new GUILayout.HorizontalScope())
 							{
 								GUILayout.Space(16);
-								GUILayout.Label(config.name);
+								GUILayout.Label("Preset: " + config.name);
 								labelRect = GUILayoutUtility.GetLastRect();
 								GUILayout.FlexibleSpace();
-								if (GUILayout.Button("From Preset"))
+
+								var path = AssetDatabase.GetAssetPath(config);
+								if (!string.IsNullOrEmpty(path))
+								{
+									if (GUILayout.Button("Ping"))
+									{
+										Debug.Log("Preset is saved at " + path, config);
+										EditorApplication.delayCall += () =>
+										{
+											EditorGUIUtility.PingObject(config);
+										};
+									}
+								}
+								
+								if (GUILayout.Button("Load"))
 								{
 									config.Apply();
 								}
-								if (GUILayout.Button("Save To"))
+								if (GUILayout.Button("Save"))
 								{
 									ConsoleFilterUserSettings.instance.SaveToPreset(config);
 								}

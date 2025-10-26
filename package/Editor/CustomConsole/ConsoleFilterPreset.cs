@@ -52,7 +52,7 @@ namespace Needle.Console
 		{
 			var dir = LastSelectedPath;
 			if (!Directory.Exists(dir) || !dir.StartsWith(Application.dataPath.Replace("\\", "/"))) dir = Application.dataPath;
-			var path = EditorUtility.SaveFilePanel("Create Console Filter", dir, "Console Filter Config", "asset");
+			var path = EditorUtility.SaveFilePanel("Create Needle Console Filter", dir, "New Needle Console Filter Preset", "asset");
 			path = path.Replace("\\", "/");
 			var validPath = Path.GetFullPath(Application.dataPath + "/../").Replace("\\", "/");
 			if (!path.StartsWith(validPath))
