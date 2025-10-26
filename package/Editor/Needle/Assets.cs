@@ -111,8 +111,8 @@ namespace Needle.Editors
 			}
 		}
 
-
-		public static void DrawGUILogo()
+		
+		public static void DrawGUILogoMiniButton()
 		{
 			float maxHeight = 15;
 			var logo = Assets.Logo;
