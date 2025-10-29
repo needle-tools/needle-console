@@ -179,7 +179,7 @@ namespace Needle.Console
 			if (string.IsNullOrEmpty(stacktrace)) return;
 			var str = stacktrace;
 			#if UNITY_EDITOR_OSX
-			// https://regex101.com/r/C13Nan/1
+			// https://regex101.com/r/Ebhrt4/1
 			const string pattern = @"in (?<path>.*?):\d+";		
 			str = Regex.Replace(str, pattern, m =>
 				{
