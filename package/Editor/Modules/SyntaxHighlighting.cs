@@ -204,7 +204,7 @@ namespace Needle.Console
 					if (colorDict.TryGetValue("link", out var col))
 					{
 						var displayUrl = link.Value.Substring(linkPrefix.Length).TrimEnd(')');
-						line += $"<a href=\"{link.Groups["hyperlink"].Value}\" line=\"{link.Groups["line"].Value}\"><color={col}> in {displayUrl}</color></a>";
+						line += $" <a href=\"{link.Groups["hyperlink"].Value}\" line=\"{link.Groups["line"].Value}\"><color={col}>in {displayUrl}</color></a>";
 					}
 					else
 						line += link.Value;
