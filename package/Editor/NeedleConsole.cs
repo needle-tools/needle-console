@@ -123,11 +123,10 @@ namespace Needle.Console
 						if (foundPrefix && settings.UseSyntaxHighlighting)
 							SyntaxHighlighting.AddSyntaxHighlighting(ref line);
 
-						// Indent wrapped lines.
-#if UNITY_6000_0_OR_NEWER
-						var l = "<indent=2em><line-indent=-2em>" + line.Trim() + "</line-indent></indent>";
-#else
 						var l = line.Trim();
+#if UNITY_6000_0_OR_NEWER
+						// Indent wrapped lines.
+						l = "<indent=0.75em><line-indent=-0.75em>" + l + "</line-indent></indent>";
 #endif
 						if (!string.IsNullOrEmpty(l))
 						{
