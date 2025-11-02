@@ -4,6 +4,9 @@ All notable changes to this package will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## [2.6.1] - 2025-11-02
+- add: indentation to wrapped lines ([PR 41](https://github.com/needle-tools/needle-console/pull/41))
+
 ## [2.6.0] - 2025-10-26
 - add: options for vertical, horizontal or automatic stacktrace orientation. For smaller console windows (height below 300px) the stacktrace can automatically orient to the right.
 - fix: OSX shorten paths feature where paths in the console window will not render the full path but be project relative
