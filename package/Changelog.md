@@ -4,6 +4,9 @@ All notable changes to this package will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## [2.6.2] - 2025-12-05
+- fix: compiler error in Unity 6000.3 LTS
+
 ## [2.6.1] - 2025-11-02
 - add: indentation to wrapped lines ([PR 41](https://github.com/needle-tools/needle-console/pull/41))
 
