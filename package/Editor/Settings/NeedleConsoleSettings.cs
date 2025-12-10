@@ -18,6 +18,28 @@ namespace Needle.Console
 			Horizontal,
 			Auto,
 		}
+		[Serializable, Flags]
+		internal enum StacktraceNamespace
+		{
+			Full,
+			Compact,
+			CompactNoReturnType,
+		}
+		[Serializable, Flags]
+		internal enum StacktraceParams
+		{
+			Full,
+			TypesOnly,
+			NamesOnly,
+			Compact,
+		}
+		[Serializable]
+		internal enum StacktraceFilename
+		{
+			Full,
+			Compact,
+			Inline,
+		}
 
 		[SerializeField]
 		internal bool Enabled = true;
@@ -129,6 +151,9 @@ namespace Needle.Console
 		public Font CustomLogEntryFont;
 
 		public StacktraceOrientations StacktraceOrientation = StacktraceOrientations.Vertical;
+		public StacktraceNamespace StacktraceNamespaceMode = StacktraceNamespace.Full;
+		public StacktraceParams StacktraceParamsMode = StacktraceParams.Full;
+		public StacktraceFilename StacktraceFilenameMode = StacktraceFilename.Full;
 		public float StacktraceOrientationAutoHeight = 300;
 		public bool UseStacktraceIgnoreFilters = true;
 		public string[] StacktraceIgnoreFilters = new string[] { };

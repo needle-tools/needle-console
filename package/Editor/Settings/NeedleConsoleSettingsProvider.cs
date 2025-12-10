@@ -137,13 +137,23 @@ namespace Needle.Console
 					if (_scope.changed) NeedleConsoleProjectSettings.RaiseColorsChangedEvent();
 				}
 
-				settings.StacktraceOrientation = (NeedleConsoleSettings.StacktraceOrientations)EditorGUILayout.EnumPopup("Stacktrace Orientation", settings.StacktraceOrientation);
-				using (new EditorGUI.DisabledScope(settings.StacktraceOrientation != NeedleConsoleSettings.StacktraceOrientations.Auto))
-				{
-					var windowHeight = Math.Max(300, Screen.height);
-					EditorGUI.indentLevel++;
-					settings.StacktraceOrientationAutoHeight = EditorGUILayout.IntSlider(new GUIContent("Auto Height (in pixel)", "The height at which the stacktrace orientation will switch from Vertical to Horizontal when Stacktrace Orientation is set to Auto."), (int)settings.StacktraceOrientationAutoHeight, 100, windowHeight);
-					EditorGUI.indentLevel--;
+				GUILayout.Space(10);
+				EditorGUILayout.LabelField("Experimental > Stacktrace", EditorStyles.boldLabel);
+				using (var _scope = new EditorGUI.ChangeCheckScope()) {
+					settings.StacktraceOrientation = (NeedleConsoleSettings.StacktraceOrientations)EditorGUILayout.EnumPopup("Orientation", settings.StacktraceOrientation);
+					using (new EditorGUI.DisabledScope(settings.StacktraceOrientation != NeedleConsoleSettings.StacktraceOrientations.Auto))
+					{
+						var windowHeight = Math.Max(300, Screen.height);
+						EditorGUI.indentLevel++;
+						settings.StacktraceOrientationAutoHeight = EditorGUILayout.IntSlider(new GUIContent("Auto Height (in pixel)", "The height at which the stacktrace orientation will switch from Vertical to Horizontal when Stacktrace Orientation is set to Auto."), (int)settings.StacktraceOrientationAutoHeight, 100, windowHeight);
+						EditorGUI.indentLevel--;
+					}
+
+					settings.StacktraceNamespaceMode = (NeedleConsoleSettings.StacktraceNamespace)EditorGUILayout.EnumPopup("Namespace", settings.StacktraceNamespaceMode);
+					settings.StacktraceParamsMode = (NeedleConsoleSettings.StacktraceParams)EditorGUILayout.EnumPopup("Parameters", settings.StacktraceParamsMode);
+					settings.StacktraceFilenameMode = (NeedleConsoleSettings.StacktraceFilename)EditorGUILayout.EnumPopup("Filename", settings.StacktraceFilenameMode);
+
+					if (_scope.changed) ThemeEditedOrChanged?.Invoke();
 				}
 
 				// using (new GUILayout.HorizontalScope())
