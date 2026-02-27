@@ -180,6 +180,10 @@ namespace Needle.Console
 						var frame = 0;
 						var hasFrame = settings.ShowFrameCount && LogFrameTracker.TryGetFrame(tempEntry.message, out frame);
 
+						// Don't cache entries that should show frame but don't have one yet
+						if (settings.ShowFrameCount && !hasFrame)
+							cacheEntry = false;
+
 						// no time:
 						if (endTimeIndex == -1)
 						{

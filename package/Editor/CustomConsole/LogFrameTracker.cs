@@ -13,7 +13,6 @@ namespace Needle.Console
 		// ConcurrentDictionary for thread safety since logMessageReceivedThreaded fires on any thread
 		private static readonly ConcurrentDictionary<string, int> messageToFrame = new ConcurrentDictionary<string, int>();
 		private const int MaxEntries = 5000;
-		private static volatile int currentFrame;
 
 		[InitializeOnLoadMethod]
 		static void Init()
@@ -21,13 +20,6 @@ namespace Needle.Console
 			// Unsubscribe first to avoid duplicate subscriptions across domain reloads
 			Application.logMessageReceivedThreaded -= OnLogMessage;
 			Application.logMessageReceivedThreaded += OnLogMessage;
-			EditorApplication.update -= TrackFrame;
-			EditorApplication.update += TrackFrame;
-		}
-
-		static void TrackFrame()
-		{
-			currentFrame = Time.frameCount;
 		}
 
 		static void OnLogMessage(string condition, string stackTrace, LogType type)
@@ -35,7 +27,8 @@ namespace Needle.Console
 			if (messageToFrame.Count > MaxEntries)
 				messageToFrame.Clear();
 
-			messageToFrame[FirstLine(condition)] = currentFrame;
+			// Read Time.frameCount directly — EditorApplication.update can lag behind
+			messageToFrame[FirstLine(condition)] = Time.frameCount;
 		}
 
 		/// <summary>
