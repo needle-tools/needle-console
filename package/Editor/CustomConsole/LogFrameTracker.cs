@@ -1,24 +1,33 @@
-using System.Collections.Generic;
+using System.Collections.Concurrent;
 using UnityEditor;
 using UnityEngine;
 
 namespace Needle.Console
 {
 	/// <summary>
-	/// Tracks the frame number for each log message via Application.logMessageReceived.
-	/// Used to display frame counts in the console prefix.
+	/// Tracks the frame number for each log message.
+	/// Used to display frame counts in the console prefix and AI copy output.
 	/// </summary>
 	internal static class LogFrameTracker
 	{
-		// Key: first line of the log message, Value: frame count when logged
-		// We use a ring buffer approach: when the dictionary gets too large, we clear it.
-		private static readonly Dictionary<string, int> messageToFrame = new Dictionary<string, int>();
+		// ConcurrentDictionary for thread safety since logMessageReceivedThreaded fires on any thread
+		private static readonly ConcurrentDictionary<string, int> messageToFrame = new ConcurrentDictionary<string, int>();
 		private const int MaxEntries = 5000;
+		private static volatile int currentFrame;
 
 		[InitializeOnLoadMethod]
 		static void Init()
 		{
-			Application.logMessageReceived += OnLogMessage;
+			// Unsubscribe first to avoid duplicate subscriptions across domain reloads
+			Application.logMessageReceivedThreaded -= OnLogMessage;
+			Application.logMessageReceivedThreaded += OnLogMessage;
+			EditorApplication.update -= TrackFrame;
+			EditorApplication.update += TrackFrame;
+		}
+
+		static void TrackFrame()
+		{
+			currentFrame = Time.frameCount;
 		}
 
 		static void OnLogMessage(string condition, string stackTrace, LogType type)
@@ -26,8 +35,7 @@ namespace Needle.Console
 			if (messageToFrame.Count > MaxEntries)
 				messageToFrame.Clear();
 
-			var key = GetKey(condition);
-			messageToFrame[key] = Time.frameCount;
+			messageToFrame[condition] = currentFrame;
 		}
 
 		/// <summary>
@@ -40,15 +48,11 @@ namespace Needle.Console
 				frame = -1;
 				return false;
 			}
-			var key = GetKey(message);
-			return messageToFrame.TryGetValue(key, out frame);
-		}
 
-		static string GetKey(string message)
-		{
-			// Use first line only as key to match against LogEntry.message which includes stacktrace
+			// Try the first line (LogEntry.message includes stacktrace after first newline)
 			var newline = message.IndexOf('\n');
-			return newline >= 0 ? message.Substring(0, newline) : message;
+			var key = newline >= 0 ? message.Substring(0, newline) : message;
+			return messageToFrame.TryGetValue(key, out frame);
 		}
 	}
 }
