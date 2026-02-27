@@ -177,19 +177,25 @@ namespace Needle.Console
 						if (settings.UseColorMarker && !string.IsNullOrWhiteSpace(colorMarker))
 							LogColor.CalcLogColor(colorKey, ref colorMarker);
 
+						var framePrefix = "";
+						if (settings.ShowFrameCount && LogFrameTracker.TryGetFrame(tempEntry.message, out var frame))
+						{
+							framePrefix = $"{colorPrefix}F{frame}{colorPostfix} ";
+						}
+
 						// no time:
 						if (endTimeIndex == -1)
 						{
 							// LogColor.AddColor(colorKey, ref text);
 							RemoveFilePathInCompilerErrorMessages(ref text);
-							text = $"{colorMarker}{prefix}{text}";
+							text = $"{framePrefix}{colorMarker}{prefix}{text}";
 						}
 						// contains time:
 						else
 						{
 							var message = text.Substring(endTimeIndex + 1);
 							RemoveFilePathInCompilerErrorMessages(ref message);
-							text = $"{colorPrefix}{text.Substring(1, endTimeIndex - 1)}{colorPostfix} {colorMarker}{prefix}{message}";
+							text = $"{colorPrefix}{text.Substring(1, endTimeIndex - 1)}{colorPostfix} {framePrefix}{colorMarker}{prefix}{message}";
 						}
 
 						if (cacheEntry)

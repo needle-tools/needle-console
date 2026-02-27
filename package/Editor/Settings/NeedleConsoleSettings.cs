@@ -130,6 +130,8 @@ namespace Needle.Console
 
 		public StacktraceOrientations StacktraceOrientation = StacktraceOrientations.Vertical;
 		public float StacktraceOrientationAutoHeight = 300;
+		public bool ShowFrameCount = false;
+
 		public bool UseStacktraceIgnoreFilters = true;
 		public string[] StacktraceIgnoreFilters = new string[] { };
 	}
