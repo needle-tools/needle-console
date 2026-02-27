@@ -177,7 +177,8 @@ namespace Needle.Console
 						if (settings.UseColorMarker && !string.IsNullOrWhiteSpace(colorMarker))
 							LogColor.CalcLogColor(colorKey, ref colorMarker);
 
-						var hasFrame = settings.ShowFrameCount && LogFrameTracker.TryGetFrame(tempEntry.message, out var frame);
+						var frame = 0;
+						var hasFrame = settings.ShowFrameCount && LogFrameTracker.TryGetFrame(tempEntry.message, out frame);
 
 						// no time:
 						if (endTimeIndex == -1)
