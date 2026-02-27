@@ -4,22 +4,11 @@ All notable changes to this package will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
-## [2.7.0-alpha.9] - 2026-02-27
-- fix: frame counter showing same frame for duplicate messages — track by log row index instead of message text
-- fix: detect console clear to reset frame tracking
-
-## [2.7.0-alpha.8] - 2026-02-27
-- fix: frame count not showing in edit mode — read Time.frameCount directly in log callback instead of lagging EditorApplication.update
-- fix: frame count not appearing for cached log rows — skip caching when frame data isn't available yet
-
-## [2.7.0-alpha.7] - 2026-02-27
-- add: "Copy Logs for AI" context menu item to copy all visible logs to clipboard in a structured, AI-friendly markdown format
-- add: "Copy This Log for AI" to copy a single log entry with full stacktrace
-- add: include project path and Editor.log path in copied output
+## [2.7.0-alpha] - 2026-02-27
+- add: "Copy Logs for AI" context menu items to copy logs in structured, AI-friendly markdown format
 - add: optional frame count display in console log rows (Preferences > Needle > Console > Show Frame Count)
-- fix: strip rich text tags (bold, color, links) from copied log messages
-- fix: skip Unity internal locations (Debug.bindings.h) in AI copy output
-- fix: remove Unity internal stacktrace noise (UIElements, GUIUtility, etc.) from AI copy output
+- add: include project path and Editor.log path in AI copy output
+- fix: strip rich text tags and Unity internal stacktrace noise from AI copy output
 
 ## [2.6.2] - 2025-12-05
 - fix: compiler error in Unity 6000.3 LTS

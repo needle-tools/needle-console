@@ -56,7 +56,7 @@ namespace Needle.Console
 			using (new ProfilerMarker("ConsoleList.ModifyText").Auto())
 			{
 				var settings = NeedleConsoleSettings.instance;
-				if (!settings.ShowLogPrefix && (string.IsNullOrWhiteSpace(settings.ColorMarker) || !settings.UseColorMarker))
+				if (!settings.ShowLogPrefix && !settings.ShowFrameCount && (string.IsNullOrWhiteSpace(settings.ColorMarker) || !settings.UseColorMarker))
 				{
 					return;
 				}
@@ -66,6 +66,10 @@ namespace Needle.Console
 					return;
 				}
 				keyBuilder.Clear();
+				// Include row in cache key when frame count is enabled,
+				// since duplicate messages have different frame numbers per row
+				if (settings.ShowFrameCount)
+					keyBuilder.Append(element.row).Append('|');
 				keyBuilder.Append(tempEntry.file).Append(tempEntry.line).Append(tempEntry.column).Append(tempEntry.mode);
 				
 #if UNITY_2021_2_OR_NEWER

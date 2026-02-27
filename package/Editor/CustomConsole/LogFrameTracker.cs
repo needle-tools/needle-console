@@ -6,12 +6,14 @@ namespace Needle.Console
 {
 	/// <summary>
 	/// Tracks the frame number for each log message by arrival order.
-	/// Index in the list corresponds to Unity's internal log entry row index.
+	/// Uses a row offset to handle domain reloads where existing logs
+	/// are already in the console before tracking starts.
 	/// </summary>
 	internal static class LogFrameTracker
 	{
-		private static readonly List<int> frames = new List<int>();
+		private static readonly Dictionary<int, int> rowToFrame = new Dictionary<int, int>();
 		private static int previousCount;
+		private static int nextRow;
 
 		[InitializeOnLoadMethod]
 		static void Init()
@@ -20,20 +22,28 @@ namespace Needle.Console
 			Application.logMessageReceived += OnLogMessage;
 			EditorApplication.update -= CheckForClear;
 			EditorApplication.update += CheckForClear;
+			// After domain reload, existing logs are already in the console
+			// Start tracking from the current count onwards
+			nextRow = LogEntries.GetCount();
+			previousCount = nextRow;
+			rowToFrame.Clear();
 		}
 
 		static void CheckForClear()
 		{
-			// Detect when the console is cleared (log count goes down)
 			var count = LogEntries.GetCount();
 			if (count < previousCount)
-				frames.Clear();
+			{
+				rowToFrame.Clear();
+				nextRow = 0;
+			}
 			previousCount = count;
 		}
 
 		static void OnLogMessage(string condition, string stackTrace, LogType type)
 		{
-			frames.Add(Time.frameCount);
+			rowToFrame[nextRow] = Time.frameCount;
+			nextRow++;
 		}
 
 		/// <summary>
@@ -41,13 +51,7 @@ namespace Needle.Console
 		/// </summary>
 		internal static bool TryGetFrame(int row, out int frame)
 		{
-			if (row >= 0 && row < frames.Count)
-			{
-				frame = frames[row];
-				return true;
-			}
-			frame = -1;
-			return false;
+			return rowToFrame.TryGetValue(row, out frame);
 		}
 	}
 }
