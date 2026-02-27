@@ -120,7 +120,7 @@ namespace Needle.Console
 			return $" ({entry.file}:{entry.line})";
 		}
 
-		static void FormatEntry(StringBuilder sb, LogEntryInfo entry, int stacktraceMaxLines = 0)
+		static void FormatEntry(StringBuilder sb, LogEntryInfo entry, int row, int stacktraceMaxLines = 0)
 		{
 			var message = entry.message;
 			if (string.IsNullOrEmpty(message)) return;
@@ -135,7 +135,7 @@ namespace Needle.Console
 			var location = GetLocation(entry);
 
 			// Add frame info if available
-			if (LogFrameTracker.TryGetFrame(message, out var frame))
+			if (LogFrameTracker.TryGetFrame(row, out var frame))
 				sb.Append("F").Append(frame).Append(" ");
 
 			sb.Append(GetPrefix(entry.mode)).Append(firstLine).AppendLine(location);
@@ -164,7 +164,7 @@ namespace Needle.Console
 			var sb = new StringBuilder();
 			AppendHeader(sb, "Unity Console Log");
 			sb.AppendLine();
-			FormatEntry(sb, entries[itemIndex].entry); // no stacktrace limit for single log
+			FormatEntry(sb, entries[itemIndex].entry, entries[itemIndex].row); // no stacktrace limit for single log
 
 			EditorGUIUtility.systemCopyBuffer = sb.ToString();
 			// No log — clipboard being filled is sufficient feedback
@@ -190,7 +190,8 @@ namespace Needle.Console
 
 			for (var i = 0; i < total; i++)
 			{
-				var entry = entries[i].entry;
+				var cached = entries[i];
+				var entry = cached.entry;
 				var message = entry.message;
 				if (string.IsNullOrEmpty(message)) continue;
 
@@ -203,7 +204,7 @@ namespace Needle.Console
 				var location = GetLocation(entry);
 
 				var framePrefix = "";
-				if (LogFrameTracker.TryGetFrame(entry.message, out var frame))
+				if (LogFrameTracker.TryGetFrame(cached.row, out var frame))
 					framePrefix = $"F{frame} ";
 
 				if (IsError(entry.mode))

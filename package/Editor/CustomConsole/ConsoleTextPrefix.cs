@@ -178,7 +178,7 @@ namespace Needle.Console
 							LogColor.CalcLogColor(colorKey, ref colorMarker);
 
 						var frame = 0;
-						var hasFrame = settings.ShowFrameCount && LogFrameTracker.TryGetFrame(tempEntry.message, out frame);
+						var hasFrame = settings.ShowFrameCount && LogFrameTracker.TryGetFrame(element.row, out frame);
 
 						// Don't cache entries that should show frame but don't have one yet
 						if (settings.ShowFrameCount && !hasFrame)

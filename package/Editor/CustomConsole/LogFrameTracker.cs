@@ -1,54 +1,53 @@
-using System.Collections.Concurrent;
+using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 
 namespace Needle.Console
 {
 	/// <summary>
-	/// Tracks the frame number for each log message.
-	/// Used to display frame counts in the console prefix and AI copy output.
+	/// Tracks the frame number for each log message by arrival order.
+	/// Index in the list corresponds to Unity's internal log entry row index.
 	/// </summary>
 	internal static class LogFrameTracker
 	{
-		// ConcurrentDictionary for thread safety since logMessageReceivedThreaded fires on any thread
-		private static readonly ConcurrentDictionary<string, int> messageToFrame = new ConcurrentDictionary<string, int>();
-		private const int MaxEntries = 5000;
+		private static readonly List<int> frames = new List<int>();
+		private static int previousCount;
 
 		[InitializeOnLoadMethod]
 		static void Init()
 		{
-			// Unsubscribe first to avoid duplicate subscriptions across domain reloads
-			Application.logMessageReceivedThreaded -= OnLogMessage;
-			Application.logMessageReceivedThreaded += OnLogMessage;
+			Application.logMessageReceived -= OnLogMessage;
+			Application.logMessageReceived += OnLogMessage;
+			EditorApplication.update -= CheckForClear;
+			EditorApplication.update += CheckForClear;
+		}
+
+		static void CheckForClear()
+		{
+			// Detect when the console is cleared (log count goes down)
+			var count = LogEntries.GetCount();
+			if (count < previousCount)
+				frames.Clear();
+			previousCount = count;
 		}
 
 		static void OnLogMessage(string condition, string stackTrace, LogType type)
 		{
-			if (messageToFrame.Count > MaxEntries)
-				messageToFrame.Clear();
-
-			// Read Time.frameCount directly — EditorApplication.update can lag behind
-			messageToFrame[FirstLine(condition)] = Time.frameCount;
+			frames.Add(Time.frameCount);
 		}
 
 		/// <summary>
-		/// Try to get the frame number for a log message.
+		/// Try to get the frame number for a log entry by its row index.
 		/// </summary>
-		internal static bool TryGetFrame(string message, out int frame)
+		internal static bool TryGetFrame(int row, out int frame)
 		{
-			if (string.IsNullOrEmpty(message))
+			if (row >= 0 && row < frames.Count)
 			{
-				frame = -1;
-				return false;
+				frame = frames[row];
+				return true;
 			}
-
-			return messageToFrame.TryGetValue(FirstLine(message), out frame);
-		}
-
-		static string FirstLine(string text)
-		{
-			var newline = text.IndexOf('\n');
-			return newline >= 0 ? text.Substring(0, newline) : text;
+			frame = -1;
+			return false;
 		}
 	}
 }
