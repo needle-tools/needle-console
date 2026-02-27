@@ -4,8 +4,11 @@ All notable changes to this package will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
-## [2.7.0-alpha.1] - 2026-02-27
+## [2.7.0-alpha.2] - 2026-02-27
 - add: "Copy Logs for AI" context menu item to copy all visible logs to clipboard in a structured, AI-friendly markdown format
+- add: "Copy This Log for AI" to copy a single log entry with full stacktrace
+- add: include project path and Editor.log path in copied output
+- fix: strip rich text tags (bold, color, links) from copied log messages
 
 ## [2.6.2] - 2025-12-05
 - fix: compiler error in Unity 6000.3 LTS

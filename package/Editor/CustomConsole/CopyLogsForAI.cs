@@ -1,4 +1,5 @@
 using System.Text;
+using System.Text.RegularExpressions;
 using UnityEditor;
 using UnityEngine;
 
@@ -14,7 +15,8 @@ namespace Needle.Console
 
 		static void OnContextMenu(GenericMenu menu, int itemIndex)
 		{
-			menu.AddItem(new GUIContent("Copy Logs for AI"), false, CopyLogs);
+			menu.AddItem(new GUIContent("Copy Logs for AI"), false, CopyAllLogs);
+			menu.AddItem(new GUIContent("Copy This Log for AI"), false, () => CopySingleLog(itemIndex));
 		}
 
 		static bool IsError(int mode) =>
@@ -27,7 +29,67 @@ namespace Needle.Console
 			ConsoleList.HasMode(mode, ConsoleWindow.Mode.ScriptingWarning |
 			                          ConsoleWindow.Mode.AssetImportWarning | ConsoleWindow.Mode.ScriptCompileWarning);
 
-		static void CopyLogs()
+		static readonly Regex RichTextTags = new Regex(@"<\/?(?:b|i|color|size|a)[^>]*>", RegexOptions.Compiled);
+
+		static string StripRichText(string text)
+		{
+			if (string.IsNullOrEmpty(text)) return text;
+			return RichTextTags.Replace(text, "");
+		}
+
+		static string GetPrefix(int mode)
+		{
+			if (IsError(mode)) return "[ERROR] ";
+			if (IsWarning(mode)) return "[WARN] ";
+			return "[LOG] ";
+		}
+
+		static void FormatEntry(StringBuilder sb, LogEntryInfo entry)
+		{
+			var message = entry.message;
+			if (string.IsNullOrEmpty(message)) return;
+
+			message = StripRichText(message);
+
+			var firstNewline = message.IndexOf('\n');
+			var firstLine = firstNewline >= 0 ? message.Substring(0, firstNewline) : message;
+			var stacktrace = firstNewline >= 0 ? message.Substring(firstNewline + 1).TrimEnd() : null;
+
+			var location = !string.IsNullOrEmpty(entry.file) ? $" ({entry.file}:{entry.line})" : "";
+
+			sb.Append(GetPrefix(entry.mode)).Append(firstLine).AppendLine(location);
+			if (!string.IsNullOrEmpty(stacktrace))
+				sb.Append("  ").AppendLine(stacktrace.Replace("\n", "\n  "));
+		}
+
+		static void AppendHeader(StringBuilder sb, string title)
+		{
+			sb.Append("## ").AppendLine(title);
+			sb.Append("Project: ").Append(Application.productName)
+				.Append(" | Unity ").AppendLine(Application.unityVersion);
+			sb.Append("Project path: ").AppendLine(Application.dataPath.Replace("/Assets", ""));
+			sb.Append("Full log: ").AppendLine(Application.consoleLogPath);
+		}
+
+		static void CopySingleLog(int itemIndex)
+		{
+			var entries = ConsoleList.CurrentEntries;
+			if (entries == null || itemIndex < 0 || itemIndex >= entries.Count)
+			{
+				EditorGUIUtility.systemCopyBuffer = "(No log selected)";
+				return;
+			}
+
+			var sb = new StringBuilder();
+			AppendHeader(sb, "Unity Console Log");
+			sb.AppendLine();
+			FormatEntry(sb, entries[itemIndex].entry);
+
+			EditorGUIUtility.systemCopyBuffer = sb.ToString();
+			Debug.Log("Copied log entry for AI to clipboard.");
+		}
+
+		static void CopyAllLogs()
 		{
 			var entries = ConsoleList.CurrentEntries;
 			if (entries == null || entries.Count == 0)
@@ -51,7 +113,8 @@ namespace Needle.Console
 				var message = entry.message;
 				if (string.IsNullOrEmpty(message)) continue;
 
-				// First line is the log message, rest is stacktrace
+				message = StripRichText(message);
+
 				var firstNewline = message.IndexOf('\n');
 				var firstLine = firstNewline >= 0 ? message.Substring(0, firstNewline) : message;
 				var stacktrace = firstNewline >= 0 ? message.Substring(firstNewline + 1).TrimEnd() : null;
@@ -68,6 +131,8 @@ namespace Needle.Console
 				else if (IsWarning(entry.mode))
 				{
 					warnings.Append("[WARN] ").Append(firstLine).AppendLine(location);
+					if (!string.IsNullOrEmpty(stacktrace))
+						warnings.Append("  ").AppendLine(stacktrace.Replace("\n", "\n  "));
 					warningCount++;
 				}
 				else
@@ -78,8 +143,7 @@ namespace Needle.Console
 			}
 
 			var sb = new StringBuilder();
-			sb.Append("## Unity Console Logs\nProject: ").Append(Application.productName)
-				.Append(" | Unity ").AppendLine(Application.unityVersion);
+			AppendHeader(sb, "Unity Console Logs");
 
 			if (errorCount > 0)
 			{
