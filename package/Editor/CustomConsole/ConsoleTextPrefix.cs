@@ -66,10 +66,6 @@ namespace Needle.Console
 					return;
 				}
 				keyBuilder.Clear();
-				// Include row in cache key when frame count is enabled,
-				// since duplicate messages have different frame numbers per row
-				if (settings.ShowFrameCount)
-					keyBuilder.Append(element.row).Append('|');
 				keyBuilder.Append(tempEntry.file).Append(tempEntry.line).Append(tempEntry.column).Append(tempEntry.mode);
 				
 #if UNITY_2021_2_OR_NEWER
@@ -84,7 +80,8 @@ namespace Needle.Console
 				
 				var key = keyBuilder.Append(text).ToString();
 				var isSelected = ConsoleList.IsSelectedRow(element.row);
-				var cacheEntry = !isSelected;
+				// Don't cache when frame count is enabled — each row has a unique frame
+				var cacheEntry = !isSelected && !settings.ShowFrameCount;
 				var isInCache = cachedInfo.ContainsKey(key);
 				if (cacheEntry && isInCache)
 				{
@@ -183,10 +180,6 @@ namespace Needle.Console
 
 						var frame = 0;
 						var hasFrame = settings.ShowFrameCount && LogFrameTracker.TryGetFrame(element.row, out frame);
-
-						// Don't cache entries that should show frame but don't have one yet
-						if (settings.ShowFrameCount && !hasFrame)
-							cacheEntry = false;
 
 						// no time:
 						if (endTimeIndex == -1)
