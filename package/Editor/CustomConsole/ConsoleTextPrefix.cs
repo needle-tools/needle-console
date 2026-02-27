@@ -194,7 +194,7 @@ namespace Needle.Console
 							var message = text.Substring(endTimeIndex + 1);
 							RemoveFilePathInCompilerErrorMessages(ref message);
 							var timePart = $"{colorPrefix}{text.Substring(1, endTimeIndex - 1)}{colorPostfix}";
-							var framePart = hasFrame ? $" {colorPrefix}{frame}{colorPostfix}" : "";
+							var framePart = hasFrame ? $" {colorPrefix}#{frame}{colorPostfix}" : "";
 							text = $"{timePart}{framePart} {colorMarker}{prefix}{message}";
 						}
 
