@@ -905,7 +905,7 @@ namespace Needle.Console
 			try
 			{
 				LogEntryContextMenu?.Invoke(menu, itemIndex);
-				if (menu.GetItemCount() > 1)
+				if (menu.GetItemCount() > 1 && itemIndex >= 0 && itemIndex < currentEntries.Count)
 				{
 					var current = currentEntries[itemIndex];
 					var file = current.entry.file;

@@ -35,7 +35,7 @@ namespace Needle.Console
 			if (messageToFrame.Count > MaxEntries)
 				messageToFrame.Clear();
 
-			messageToFrame[condition] = currentFrame;
+			messageToFrame[FirstLine(condition)] = currentFrame;
 		}
 
 		/// <summary>
@@ -49,10 +49,13 @@ namespace Needle.Console
 				return false;
 			}
 
-			// Try the first line (LogEntry.message includes stacktrace after first newline)
-			var newline = message.IndexOf('\n');
-			var key = newline >= 0 ? message.Substring(0, newline) : message;
-			return messageToFrame.TryGetValue(key, out frame);
+			return messageToFrame.TryGetValue(FirstLine(message), out frame);
+		}
+
+		static string FirstLine(string text)
+		{
+			var newline = text.IndexOf('\n');
+			return newline >= 0 ? text.Substring(0, newline) : text;
 		}
 	}
 }
