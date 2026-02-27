@@ -167,7 +167,7 @@ namespace Needle.Console
 			FormatEntry(sb, entries[itemIndex].entry); // no stacktrace limit for single log
 
 			EditorGUIUtility.systemCopyBuffer = sb.ToString();
-			Debug.Log("Copied log entry for AI to clipboard.");
+			// No log — clipboard being filled is sufficient feedback
 		}
 
 		static void CopyAllLogs()
@@ -255,7 +255,7 @@ namespace Needle.Console
 				sb.Append("\n(Showing ").Append(maxEntries).Append(" of ").Append(entries.Count).AppendLine(" entries)");
 
 			EditorGUIUtility.systemCopyBuffer = sb.ToString();
-			Debug.Log($"Copied {total} log entries for AI to clipboard.");
+			// No log — clipboard being filled is sufficient feedback
 		}
 	}
 }
