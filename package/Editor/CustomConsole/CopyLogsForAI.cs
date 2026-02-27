@@ -16,8 +16,8 @@ namespace Needle.Console
 
 		static void OnContextMenu(GenericMenu menu, int itemIndex)
 		{
-			menu.AddItem(new GUIContent("Copy for AI/This Log"), false, () => CopySingleLog(itemIndex));
-			menu.AddItem(new GUIContent("Copy for AI/All Visible Logs"), false, CopyAllLogs);
+			menu.AddItem(new GUIContent("Copy/This Log for AI"), false, () => CopySingleLog(itemIndex));
+			menu.AddItem(new GUIContent("Copy/All Visible Logs for AI"), false, CopyAllLogs);
 		}
 
 		static bool IsError(int mode) =>
