@@ -599,7 +599,25 @@ namespace Needle.Console
 			if ((evt.type == EventType.ValidateCommand || evt.type == EventType.ExecuteCommand) && evt.commandName == EventCommandNames.Copy && tempContent != null)
 			{
 				if (evt.type == EventType.ExecuteCommand)
-					EditorGUIUtility.systemCopyBuffer = text;
+				{
+					if (selectedIndices.Count > 1)
+					{
+						var sorted = new List<int>(selectedIndices);
+						sorted.Sort();
+						var sb = new System.Text.StringBuilder();
+						foreach (var i in sorted)
+						{
+							if (i < 0 || i >= currentEntries.Count) continue;
+							if (sb.Length > 0) sb.AppendLine();
+							sb.Append(currentEntries[i].entry.message);
+						}
+						EditorGUIUtility.systemCopyBuffer = sb.ToString();
+					}
+					else
+					{
+						EditorGUIUtility.systemCopyBuffer = text;
+					}
+				}
 				evt.Use();
 			}
 			
