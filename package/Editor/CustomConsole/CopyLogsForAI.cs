@@ -16,10 +16,10 @@ namespace Needle.Console
 
 		static void OnContextMenu(GenericMenu menu, int itemIndex)
 		{
-			menu.AddItem(new GUIContent("Copy/This Log for AI"), false, () => CopySingleLog(itemIndex));
+			menu.AddItem(new GUIContent("Copy Log\tfor AI"), false, () => CopySingleLog(itemIndex));
 			if (ConsoleList.SelectedIndices.Count > 1)
-				menu.AddItem(new GUIContent("Copy/Selected Logs for AI"), false, CopySelectedLogs);
-			menu.AddItem(new GUIContent("Copy/All Visible Logs for AI"), false, CopyAllLogs);
+				menu.AddItem(new GUIContent("Copy Selected Logs\tfor AI"), false, CopySelectedLogs);
+			menu.AddItem(new GUIContent("Copy Visible Logs\tfor AI"), false, CopyAllLogs);
 		}
 
 		static bool IsError(int mode) =>
