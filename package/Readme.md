@@ -16,7 +16,7 @@
 - Editor-only logs without impact on builds
 - Fixes to source code links
 - Stacktrace orientation support: Render the stacktrace at the bottom (default) or on the right side
-- Copy logs for AI: Right-click to copy single, selected, or all visible logs in a structured format optimized for AI assistants. Supports multi-select with Ctrl+click and Shift+click.
+- Copy logs for AI: Right-click to copy single, selected, or all visible logs in a structured format optimized for AI assistants. Includes project path and Editor.log path for easy context sharing. Supports multi-select with Ctrl+click and Shift+click.
 
  
 ## License  
