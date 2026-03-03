@@ -172,7 +172,7 @@ namespace Needle.Console
 			// No log — clipboard being filled is sufficient feedback
 		}
 
-		static void CopySelectedLogs()
+		internal static void CopySelectedLogs()
 		{
 			var entries = ConsoleList.CurrentEntries;
 			var indices = ConsoleList.SelectedIndices;
