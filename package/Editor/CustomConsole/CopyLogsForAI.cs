@@ -20,6 +20,7 @@ namespace Needle.Console
 			if (ConsoleList.SelectedIndices.Count > 1)
 				menu.AddItem(new GUIContent("Copy Selected Logs\tfor AI"), false, CopySelectedLogs);
 			menu.AddItem(new GUIContent("Copy Visible Logs\tfor AI"), false, CopyAllLogs);
+			menu.AddItem(new GUIContent("Open Logs Directory"), false, OpenLogsDirectory);
 		}
 
 		static bool IsError(int mode) =>
@@ -152,6 +153,17 @@ namespace Needle.Console
 				.Append(" | Unity ").AppendLine(Application.unityVersion);
 			sb.Append("Project path: ").AppendLine(Application.dataPath.Replace("/Assets", ""));
 			sb.Append("Full log: ").AppendLine(Application.consoleLogPath);
+		}
+
+	static void OpenLogsDirectory()
+		{
+			var logPath = Application.consoleLogPath;
+			if (!string.IsNullOrEmpty(logPath))
+			{
+				var directory = System.IO.Path.GetDirectoryName(logPath);
+				if (!string.IsNullOrEmpty(directory))
+					EditorUtility.RevealInFinder(logPath);
+			}
 		}
 
 		static void CopySingleLog(int itemIndex)
