@@ -17,6 +17,8 @@ namespace Needle.Console
 		static void OnContextMenu(GenericMenu menu, int itemIndex)
 		{
 			menu.AddItem(new GUIContent("Copy/This Log for AI"), false, () => CopySingleLog(itemIndex));
+			if (ConsoleList.SelectedIndices.Count > 1)
+				menu.AddItem(new GUIContent("Copy/Selected Logs for AI"), false, CopySelectedLogs);
 			menu.AddItem(new GUIContent("Copy/All Visible Logs for AI"), false, CopyAllLogs);
 		}
 
@@ -168,6 +170,32 @@ namespace Needle.Console
 
 			EditorGUIUtility.systemCopyBuffer = sb.ToString();
 			// No log — clipboard being filled is sufficient feedback
+		}
+
+		static void CopySelectedLogs()
+		{
+			var entries = ConsoleList.CurrentEntries;
+			var indices = ConsoleList.SelectedIndices;
+			if (entries == null || indices.Count == 0)
+			{
+				EditorGUIUtility.systemCopyBuffer = "(No logs selected)";
+				return;
+			}
+
+			var sb = new StringBuilder();
+			AppendHeader(sb, "Unity Console Logs (Selected)");
+			sb.AppendLine();
+
+			var sorted = new System.Collections.Generic.List<int>(indices);
+			sorted.Sort();
+
+			foreach (var i in sorted)
+			{
+				if (i < 0 || i >= entries.Count) continue;
+				FormatEntry(sb, entries[i].entry, entries[i].row);
+			}
+
+			EditorGUIUtility.systemCopyBuffer = sb.ToString();
 		}
 
 		static void CopyAllLogs()

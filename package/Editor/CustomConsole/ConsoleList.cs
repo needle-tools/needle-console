@@ -72,8 +72,11 @@ namespace Needle.Console
 			set => SessionState.SetInt("NeedleConsole-SelectedRow", value);
 		}
 
-		private static int previouslySelectedRowIndex = -2, rowDoubleClicked = -1; 
+		private static int previouslySelectedRowIndex = -2, rowDoubleClicked = -1;
 		private static int selectedRowNumber = -1;
+
+		private static readonly HashSet<int> selectedIndices = new HashSet<int>();
+		internal static IReadOnlyCollection<int> SelectedIndices => selectedIndices;
 
 		private static string selectedText
 		{
@@ -123,7 +126,7 @@ namespace Needle.Console
 		{
 			if (DrawCustom)
 			{
-				return row == selectedRowNumber;
+				return row == selectedRowNumber || selectedIndices.Contains(row);
 			}
 
 			return false;
@@ -161,6 +164,7 @@ namespace Needle.Console
 						selectedText = null;
 						SelectedRowIndex = -1;
 						previouslySelectedRowIndex = -1;
+						selectedIndices.Clear();
 					}
 
 					var shouldUpdateLogs = ConsoleFilter.ShouldUpdate(count);
@@ -407,7 +411,33 @@ namespace Needle.Console
 									scrollEntryInteractionTime = DateTime.Now;
 
 									isAutoScrolling = false;
-									SelectRow(k);
+
+									if (evt.control)
+									{
+										// Ctrl+click: toggle index in multi-select
+										if (selectedIndices.Contains(k))
+											selectedIndices.Remove(k);
+										else
+											selectedIndices.Add(k);
+										SelectRow(k);
+									}
+									else if (evt.shift && SelectedRowIndex >= 0)
+									{
+										// Shift+click: range select from current to clicked
+										var from = Math.Min(SelectedRowIndex, k);
+										var to = Math.Max(SelectedRowIndex, k);
+										selectedIndices.Clear();
+										for (var r = from; r <= to; r++)
+											selectedIndices.Add(r);
+										SelectRow(k);
+									}
+									else
+									{
+										// Plain click: single select
+										selectedIndices.Clear();
+										selectedIndices.Add(k);
+										SelectRow(k);
+									}
 
 									if (previouslySelectedRowIndex == SelectedRowIndex)
 									{
@@ -468,9 +498,10 @@ namespace Needle.Console
 					break;
 				case EventType.MouseUp when Event.current.button == 0:
 					if (!leftClickedLog && new Rect(0,0, console.position.width, console.position.height).Contains(Event.current.mousePosition))
-					{ 
-						SelectRow(-1); 
-						console.Repaint(); 
+					{
+						selectedIndices.Clear();
+						SelectRow(-1);
+						console.Repaint();
 					}
 
 					break;
@@ -645,7 +676,7 @@ namespace Needle.Console
 			
 			var row = index;
 			var item = currentEntries[index];
-			var entryIsSelected = selectedRowNumber == item.row;
+			var entryIsSelected = selectedRowNumber == item.row || selectedIndices.Contains(index);
 			var entry = item.entry;
 			element.row = item.row;
 			element.position = rect;
@@ -766,6 +797,7 @@ namespace Needle.Console
 					SelectedRowIndex = -1;
 					selectedRowNumber = -1;
 					selectedText = null;
+					selectedIndices.Clear();
 					isAutoScrolling = false;
 					break;
 
@@ -787,12 +819,14 @@ namespace Needle.Console
 				case KeyCode.RightArrow:
 					if (SelectedRowIndex >= 0)
 					{
+						selectedIndices.Clear();
 						var newIndex = SelectedRowIndex + (int) (scrollAreaHeight / lineHeight);
 						newIndex = Mathf.Clamp(newIndex, 0, currentEntries.Count);
 						if (newIndex >= 0 && (newIndex) < currentEntries.Count)
 						{
 							SetScroll(scroll.y + (newIndex - SelectedRowIndex) * lineHeight);
 							SelectRow(newIndex);
+							selectedIndices.Add(SelectedRowIndex);
 							console.Repaint();
 						}
 					}
@@ -809,12 +843,14 @@ namespace Needle.Console
 				case KeyCode.LeftArrow:
 					if (SelectedRowIndex >= 0)
 					{
+						selectedIndices.Clear();
 						var newIndex = SelectedRowIndex - (int) (scrollAreaHeight / lineHeight);
 						newIndex = Mathf.Clamp(newIndex, 0, currentEntries.Count);
 						if (newIndex >= 0 && (newIndex) < currentEntries.Count)
 						{
 							SetScroll(scroll.y + (newIndex - SelectedRowIndex) * lineHeight);
 							SelectRow(newIndex);
+							selectedIndices.Add(SelectedRowIndex);
 							console.Repaint();
 						}
 					}
@@ -825,8 +861,10 @@ namespace Needle.Console
 				case KeyCode.DownArrow:
 					if (SelectedRowIndex >= 0 && (SelectedRowIndex + 1) < currentEntries.Count)
 					{
+						selectedIndices.Clear();
 						SetScroll(scroll.y + lineHeight);
 						SelectRow(SelectedRowIndex + 1);
+						selectedIndices.Add(SelectedRowIndex);
 						// if(selectedRow * lineHeight > scroll.y + (contentHeight - scrollAreaHeight))
 						// 	scrollArea
 						console.Repaint();
@@ -837,7 +875,9 @@ namespace Needle.Console
 				case KeyCode.UpArrow:
 					if (currentEntries.Count > 0 && SelectedRowIndex > 0 && SelectedRowIndex < currentEntries.Count)
 					{
+						selectedIndices.Clear();
 						SelectRow(SelectedRowIndex - 1);
+						selectedIndices.Add(SelectedRowIndex);
 						SetScroll(scroll.y - lineHeight);
 						if (scroll.y < 0) SetScroll(0);
 						console.Repaint();
