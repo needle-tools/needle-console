@@ -79,7 +79,8 @@ namespace Needle.Console
 				settings.ShortenFilePaths = EditorGUILayout.Toggle(new GUIContent("Short File Paths", "When enabled Needle Console tries to shorten package paths to <package_name>@<version> <fileName><line>"), settings.ShortenFilePaths);
 				settings.ShowLogPrefix = EditorGUILayout.Toggle(new GUIContent("Show Filename", "When enabled Needle Console will prefix console log entries with the file name of the log source"), settings.ShowLogPrefix);
 				settings.HideInternalStacktrace = EditorGUILayout.Toggle(new GUIContent("Clean Stacktrace", "When enabled internal stacktrace elements will not be shown (e.g. System.Tasks or internal UnityEngine method calls). Changes will take effect for new logs (already logged items will not be updates)"), settings.HideInternalStacktrace);
-				settings.ShowFrameCount = EditorGUILayout.Toggle(new GUIContent("Show Frame Count", "When enabled, the frame number when the log was emitted is shown in the console row prefix. Works in both play mode and edit mode."), settings.ShowFrameCount);
+				// TODO: Frame count feature disabled until timing/caching issues are resolved
+				// settings.ShowFrameCount = EditorGUILayout.Toggle(new GUIContent("Show Frame Count", "When enabled, the frame number when the log was emitted is shown in the console row prefix."), settings.ShowFrameCount);
 
 				EditorGUILayout.Space();
 				using (new GUILayout.HorizontalScope())
