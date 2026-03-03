@@ -16,6 +16,7 @@ Needle Console is [available on the Asset Store](https://assetstore.unity.com/pa
 - Console hyperlinks
 - Editor-only logs (extensible)
 - Fixes to source code links
+- Copy logs for AI: copy single, selected, or all visible logs in a structured AI-friendly format (with multi-select via Ctrl+click / Shift+click)
 
 ## How to Install
 
