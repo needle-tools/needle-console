@@ -97,9 +97,11 @@ namespace Needle.Console
 						yield return CodeInstruction.Call(typeof(ConsoleToolbarIcon), nameof(ConsoleToolbarIcon.OnDrawToolbar));
 					}
 
-					// TODO: properly search for the right spots
-					// this is right before  SplitterGUILayout.BeginVerticalSplit(spl);
-#if UNITY_6000_2_OR_NEWER
+				// TODO: properly search for the right spots
+				// this is right before  SplitterGUILayout.BeginVerticalSplit(spl);
+#if UNITY_6000_3_OR_NEWER
+					if (index == 394)
+#elif UNITY_6000_2_OR_NEWER
 					if (index == 380)
 					// if (index == 374) // Unity < 6000.2.6
 #elif UNITY_6000_0_OR_NEWER || UNITY_2022_3_OR_NEWER
@@ -113,7 +115,7 @@ namespace Needle.Console
 #elif UNITY_2020_1_OR_NEWER
 					if (index == 318)
 #else // 2019
-					if (index == -1)
+				if (index == -1)
 #endif
 					{
 						yield return new CodeInstruction(OpCodes.Ldarg_0);
@@ -124,7 +126,7 @@ namespace Needle.Console
 					yield return inst;
 				}
 #else
-			if (SessionState.GetBool("NeedleConsole:NetStandardIsUnsupportedWarning", false) == false)
+				if (SessionState.GetBool("NeedleConsole:NetStandardIsUnsupportedWarning", false) == false)
 			{
 				SessionState.SetBool("NeedleConsole:NetStandardIsUnsupportedWarning", true);
 				UnityEngine.Debug.LogWarning("Needle Console does currently not support .NET Standard ('Project Settings/Player/Editor Assemblies Compatibility Level') set to : https://github.com/needle-tools/needle-console/issues/27");

@@ -56,7 +56,7 @@ namespace Needle.Console
 			using (new ProfilerMarker("ConsoleList.ModifyText").Auto())
 			{
 				var settings = NeedleConsoleSettings.instance;
-				if (!settings.ShowLogPrefix && (string.IsNullOrWhiteSpace(settings.ColorMarker) || !settings.UseColorMarker))
+				if (!settings.ShowLogPrefix && !settings.ShowFrameCount && (string.IsNullOrWhiteSpace(settings.ColorMarker) || !settings.UseColorMarker))
 				{
 					return;
 				}
@@ -80,7 +80,8 @@ namespace Needle.Console
 				
 				var key = keyBuilder.Append(text).ToString();
 				var isSelected = ConsoleList.IsSelectedRow(element.row);
-				var cacheEntry = !isSelected;
+				// Don't cache when frame count is enabled — each row has a unique frame
+				var cacheEntry = !isSelected && !settings.ShowFrameCount;
 				var isInCache = cachedInfo.ContainsKey(key);
 				if (cacheEntry && isInCache)
 				{
@@ -177,19 +178,25 @@ namespace Needle.Console
 						if (settings.UseColorMarker && !string.IsNullOrWhiteSpace(colorMarker))
 							LogColor.CalcLogColor(colorKey, ref colorMarker);
 
+						var frame = 0;
+						var hasFrame = settings.ShowFrameCount && LogFrameTracker.TryGetFrame(element.row, out frame);
+
 						// no time:
 						if (endTimeIndex == -1)
 						{
 							// LogColor.AddColor(colorKey, ref text);
 							RemoveFilePathInCompilerErrorMessages(ref text);
-							text = $"{colorMarker}{prefix}{text}";
+							var framePrefix = hasFrame ? $"{colorPrefix}{frame}{colorPostfix} " : "";
+							text = $"{framePrefix}{colorMarker}{prefix}{text}";
 						}
 						// contains time:
 						else
 						{
 							var message = text.Substring(endTimeIndex + 1);
 							RemoveFilePathInCompilerErrorMessages(ref message);
-							text = $"{colorPrefix}{text.Substring(1, endTimeIndex - 1)}{colorPostfix} {colorMarker}{prefix}{message}";
+							var timePart = $"{colorPrefix}{text.Substring(1, endTimeIndex - 1)}{colorPostfix}";
+							var framePart = hasFrame ? $" {colorPrefix}#{frame}{colorPostfix}" : "";
+							text = $"{timePart}{framePart} {colorMarker}{prefix}{message}";
 						}
 
 						if (cacheEntry)

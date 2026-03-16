@@ -155,6 +155,8 @@ namespace Needle.Console
 		public StacktraceParams StacktraceParamsMode = StacktraceParams.Full;
 		public StacktraceFilename StacktraceFilenameMode = StacktraceFilename.Full;
 		public float StacktraceOrientationAutoHeight = 300;
+		public bool ShowFrameCount = false;
+
 		public bool UseStacktraceIgnoreFilters = true;
 		public string[] StacktraceIgnoreFilters = new string[] { };
 	}

@@ -4,6 +4,18 @@ All notable changes to this package will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## [2.7.0] - 2026-03-03
+- add: "Copy Logs for AI" context menu items to copy logs in structured, AI-friendly markdown format
+- add: multi-select log entries with Ctrl+click (toggle) and Shift+click (range)
+- add: "Copy/Selected Logs for AI" context menu item when multiple logs are selected
+- add: Ctrl+C copies all selected logs in AI-friendly format when multiple are selected
+- add: optional frame count display in console log rows (Preferences > Needle > Console > Show Frame Count)
+- add: include project path and Editor.log path in AI copy output
+- fix: strip rich text tags and Unity internal stacktrace noise from AI copy output
+
+## [2.6.2] - 2025-12-05
+- fix: compiler error in Unity 6000.3 LTS
+
 ## [2.6.1] - 2025-11-02
 - add: indentation to wrapped lines ([PR 41](https://github.com/needle-tools/needle-console/pull/41))
 
