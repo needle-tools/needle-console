@@ -204,7 +204,28 @@ namespace Needle.Console
 					if (colorDict.TryGetValue("link", out var col))
 					{
 						var displayUrl = link.Value.Substring(linkPrefix.Length).TrimEnd(')');
-						line += $" <a href=\"{link.Groups["hyperlink"].Value}\" line=\"{link.Groups["line"].Value}\"><color={col}>in {displayUrl}</color></a>";
+
+						// Trim the preceding path from the filename.
+						if (NeedleConsoleSettings.instance.StacktraceFilenameMode == NeedleConsoleSettings.StacktraceFilename.Compact)
+						{
+							var lastSlashIndex = displayUrl.LastIndexOf("/", StringComparison.Ordinal);
+							if (lastSlashIndex != -1)
+							{
+								displayUrl = displayUrl[(lastSlashIndex + 1)..];
+							}
+						}
+
+						var lineIndex = link.Groups["line"].Value;
+						line = NeedleConsoleSettings.instance.StacktraceFilenameMode switch
+						{
+							NeedleConsoleSettings.StacktraceFilename.Full
+								=> $"{line} <a href=\"{link.Groups["hyperlink"].Value}\" line=\"{lineIndex}\"><color={col}>in {displayUrl}</color></a>",
+							NeedleConsoleSettings.StacktraceFilename.Compact
+								=> $"{line} <a href=\"{link.Groups["hyperlink"].Value}\" line=\"{lineIndex}\"><color={col}>{displayUrl}</color></a>",
+							NeedleConsoleSettings.StacktraceFilename.Inline
+								=> $"<a href=\"{link.Groups["hyperlink"].Value}\" line=\"{lineIndex}\">{line}<color={col}>:{lineIndex}</color></a>",
+							_ => throw new ArgumentOutOfRangeException(),
+						};
 					}
 					else
 						line += link.Value;
