@@ -4,6 +4,9 @@ All notable changes to this package will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## [2.7.1] - 2026-06-26
+- fix: Unity 6000.3+ compatibility
+
 ## [2.7.0] - 2026-03-03
 - add: "Copy Logs for AI" context menu items to copy logs in structured, AI-friendly markdown format
 - add: multi-select log entries with Ctrl+click (toggle) and Shift+click (range)
