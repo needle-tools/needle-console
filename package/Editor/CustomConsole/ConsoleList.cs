@@ -447,8 +447,13 @@ namespace Needle.Console
 									}
 									else
 									{
+#if UNITY_6000_4_OR_NEWER		
+										if (entry.entry.entityId.IsValid())
+											EditorGUIUtility.PingObject(entry.entry.entityId);
+#else
 										if (entry.entry.instanceID != 0)
 											EditorGUIUtility.PingObject(entry.entry.instanceID);
+#endif
 										else if (entry.entry.IsCompilerError())
 											ConsoleUtils.TryPingFile(entry.entry.file);
 									}

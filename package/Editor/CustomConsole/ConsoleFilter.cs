@@ -65,7 +65,11 @@ namespace Needle.Console
 		public string message;
 		public string file;
 		public int line;
+#if UNITY_6000_4_OR_NEWER
+		public EntityId entityId;
+#else
 		public int instanceID;
+#endif
 		public int mode;
 
 		internal LogEntryInfo(LogEntry entry)
@@ -73,7 +77,11 @@ namespace Needle.Console
 			this.message = entry.message;
 			this.file = entry.file;
 			this.line = entry.line;
+#if UNITY_6000_4_OR_NEWER
+			this.entityId = entry.entityId;
+#else
 			this.instanceID = entry.instanceID;
+#endif
 			this.mode = entry.mode;
 		}
 	}
@@ -126,8 +134,13 @@ namespace Needle.Console
 		private static readonly List<IConsoleFilter> registeredFilters = new List<IConsoleFilter>();
 		private static readonly List<Stats> registeredFiltersStats = new List<Stats>();
 
+#if UNITY_6000_4_OR_NEWER
+		private static readonly Dictionary<(string preview, EntityId entityId), bool> cachedLogResultForMask =
+			new Dictionary<(string preview, EntityId entityId), bool>();
+#else
 		private static readonly Dictionary<(string preview, int instanceId), bool> cachedLogResultForMask =
 			new Dictionary<(string preview, int instanceId), bool>();
+#endif
 
 		private static readonly List<LogEntry> logEntries = new List<LogEntry>();
 
@@ -271,7 +284,12 @@ namespace Needle.Console
 					bool cacheRes;
 					using (new ProfilerMarker("Filter.GetCachedValue").Auto())
 					{
+#if UNITY_6000_4_OR_NEWER
+						isCached = cachedLogResultForMask.TryGetValue((preview, entry.entityId), out cacheRes);
+#else
 						isCached = cachedLogResultForMask.TryGetValue((preview, entry.instanceID), out cacheRes);
+#endif
+
 					}
 
 					if (isCached)
@@ -341,7 +359,11 @@ namespace Needle.Console
 						}
 					}
 
+#if UNITY_6000_4_OR_NEWER					
+					var key = (preview, entry.entityId);
+#else
 					var key = (preview, entry.instanceID);
+#endif
 					if (!cachedLogResultForMask.ContainsKey(key))
 						cachedLogResultForMask.Add(key, skip);
 					if (enabled && skip) continue;

@@ -70,7 +70,11 @@ namespace Needle.Console
 		#endregion
 
 		[SerializeField] public List<FilterBase<string>.FilterEntry> messages, files, packages, warnings, namespaces;
+#if UNITY_6000_4_OR_NEWER		
+		[SerializeField] public List<FilterBase<EntityId>.FilterEntry> ids;
+#else
 		[SerializeField] public List<FilterBase<int>.FilterEntry> ids;
+#endif
 		[SerializeField] public List<FilterBase<FileLine>.FilterEntry> lines;
 		[SerializeField] public List<FilterBase<LogTime>.FilterEntry> times;
 

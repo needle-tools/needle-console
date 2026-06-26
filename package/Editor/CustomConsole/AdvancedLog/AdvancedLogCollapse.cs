@@ -41,7 +41,11 @@ namespace Needle.Console
 
 			builder.Clear();
 			builder.Append(entry.file).Append("::").Append(entry.line);
+#if UNITY_6000_4_OR_NEWER
+			if (entry.entityId.IsValid()) builder.Append("@").Append(entry.entityId.ToString());
+#else
 			if (entry.instanceID != 0) builder.Append("@").Append(entry.instanceID);
+#endif
 			var key = builder.ToString();
 			if (NeedleConsoleSettings.instance.IndividualCollapsePreserveContext)
 			{

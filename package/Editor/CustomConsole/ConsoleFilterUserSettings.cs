@@ -61,8 +61,13 @@ namespace Needle.Console
 		
 		[SerializeField]
 		private List<FilterBase<string>.FilterEntry> messages, files, packages, warnings, @namespace;
+
 		[SerializeField]
+#if UNITY_6000_4_OR_NEWER
+		private List<FilterBase<EntityId>.FilterEntry> ids;
+#else
 		private List<FilterBase<int>.FilterEntry> ids;
+#endif
 		[SerializeField]
 		private List<FilterBase<FileLine>.FilterEntry> lines;
 		[SerializeField]
