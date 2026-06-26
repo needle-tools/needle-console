@@ -124,8 +124,11 @@ namespace Needle.Console
 							SyntaxHighlighting.AddSyntaxHighlighting(ref line);
 
 						var l = line.Trim();
-#if UNITY_6000_0_OR_NEWER
-						// Indent wrapped lines.
+#if UNITY_6000_0_OR_NEWER && !UNITY_6000_4_OR_NEWER
+						// Indent wrapped lines (hanging indent built from rich text tags).
+						// Disabled on Unity 6.4+: the changed IMGUI text engine renders <line-indent>
+						// incorrectly, so the wrapped continuation of a long line overdraws the start of
+						// the line (e.g. a method signature's parameter list overlapping the method name).
 						l = "<indent=0.75em><line-indent=-0.75em>" + l + "</line-indent></indent>";
 #endif
 						if (!string.IsNullOrEmpty(l))
