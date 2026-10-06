@@ -40,7 +40,7 @@ namespace Needle.Console
 			if (serializedObject == null || serializedObject.targetObject != settings)
 			{
 				serializedObject = new SerializedObject(settings);
-				serializedObject.targetObject.hideFlags = HideFlags.None; // Ensure it's editable
+				serializedObject.targetObject.hideFlags = HideFlags.DontSave; // Ensure it's editable but out of scene
 			}
 		}
 
