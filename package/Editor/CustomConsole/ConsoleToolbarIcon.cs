@@ -50,9 +50,9 @@ namespace Needle.Console
 			NeedleConsoleSettings.instance.StacktraceOrientation = (NeedleConsoleSettings.StacktraceOrientations)
 				EditorGUILayout.CycleButton((int) NeedleConsoleSettings.instance.StacktraceOrientation, new GUIContent[]
 				{
-					new(orientationVerticalIcon, "Stacktrace orientation: Vertical. \n\nClick to cycle through options"),
-					new(orientationHorizontalIcon, "Stacktrace orientation: Horizontal. \n\nClick to cycle through options."),
-					new(orientationAutoIcon, $"Stacktrace orientation: Auto. Your stacktrace will use vertical orientation or change to horizontal orientation when your Console window height is below {NeedleConsoleSettings.instance.StacktraceOrientationAutoHeight} pixel. \n\nClick to cycle through options."),
+					new GUIContent(orientationVerticalIcon, "Stacktrace orientation: Vertical. \n\nClick to cycle through options"),
+					new GUIContent(orientationHorizontalIcon, "Stacktrace orientation: Horizontal. \n\nClick to cycle through options."),
+					new GUIContent(orientationAutoIcon, $"Stacktrace orientation: Auto. Your stacktrace will use vertical orientation or change to horizontal orientation when your Console window height is below {NeedleConsoleSettings.instance.StacktraceOrientationAutoHeight} pixel. \n\nClick to cycle through options."),
 				}, ConsoleWindow.Constants.MiniButton);
 			
 			// draw vertical line

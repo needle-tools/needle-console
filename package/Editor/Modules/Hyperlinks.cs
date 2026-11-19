@@ -31,15 +31,15 @@ namespace Needle.Console
 
 					if (NeedleConsoleSettings.instance.HideInternalStacktrace)
 					{
-						if (line.Contains("/Users/bokken/build", StringComparison.OrdinalIgnoreCase)
-						|| line.Contains("UnityEngine.UnitySynchronizationContext+", StringComparison.OrdinalIgnoreCase)
-						|| line.Contains("UnityEngine.UnitySynchronizationContext.Exec(", StringComparison.OrdinalIgnoreCase)
-						|| line.Contains("System.Threading.Tasks.Task", StringComparison.OrdinalIgnoreCase)
-						|| line.Contains("System.Threading.Tasks.Await", StringComparison.OrdinalIgnoreCase)
-						|| line.Contains("System.Threading.Tasks.SynchronizationContextAwaitTaskContinuation", StringComparison.OrdinalIgnoreCase)
-						|| line.Contains("System.Runtime.CompilerServices.AsyncMethodBuilderCore", StringComparison.OrdinalIgnoreCase)
-						|| line.Contains("System.Runtime.CompilerServices.AsyncMethodBuilder", StringComparison.OrdinalIgnoreCase)
-						|| line.Contains("System.Runtime.CompilerServices.AsyncTaskMethodBuilder", StringComparison.OrdinalIgnoreCase)
+						if (line.IndexOf("/Users/bokken/build", StringComparison.OrdinalIgnoreCase) >= 0
+						|| line.IndexOf("UnityEngine.UnitySynchronizationContext+", StringComparison.OrdinalIgnoreCase) >= 0
+						|| line.IndexOf("UnityEngine.UnitySynchronizationContext.Exec(", StringComparison.OrdinalIgnoreCase) >= 0
+						|| line.IndexOf("System.Threading.Tasks.Task", StringComparison.OrdinalIgnoreCase) >= 0
+						|| line.IndexOf("System.Threading.Tasks.Await", StringComparison.OrdinalIgnoreCase) >= 0
+						|| line.IndexOf("System.Threading.Tasks.SynchronizationContextAwaitTaskContinuation", StringComparison.OrdinalIgnoreCase) >= 0
+						|| line.IndexOf("System.Runtime.CompilerServices.AsyncMethodBuilderCore", StringComparison.OrdinalIgnoreCase) >= 0
+						|| line.IndexOf("System.Runtime.CompilerServices.AsyncMethodBuilder", StringComparison.OrdinalIgnoreCase) >= 0
+						|| line.IndexOf("System.Runtime.CompilerServices.AsyncTaskMethodBuilder", StringComparison.OrdinalIgnoreCase) >= 0
 						)
 						{
 							continue;
